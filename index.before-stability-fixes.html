@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff7ec">
+  <title>オウチエイゴ</title>
+  <style>
+    :root { --ink:#26364a; --peach:#ffe4c4; --orange:#f79256; --blue:#66b7d6; --green:#75bd8b; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100svh; display:grid; place-items:center; background:#e9f4f7; color:var(--ink); font-family:"Hiragino Maru Gothic ProN", "Hiragino Maru Gothic Pro", "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif; touch-action:manipulation; }
+    [hidden] { display:none !important; }
+    .app { width:min(100%, 430px); min-height:100svh; background:#fffaf3; display:flex; flex-direction:column; overflow:hidden; }
+    /* Home: an inviting, simple first screen for young children. */
+    .home { width:min(100%, 430px); min-height:100svh; overflow:hidden; background:linear-gradient(165deg,#ff6865 0,#ff5f77 39%,#ff9462 100%); color:#fff; }
+    #place-screen { height:100svh; overflow-y:auto; overscroll-behavior:contain; }
+    .home-top { display:flex; justify-content:space-between; align-items:center; padding:calc(16px + env(safe-area-inset-top)) 20px 8px; }
+    .brand { display:flex; align-items:center; gap:9px; font-weight:900; font-size:25px; letter-spacing:.04em; }
+    .brand-mark { width:41px; height:38px; display:grid; place-items:center; border-radius:16px 16px 12px 12px; background:#ffd75f; box-shadow:0 3px 0 #da9a34; color:#fff; font-size:24px; transform:rotate(-2deg); text-shadow:none; }
+    .brand-title { display:flex; align-items:center; letter-spacing:-.02em; } .brand-title b { display:inline-block; color:#fff; font-weight:1000; line-height:1; text-shadow:0 3px 0 #c74456, 0 4px 0 #c74456; } .brand-title b:nth-child(1) { transform:rotate(-6deg); text-shadow:0 3px 0 #ce4b66; } .brand-title b:nth-child(2) { transform:translateY(-2px) rotate(3deg); text-shadow:0 3px 0 #ea8f28; } .brand-title b:nth-child(3) { transform:rotate(-2deg); text-shadow:0 3px 0 #3d86bd; } .brand-title b:nth-child(4) { transform:translateY(-1px) rotate(4deg); text-shadow:0 3px 0 #7a56bf; } .brand-title b:nth-child(5) { transform:rotate(-3deg); text-shadow:0 3px 0 #ce4b66; } .brand-title b:nth-child(6) { transform:translateY(-2px) rotate(3deg); text-shadow:0 3px 0 #e68730; }
+    .profile-dot { display:grid; place-items:center; width:43px; height:43px; overflow:hidden; border:3px solid #fff; border-radius:50%; background:#6fb5ee; box-shadow:0 3px 0 #3a7ebc; font-size:22px; }
+    .profile-dot img { width:52px; height:52px; object-fit:contain; transform:translateY(4px); }
+    .home-hero { position:relative; min-height:150px; padding:18px 23px 24px; overflow:hidden; }
+    .home-hero h2 { max-width:230px; margin:0; font-size:27px; line-height:1.22; letter-spacing:.02em; text-shadow:0 2px 0 #c84451; }
+    .home-hero p { margin:9px 0 0; color:#fff8db; font-size:14px; font-weight:800; text-shadow:0 1px 0 #c84451; }
+    .home-sun { display:none; }
+    .home-sun::before, .home-sun::after { content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:#bd8133; top:29px; } .home-sun::before { left:20px; } .home-sun::after { right:20px; }
+    .home-sun span { position:absolute; left:27px; top:42px; width:19px; height:9px; border-bottom:3px solid #bd8133; border-radius:0 0 20px 20px; }
+    .home-mascot { position:absolute; z-index:1; right:-8px; bottom:-28px; width:165px; height:auto; transform:rotate(4deg); filter:drop-shadow(0 6px 0 #c8445140); pointer-events:none; }
+    .home-content { min-height:calc(100svh - 185px); padding:22px 17px calc(24px + env(safe-area-inset-bottom)); border-radius:30px 30px 0 0; background:#fff9e8; box-shadow:0 -5px 0 #ffe48a; color:var(--ink); }
+    #place-screen .home-content { min-height:calc(100svh - 72px); padding-top:24px; }
+    .home-label { display:flex; justify-content:space-between; align-items:center; margin:0 5px 12px; font-size:16px; font-weight:900; }
+    .home-label small { color:#e85e6d; font-size:12px; }
+    .place-card { position:relative; width:100%; min-height:136px; overflow:hidden; border:0; border-radius:25px; background:linear-gradient(135deg,#4ba9ef,#347de3); box-shadow:0 5px 0 #bd4b4c,0 9px 20px #34465b2a; color:#fff; text-align:left; cursor:pointer; padding:0; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    .place-card::after { content:""; position:absolute; right:-39px; top:-48px; width:178px; height:178px; border:18px solid #fff3; border-radius:50%; pointer-events:none; }
+    .place-card:active { transform:translateY(3px); box-shadow:0 2px 0 #bd4b4c,0 5px 12px #34465b2a; }
+    .place-illustration { position:absolute; inset:0 0 0 43%; background-image:linear-gradient(90deg,#347de3 0%,#347de300 57%),url('bathroom-stage-v4.jpg'); background-position:65% 27%; background-size:cover; }
+    .place-card.place-breakfast { background:linear-gradient(135deg,#ffad35,#ff7f35); } .place-card.place-breakfast .place-illustration { background-image:linear-gradient(90deg,#ff8335 0%,#ff833500 58%),url('breakfast-stage-v7.jpg'); background-position:58% 48%; } .place-card.place-breakfast .place-copy h3 { text-shadow:0 3px 0 #d96834; }
+    .place-card.place-living { background:linear-gradient(135deg,#a66be5,#7652d6); } .place-card.place-living .place-illustration { background-image:linear-gradient(90deg,#7652d6 0%,#7652d600 58%),url('living-stage-v2.png'); background-position:53% 47%; background-size:cover; } .place-card.place-living .place-copy h3 { text-shadow:0 3px 0 #6242bf; }
+    .place-card.place-bedroom { background:linear-gradient(135deg,#43578f,#283866); } .place-card.place-bedroom .place-illustration { background-image:linear-gradient(90deg,#283866 0%,#28386600 58%),url('bedroom-stage-v1.png'); background-position:52% 42%; background-size:cover; } .place-card.place-bedroom .place-copy h3 { text-shadow:0 3px 0 #25365f; }
+    .place-copy { position:relative; z-index:1; display:grid; align-content:center; width:63%; min-height:136px; padding:16px 0 16px 18px; }
+    .place-pill { display:inline-block; padding:5px 9px; border-radius:999px; color:#3f8b6a; background:#e0f4df; font-size:12px; font-weight:900; }
+    .place-copy h3 { margin:0 0 4px; font-size:27px; line-height:1.1; text-shadow:0 2px 0 #2361ae; }
+    .place-copy p { margin:0; color:#fff; font-size:27px; font-weight:1000; line-height:1.1; letter-spacing:.01em; text-shadow:0 2px 0 #2361ae; }
+    .play-badge { display:inline-flex; align-items:center; gap:5px; margin-top:18px; padding:9px 12px; border-radius:999px; background:#f79256; box-shadow:0 3px 0 #d66c38; color:#fff; font-size:13px; font-weight:900; }
+    .home-mini-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
+    .place-list { display:grid; gap:18px; padding-bottom:28px; }
+    .coming-card { min-height:116px; padding:16px 13px; border-radius:20px; border:2px solid #f0e6da; background:#fffdf9; color:#8b98a3; opacity:.82; }
+    .coming-card span { display:block; font-size:28px; } .coming-card strong { display:block; margin-top:6px; color:#546576; font-size:15px; } .coming-card small { font-size:11px; font-weight:700; }
+    button.coming-card { width:100%; text-align:left; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .ready-place { border:0; background:linear-gradient(135deg,#ffb237,#ff8d34); box-shadow:0 4px 0 #c76c42; color:#fff; opacity:1; } .ready-place strong, .ready-place small { color:#fff; } .ready-place:active { transform:translateY(3px); box-shadow:0 1px 0 #c76c42; }
+    .home-progress { display:flex; gap:10px; align-items:center; margin:18px 4px 0; padding:12px 14px; border-radius:17px; background:#dff3ff; color:#3e718c; font-size:12px; font-weight:800; }
+    .home-progress b { color:#e85e6d; font-size:17px; }
+    .game-select { display:grid; gap:13px; }
+    .game-select + .game-card { margin-top:13px; }
+    .game-card { position:relative; display:grid; grid-template-columns:64px 1fr auto; align-items:center; width:100%; min-height:101px; padding:13px 15px; overflow:hidden; border:0; border-radius:24px; color:#fff; text-align:left; box-shadow:0 5px 0 #bd4b4c, 0 9px 18px #8b3c4030; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .game-card::after { content:""; position:absolute; right:-22px; top:-31px; width:105px; height:105px; border:15px solid #fff3; border-radius:50%; pointer-events:none; }
+    .game-card:active:not(:disabled) { transform:translateY(3px); box-shadow:0 2px 0 #bd4b4c, 0 5px 12px #8b3c4030; }
+    .game-card:disabled { cursor:default; opacity:.76; }
+    .mode-word { background:linear-gradient(135deg,#ff9e23,#ff7c20); } .mode-listen { background:linear-gradient(135deg,#4ba9ef,#347de3); } .mode-think { background:linear-gradient(135deg,#a968ed,#7351d8); } .mode-my { background:linear-gradient(135deg,#f45b9e,#dc3d80); }
+    .mode-icon { position:relative; z-index:1; display:grid; place-items:center; width:51px; height:51px; border:3px solid #fff9; border-radius:17px; background:#fff3; font-size:28px; }
+    .cat-mode-icon { overflow:hidden; background:#fff; } .cat-mode-icon img { width:62px; height:62px; object-fit:contain; transform:translateY(6px); }
+    .mode-copy { position:relative; z-index:1; } .mode-copy strong { display:block; font-size:19px; text-shadow:0 2px 0 #0002; } .mode-copy small { display:block; margin-top:3px; color:#fff; font-size:12px; font-weight:800; line-height:1.25; }
+    .mode-arrow { position:relative; z-index:1; display:grid; place-items:center; width:31px; height:31px; border:2px solid #fff8; border-radius:50%; background:#fff3; color:#fff; font-size:15px; font-weight:900; }
+    .mode-status { position:relative; z-index:1; padding:5px 7px; border-radius:999px; background:#fff4; color:#fff; font-size:10px; font-weight:900; }
+    .place-top-title { display:flex; align-items:center; gap:10px; font-size:21px; font-weight:900; text-shadow:0 2px 0 #c84451; }
+    .back-games { width:38px; height:38px; display:grid; place-items:center; padding:0; border:0; border-radius:50%; background:#6b9db5; box-shadow:0 3px 0 #47778e; color:#fff; font:800 18px inherit; cursor:pointer; }
+    .breakfast-scene, .living-scene { position:relative; width:100%; aspect-ratio:.75; overflow:hidden; background:#fff7e2; touch-action:none; user-select:none; }
+    .breakfast-scene svg, .living-scene svg { display:block; width:100%; height:100%; }
+    .breakfast-title { position:absolute; z-index:2; left:16px; top:14px; padding:8px 13px; border-radius:999px; background:#ff8c47; box-shadow:0 3px 0 #c76c42; color:#fff; font-size:16px; font-weight:900; }
+    .breakfast-controls { display:flex; justify-content:space-between; align-items:center; width:100%; }
+    .breakfast-controls .controls { margin-left:auto; }
+    .compact-control { width:38px; min-width:38px; min-height:38px; padding:0; font-size:18px; }
+    .breakfast-target, .living-target { opacity:0; pointer-events:none; transition:opacity .12s; }
+    .breakfast-dragging .breakfast-target, .living-dragging .living-target { opacity:1; }
+    .breakfast-target rect, .living-target rect { fill:#fff7a8; fill-opacity:.48; stroke:#e5a500; stroke-width:9; stroke-dasharray:24 16; rx:28; }
+    .breakfast-target circle, .living-target circle { fill:#fff; stroke:#e5a500; stroke-width:6; }
+    .breakfast-target text, .living-target text { font-size:32px; font-weight:800; fill:#8e6500; text-anchor:middle; dominant-baseline:middle; }
+    .breakfast-item, .living-item { position:absolute; z-index:5; width:48px; height:54px; display:grid; place-items:center; overflow:visible; border:0; border-radius:48%; background:transparent; box-shadow:none; cursor:grab; touch-action:none; transform:translateX(-50%); -webkit-tap-highlight-color:transparent; }
+    .breakfast-item::before { content:""; position:absolute; inset:0; background:url('breakfast-items-v2.png') var(--item-sprite) / 300% 200% no-repeat; pointer-events:none; }
+    .breakfast-item.extra::before { display:none; }
+    .breakfast-item-art { width:58px; height:58px; object-fit:contain; filter:drop-shadow(0 2px 1px #5f45262e); pointer-events:none; transform:translateX(var(--art-center-x, 0px)); }
+    [data-breakfast-item="plate"] .breakfast-item-art, [data-breakfast-item="mug"] .breakfast-item-art { filter:hue-rotate(145deg) saturate(.72) brightness(1.08) drop-shadow(0 2px 1px #5f45262e); }
+    .breakfast-item.drag, .living-item.drag { cursor:grabbing; z-index:20; transform:translateX(-50%) scale(1.15); box-shadow:0 7px 15px #26364a4f; }
+    .breakfast-item.done, .living-item.done { visibility:hidden; }
+    .breakfast-item.queued, .living-item.queued { display:none; }
+    #breakfast-item-toast { left:5.5%; top:86%; --item-sprite:0 0; } #breakfast-item-banana { left:21.5%; top:86%; --item-sprite:50% 0; } #breakfast-item-milk { left:37.8%; top:86%; --item-sprite:100% 0; }
+    #breakfast-item-cereal { left:54%; top:86%; --item-sprite:0 100%; } #breakfast-item-spoon { left:70.2%; top:86%; --item-sprite:50% 100%; } #breakfast-item-napkin { left:86.5%; top:86%; --item-sprite:100% 100%; }
+    .breakfast-toast { position:absolute; z-index:30; left:50%; top:40%; transform:translate(-50%,-50%) scale(.9); width:75%; padding:13px; border-radius:18px; text-align:center; font-weight:800; color:#fff; background:#2f8e6a; opacity:0; pointer-events:none; transition:.18s; }
+    .breakfast-toast.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+    .breakfast-finish { position:absolute; z-index:25; inset:0; display:none; place-items:center; padding:24px; text-align:center; background:#fff8e8e8; }
+    .breakfast-finish.show { display:grid; animation:appear .3s ease-out; }
+    header { padding:calc(12px + env(safe-area-inset-top)) 16px 10px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:2px solid #f3e6d7; }
+    h1 { font-size:18px; margin:0; letter-spacing:.1px; }
+    .round { border:0; border-radius:999px; min-height:46px; padding:0 16px; background:var(--orange); color:#fff; font:700 15px inherit; box-shadow:0 3px 0 #d66c38; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .round:active { transform:translateY(2px); box-shadow:0 1px 0 #d66c38; }
+    #speaker { flex:none; width:46px; min-width:46px; padding:0; font-size:20px; white-space:nowrap; }
+    #speaker[aria-pressed="true"] { background:#46a4c5; box-shadow:0 3px 0 #277e9e; }
+    #reset { width:38px; min-height:38px; padding:0; background:#8a9aaa; box-shadow:0 3px 0 #637180; font-size:0; }
+    #reset::after { content:"↻"; font-size:20px; }
+    #kana { min-width:45px; min-height:38px; padding:0 8px; background:#c878a6; box-shadow:0 3px 0 #9b527d; font-size:13px; }
+    #kana[aria-pressed="true"], #breakfast-kana[aria-pressed="true"] { background:#5f9ed2; box-shadow:0 3px 0 #417cae; }
+    #home { width:38px; min-height:38px; padding:0; background:#6b9db5; box-shadow:0 3px 0 #47778e; font-size:17px; }
+    .app > header { position:relative; min-height:68px; padding:calc(12px + env(safe-area-inset-top)) 16px 10px; overflow:hidden; background:radial-gradient(circle at 9% 23%,#fff4 0 2px,transparent 3px),radial-gradient(circle at 88% 73%,#fff3 0 2px,transparent 3px),linear-gradient(135deg,#ff7379,#f98868); background-size:18px 18px,23px 23px,auto; border-bottom:5px solid #ffe6a8; box-shadow:0 4px 0 #c9565f; color:#fff; }
+    #game-screen header { justify-content:space-between; }
+    .app > header .round, .app > header .stage-back { display:grid; place-items:center; width:42px; min-width:42px; min-height:42px; padding:0; border:3px solid #fff9e8; border-radius:17px 19px 17px 19px; background:linear-gradient(145deg,#fffdf0,#f6dba8); box-shadow:0 4px 0 #bc765c,inset 0 2px 0 #fff; color:#764b39; text-align:center; line-height:1; text-shadow:0 1px 0 #fff; }
+    .app > header .round:active, .app > header .stage-back:active { transform:translateY(2px) rotate(-1deg); box-shadow:0 2px 0 #bc765c,inset 0 2px 0 #fff; }
+    .app > header #home, .app > header #breakfast-home, .app > header #living-home, .app > header #bedroom-home, .app > header #word-home, .app > header #action-home, .app > header #match-mode-home { background:linear-gradient(145deg,#fff5a3,#ffc95b); font-size:19px; }
+    .app > header #reset, .app > header #breakfast-reset, .app > header #living-reset, .app > header #bedroom-reset, .app > header #word-reset { background:linear-gradient(145deg,#d9f1ff,#8ac8e9); font-size:0; }
+    .app > header #reset::after, .app > header #breakfast-reset::after, .app > header #living-reset::after, .app > header #bedroom-reset::after, .app > header #word-reset::after { content:"↻"; font-size:21px; }
+    .app > header #kana, .app > header #breakfast-kana, .app > header #living-kana, .app > header #bedroom-kana, .app > header #word-kana { background:linear-gradient(145deg,#ecd8ff,#c695e4); font-size:13px; }
+    .app > header #kana[aria-pressed="true"], .app > header #breakfast-kana[aria-pressed="true"], .app > header #living-kana[aria-pressed="true"], .app > header #bedroom-kana[aria-pressed="true"], .app > header #word-kana[aria-pressed="true"] { background:linear-gradient(145deg,#d8f5ff,#81c8e6); }
+    .app > header #speaker, .app > header #breakfast-speaker, .app > header #living-speaker, .app > header #bedroom-speaker, .app > header #word-speaker, .app > header #action-speaker { background:linear-gradient(145deg,#ffe9b6,#ffb966); font-size:20px; }
+    .controls { display:flex; align-items:center; gap:7px; }
+    .stage-back { flex:none; font:900 25px/1 inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .speech-speed { flex:none; display:flex; align-items:center; gap:4px; height:40px; padding:2px 5px; border:2px solid #fff9e8; border-radius:999px; background:#fff3; box-shadow:inset 0 1px 0 #fff5; color:#fff; font-size:13px; }
+    .word-board { position:relative; flex:1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-template-rows:repeat(4,minmax(0,1fr)); gap:12px; min-height:0; padding:55px 16px 18px; overflow:hidden; background:repeating-linear-gradient(8deg,#c98644 0 3px,#d99d59 4px 8px,#ba7134 9px 12px); }
+    .word-board::before { content:""; position:absolute; inset:0; background:linear-gradient(110deg,#fff4 0 8%,transparent 9% 91%,#59351e33 92%),repeating-linear-gradient(90deg,transparent 0 74px,#6d3a1c20 75px 78px); pointer-events:none; }
+    .word-paw { position:absolute; z-index:0; left:50%; top:54%; width:320px; height:300px; transform:translate(-50%,-50%) rotate(-12deg); opacity:.88; filter:drop-shadow(0 8px 0 #6f3d1f40); pointer-events:none; }
+    .word-paw .pad, .word-paw i { position:absolute; display:block; background:linear-gradient(145deg,#3b353b,#0b090c 74%); border:3px solid #5e535b; box-shadow:inset 5px 5px 0 #ffffff12, inset 0 -8px 0 #0008, 0 6px 0 #7a411e44; }
+    .word-paw .pad { left:57px; top:115px; width:204px; height:157px; border-radius:54% 54% 48% 48%; }
+    .word-paw i { width:72px; height:91px; border-radius:58% 58% 48% 48%; }
+    .word-paw i:nth-child(2) { left:22px; top:52px; transform:rotate(-28deg); } .word-paw i:nth-child(3) { left:94px; top:4px; } .word-paw i:nth-child(4) { right:94px; top:4px; } .word-paw i:nth-child(5) { right:22px; top:52px; transform:rotate(28deg); }
+    .word-title { position:absolute; z-index:2; left:16px; top:13px; padding:7px 12px; border-radius:999px; background:#ff8c47; box-shadow:0 3px 0 #c76c42; color:#fff; font-size:16px; font-weight:900; }
+    .word-caption { position:absolute; z-index:3; top:14px; right:16px; left:142px; display:none; padding:5px 9px; border-radius:10px; background:#fffdf4e8; color:#30445a; font-size:12px; font-weight:900; text-align:center; }
+    .text-english .word-caption, .text-bilingual .word-caption { display:block; } .text-english .word-caption .word-jp { display:none; } .word-caption .word-jp { display:block; margin-top:1px; color:#a25372; font-size:10px; }
+    .word-card { position:relative; z-index:1; display:grid; place-items:center; min-width:0; min-height:0; border:3px solid #fff9; border-radius:22px; background:linear-gradient(145deg,#fffdf4,#f9ecd8); box-shadow:0 5px 0 #8a4d26,0 9px 14px #41251655; cursor:pointer; transition:opacity .2s,transform .2s; -webkit-tap-highlight-color:transparent; }
+    .word-card:active { transform:translateY(3px) scale(.98); box-shadow:0 2px 0 #8a4d26,0 4px 9px #41251655; } .word-card.matched { opacity:0; transform:scale(.62) rotate(8deg); pointer-events:none; } .word-card.queued { display:none; }
+    .word-card img, .word-card .word-sprite { width:91%; height:91%; object-fit:contain; filter:drop-shadow(0 3px 1px #5f45262e); pointer-events:none; }
+    .word-emoji { font-size:54px; line-height:1; filter:drop-shadow(0 3px 1px #5f45262e); pointer-events:none; }
+    .match-mode { flex:1; display:grid; align-content:center; gap:18px; padding:25px 22px; background:linear-gradient(160deg,#fff6df,#fde8cc); }
+    .match-mode h2 { margin:0 0 4px; text-align:center; color:#754c35; font-size:23px; }
+    .match-choice { display:grid; grid-template-columns:74px 1fr auto; align-items:center; min-height:124px; padding:14px; border:3px solid #fff9; border-radius:28px; box-shadow:0 5px 0 #b56b42,0 9px 18px #7b4a3430; color:#fff; text-align:left; cursor:pointer; }
+    .match-choice.item { background:linear-gradient(135deg,#ff9b33,#f57638); } .match-choice.action { background:linear-gradient(135deg,#6bafdc,#4f78bf); }
+    .match-choice:active { transform:translateY(3px); box-shadow:0 2px 0 #b56b42,0 5px 10px #7b4a3430; }
+    .match-choice-icon { display:grid; place-items:center; width:62px; height:62px; border-radius:20px; background:#fff3; border:2px solid #fff8; font-size:33px; }
+    .match-choice strong { display:block; font-size:21px; text-shadow:0 2px 0 #0002; } .match-choice small { display:block; margin-top:4px; font-size:13px; font-weight:800; } .match-choice-arrow { font-size:25px; font-weight:900; }
+    #action-screen { height:100svh; min-height:0; }
+    .action-board { flex:1; min-height:0; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4,minmax(0,1fr)); gap:8px; padding:10px 14px 14px; overflow:hidden; background:repeating-linear-gradient(8deg,#c98644 0 3px,#d99d59 4px 8px,#ba7134 9px 12px); }
+    .action-card { display:grid; place-items:center; min-width:0; min-height:0; overflow:hidden; border:3px solid #fff9; border-radius:18px; background:linear-gradient(145deg,#fffdf4,#f6dfc1); box-shadow:0 4px 0 #8a4d26,0 6px 10px #41251655; cursor:pointer; transition:opacity .2s,transform .2s; }
+    .action-card:active { transform:translateY(3px); box-shadow:0 2px 0 #8a4d26,0 4px 8px #41251655; } .action-card img { display:block; width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain; pointer-events:none; }
+    .action-card.queued { display:none; }
+    .action-card.matched { opacity:0; transform:scale(.72); pointer-events:none; }
+    .word-card::before, .word-card::after { position:absolute; z-index:2; display:none; left:4px; right:4px; overflow:hidden; color:#654632; font-weight:900; line-height:1.05; text-align:center; text-overflow:ellipsis; white-space:nowrap; pointer-events:none; text-shadow:0 1px 0 #fff; }
+    .word-card::after { content:attr(data-label); bottom:4px; font-size:10px; }
+    .word-card::before { content:attr(data-jp); bottom:15px; color:#a25372; font-size:9px; }
+    .text-english .word-card::after { display:block; } .text-bilingual .word-card::after, .text-bilingual .word-card::before { display:block; }
+    .text-english .word-card img, .text-english .word-card .word-sprite { width:80%; height:80%; } .text-bilingual .word-card img, .text-bilingual .word-card .word-sprite { width:69%; height:69%; }
+    .word-sprite { background:url('breakfast-items-v2.png') var(--word-sprite, 100% 100%) / 300% 200% no-repeat; }
+    .word-finish { position:absolute; z-index:5; inset:0; display:none; place-items:center; padding:24px; background:#fff8e8e8; text-align:center; } .word-finish.show { display:grid; animation:appear .3s ease-out; }
+    .speech-speed input { width:52px; height:9px; margin:0; appearance:none; border:2px solid #fff8e4; border-radius:999px; background:linear-gradient(90deg,#9bd98d,#ffe07b,#87cbe7); box-shadow:inset 0 1px 2px #426a7b66; }
+    .speech-speed input::-webkit-slider-thumb { width:18px; height:18px; appearance:none; border:2px solid #fffdf2; border-radius:50%; background:#ffcf55; box-shadow:0 2px 0 #d9952e; }
+    .speed-animal { display:grid; place-items:center; width:21px; height:21px; border:2px solid #fff9e8; border-radius:9px 11px 9px 11px; background:#fff6cf; box-shadow:0 2px 0 #d9952e; font-size:13px; line-height:1; }
+    .speed-animal:last-child { background:#dff2ff; box-shadow:0 2px 0 #4e92c3; }
+    #game-screen > header > .controls { margin-left:auto; }
+    .prompt { display:none; }
+    .scene-wrap { position:relative; width:100%; aspect-ratio:.75; max-height:calc(100svh - 120px); min-height:420px; overflow:hidden; touch-action:none; user-select:none; }
+    svg { display:block; width:100%; height:100%; }
+    .target { opacity:0; pointer-events:none; transition:opacity .12s; }
+    .dragging .target { opacity:1; }
+    .target rect { fill:#fff7a8; fill-opacity:.48; stroke:#e5a500; stroke-width:9; stroke-dasharray:24 16; rx:28; }
+    .target circle { fill:#fff; stroke:#e5a500; stroke-width:6; }
+    .target text { font-size:36px; font-weight:800; fill:#8e6500; text-anchor:middle; dominant-baseline:middle; }
+    .item { position:absolute; z-index:5; width:48px; height:54px; display:grid; place-items:center; overflow:visible; border:0; border-radius:18px; background:transparent; box-shadow:none; cursor:grab; touch-action:none; -webkit-tap-highlight-color:transparent; }
+    .item-art { display:block; width:100%; height:100%; object-fit:contain; transform:scale(var(--item-art-scale, 1)); filter:drop-shadow(0 2px 1px #5f45262e); pointer-events:none; }
+    .item:focus-visible { outline:4px solid #305aeb; outline-offset:3px; }
+    .item.drag { cursor:grabbing; z-index:20; transform:scale(1.15); box-shadow:0 7px 15px #26364a4f; }
+    .item.done { visibility:hidden; }
+    /* The icons sit on one uninterrupted tray so every illustrated shape has room. */
+    #toothbrush { left:4.8%; top:84.5%; --item-art-scale:1.12; } #cup { left:21.4%; top:84.5%; --item-art-scale:1.78; } #towel { left:38%; top:84.5%; --item-art-scale:1.82; }
+    #soap { left:54.4%; top:84.5%; --item-art-scale:1.86; } #toothpaste { left:70.9%; top:84.5%; --item-art-scale:1.74; } #comb { left:87.5%; top:84.5%; --item-art-scale:1.72; }
+    .scene-wrap::after, .breakfast-scene::after, .living-scene::after { content:""; position:absolute; z-index:4; left:0; right:0; bottom:0; height:16.75%; border-top:4px solid #9c571f; border-bottom:4px solid #7c3f17; border-radius:0; background:repeating-linear-gradient(7deg,#bd742d 0 3px,#c98238 4px 7px,#b86e28 8px 10px); box-shadow:inset 0 4px 0 #f6c375, inset 0 -7px 0 #7c3f17, 0 -3px 8px #4a2b173b; pointer-events:none; }
+    .breakfast-item::after, .living-item::after { display:none; }
+    .text-english .breakfast-item::after, .text-bilingual .breakfast-item::after, .text-english .living-item::after, .text-bilingual .living-item::after { content:attr(data-label); position:absolute; left:50%; bottom:-17px; z-index:1; display:block; transform:translateX(-50%); padding:2px 5px; border-radius:6px; color:#513c2a; background:#fffdf4e8; font-size:10px; font-weight:800; line-height:1; white-space:nowrap; pointer-events:none; }
+    .text-bilingual .breakfast-item::after, .text-bilingual .living-item::after { content:attr(data-label) "\A" attr(data-jp); bottom:-27px; line-height:1.2; text-align:center; white-space:pre; }
+    .breakfast-place-label, .living-place-label { position:absolute; z-index:8; display:none; padding:3px 6px; border-radius:8px; color:#513c2a; background:#fffdf4e8; box-shadow:0 1px 5px #55412c2e; font-size:11px; font-weight:800; line-height:1; pointer-events:none; white-space:nowrap; }
+    .text-english .breakfast-place-label, .text-bilingual .breakfast-place-label, .text-english .living-place-label, .text-bilingual .living-place-label { display:block; }
+    .text-bilingual .breakfast-place-label::after, .text-bilingual .living-place-label::after, .text-bilingual .place-label::after { content:"\A" attr(data-jp); white-space:pre; }
+    .breakfast-instruction-caption, .living-instruction-caption { position:absolute; z-index:9; left:5%; right:5%; top:72%; display:none; padding:7px 10px; border-radius:12px; background:#fffdf4ed; box-shadow:0 2px 8px #55412c2e; text-align:center; pointer-events:none; }
+    .breakfast-instruction-caption .english, .living-instruction-caption .english { display:block; color:#30445a; font-weight:800; font-size:14px; line-height:1.25; } .breakfast-instruction-caption .kana-text, .living-instruction-caption .kana-text { display:block; margin-top:2px; color:#a25372; font-size:12px; font-weight:700; line-height:1.25; }
+    .text-english .breakfast-instruction-caption, .text-bilingual .breakfast-instruction-caption, .text-english .living-instruction-caption, .text-bilingual .living-instruction-caption { display:block; }
+    .text-english .breakfast-instruction-caption .kana-text, .text-english .living-instruction-caption .kana-text { display:none; }
+    #breakfast-label-sink { left:5%; top:11%; } #breakfast-label-girl { left:77%; top:18%; } #breakfast-label-table { left:28%; top:48%; } #breakfast-label-plate { left:28%; top:63%; } #breakfast-label-bowl { left:59%; top:50%; } #breakfast-label-cup { left:82%; top:64%; }
+    #living-label-bookshelf { left:4%; top:11%; } #living-label-table { left:50%; top:65%; } #living-label-mom { left:77%; top:18%; } #living-label-sofa { left:43%; top:31%; } #living-label-toybox { left:2%; top:48%; } #living-label-bin { left:28%; top:48%; }
+    .toast, .breakfast-toast, .living-toast { position:absolute; z-index:30; left:50%; top:42%; display:flex; align-items:center; justify-content:center; gap:8px; transform:translate(-50%,-50%) scale(.9); width:75%; min-height:64px; padding:9px 13px; border:3px solid #fff; border-radius:18px; text-align:center; font-weight:900; color:#fff; background:#2f8e6a; box-shadow:0 4px 0 #1f6e51; opacity:0; pointer-events:none; transition:.18s; }
+    .toast::before, .breakfast-toast::before, .living-toast::before { content:""; flex:0 0 46px; width:46px; height:46px; background:url('cat-mascot-v2-small.png') 50% 38% / 118% auto no-repeat; }
+    .toast.wrong, .breakfast-toast.wrong, .living-toast.wrong { background:#e36f78; box-shadow:0 4px 0 #b84c58; }
+    .toast.show, .living-toast.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+    .instruction-caption { position:absolute; z-index:7; left:7%; right:7%; top:73%; display:none; padding:7px 10px; border-radius:12px; background:#fffdf4e8; box-shadow:0 2px 8px #55412c2e; text-align:center; pointer-events:none; }
+    .instruction-caption .english { display:block; color:#30445a; font-weight:800; font-size:14px; } .instruction-caption .kana-text { display:block; margin-top:2px; color:#a25372; font-size:12px; font-weight:700; }
+    .text-english .instruction-caption, .text-bilingual .instruction-caption, .text-english .place-label, .text-bilingual .place-label { display:block; }
+    .text-english .instruction-caption .kana-text { display:none; }
+    .text-english .item::after, .text-bilingual .item::after { content:attr(data-label); position:absolute; left:50%; bottom:-17px; transform:translateX(-50%); padding:2px 5px; border-radius:6px; color:#513c2a; background:#fffdf4e8; font-size:10px; font-weight:800; line-height:1; white-space:nowrap; pointer-events:none; }
+    .text-bilingual .item::after { content:attr(data-label) "\A" attr(data-jp); bottom:-27px; line-height:1.2; text-align:center; white-space:pre; }
+    .place-label { position:absolute; z-index:8; display:none; padding:3px 6px; border-radius:8px; color:#513c2a; background:#fffdf4e8; box-shadow:0 1px 5px #55412c2e; font-size:11px; font-weight:800; line-height:1; pointer-events:none; white-space:nowrap; }
+    #label-sink { left:5%; top:19%; } #label-organizer { left:40%; top:20%; } #label-rack { left:70%; top:4%; } #label-boy { left:80%; top:56%; } #label-basket { left:45%; top:62%; }
+    .start { position:absolute; z-index:10; inset:0; display:grid; place-items:center; background:#fffaf3e6; text-align:center; padding:30px; }
+    .start.hidden { display:none; }
+    .start-card { max-width:300px; }
+    .start h2 { margin:0 0 8px; font-size:26px; } .start p { margin:0 0 20px; color:#596979; line-height:1.45; }
+    #start { font-size:18px; min-height:56px; }
+    .finish { position:absolute; z-index:25; inset:0; display:none; place-items:center; padding:24px; text-align:center; background:#fff8e8e8; }
+    .finish.show { display:grid; animation:appear .3s ease-out; }
+    .finish-card { padding:21px 20px 26px; width:min(310px, 92%); border-radius:28px; background:#fff; box-shadow:0 12px 32px #80623642; }
+    .popup-cat { display:block; width:82px; height:70px; margin:-4px auto 4px; object-fit:contain; filter:drop-shadow(0 3px 0 #26364a18); }
+    .stars { font-size:43px; letter-spacing:5px; animation:pop 1s ease-in-out infinite alternate; }
+    .finish h2 { margin:9px 0 7px; font-size:29px; color:#e8753f; } .finish p { margin:0 0 19px; color:#596979; line-height:1.4; }
+    @keyframes appear { from { opacity:0; } to { opacity:1; } } @keyframes pop { to { transform:scale(1.12) rotate(3deg); } }
+    .small { display:block; padding:7px 14px calc(8px + env(safe-area-inset-bottom)); font-size:12px; text-align:center; color:#6b7580; }
+    .speech-debug { position:fixed; z-index:1000; right:0; bottom:0; left:0; display:flex; flex-direction:column; max-height:40svh; padding:8px; background:#000c; color:#fff; font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .speech-debug-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; font-weight:800; }
+    .speech-debug-actions { display:flex; gap:6px; } .speech-debug button { border:1px solid #fff7; border-radius:5px; padding:3px 6px; background:#fff2; color:#fff; font:inherit; cursor:pointer; }
+    .speech-debug-log { overflow:auto; white-space:pre-wrap; word-break:break-word; }
+  </style>
+</head>
+<body>
+  <main class="home" id="home-screen" aria-label="オウチエイゴ ホーム">
+    <div class="home-top"><div class="brand"><span class="brand-mark">⌂</span><span class="brand-title" aria-label="オウチエイゴ"><b>オ</b><b>ウ</b><b>チ</b><b>エ</b><b>イ</b><b>ゴ</b></span></div><span class="profile-dot" aria-label="ねこのマスコット"><img src="cat-mascot-v2-small.png" alt=""></span></div>
+    <section class="home-hero"><img class="home-mascot" src="cat-mascot-v2-small.png" alt="星のそばにいる黒白猫のマスコット"><h2>何して遊ぶ？</h2></section>
+    <section class="home-content" aria-label="ゲームをえらぶ">
+      <div class="game-select">
+        <button class="game-card mode-word" id="open-word" type="button"><span class="mode-icon">🔎</span><span class="mode-copy"><strong>Word Match</strong><small>ことばを みつけよう</small></span><span class="mode-arrow">▶</span></button>
+        <button class="game-card mode-listen" id="open-listen" type="button"><span class="mode-icon">👂</span><span class="mode-copy"><strong>Listen &amp; Do</strong><small>きいて、うごいてみよう</small></span><span class="mode-arrow">▶</span></button>
+        <button class="game-card mode-think" type="button" disabled><span class="mode-icon">💭</span><span class="mode-copy"><strong>Think &amp; Say</strong><small>えいごを つくってみよう</small></span><span class="mode-status">じゅんび中</span></button>
+      </div>
+      <button class="game-card mode-my" type="button" disabled aria-label="マイミーとマイルーム、準備中"><span class="mode-icon cat-mode-icon"><img src="cat-mascot-v2-small.png" alt=""></span><span class="mode-copy"><strong>マイミー ＆ マイルーム</strong><small>ねこと おへやを かざろう</small></span><span class="mode-status">じゅんび中</span></button>
+      <div class="home-progress"><span>🌱</span><span>きょうの おうちえいご</span><b>0 / 1</b></div>
+    </section>
+  </main>
+  <main class="home" id="place-screen" aria-label="Listen and Do 場所選択" hidden>
+    <div class="home-top"><div class="place-top-title"><button class="back-games" id="back-games" type="button" aria-label="ゲーム選択へ戻る">‹</button><span>Listen &amp; Do</span></div><span class="profile-dot" aria-hidden="true"><img src="cat-mascot-v2-small.png" alt=""></span></div>
+    <section class="home-content" aria-label="あそぶ場所をえらぶ">
+      <div class="place-list" aria-label="あそぶ場所の一覧">
+        <button class="place-card" id="open-bathroom" type="button" aria-label="洗面所であそぶ">
+          <div class="place-illustration" aria-hidden="true"></div><div class="place-copy"><h3>せんめんじょ</h3><p>Bathroom</p></div>
+        </button>
+        <button class="place-card place-breakfast" id="open-breakfast" type="button" aria-label="朝ごはんであそぶ">
+          <div class="place-illustration" aria-hidden="true"></div><div class="place-copy"><h3>あさごはん</h3><p>Breakfast</p></div>
+        </button>
+        <button class="place-card place-living" id="open-living" type="button" aria-label="リビングであそぶ">
+          <div class="place-illustration" aria-hidden="true"></div><div class="place-copy"><h3>リビング</h3><p>Living room</p></div>
+        </button>
+        <button class="place-card place-bedroom" id="open-bedroom" type="button" aria-label="寝室であそぶ">
+          <div class="place-illustration" aria-hidden="true"></div><div class="place-copy"><h3>しんしつ</h3><p>Bedroom</p></div>
+        </button>
+      </div>
+    </section>
+  </main>
+  <main class="app" id="match-mode-screen" hidden aria-label="Word Match のモード選択">
+    <header><div class="breakfast-controls"><button class="stage-back" id="match-mode-back" type="button" aria-label="ホームへ戻る">‹</button><div class="controls"><button class="round compact-control" id="match-mode-home" type="button" aria-label="ホームへ戻る">🏠</button></div></div></header>
+    <section class="match-mode"><h2>Word Match</h2><button class="match-choice item" id="open-item-match" type="button"><span class="match-choice-icon">🔎</span><span><strong>Item Match</strong><small>ものの なまえを みつけよう</small></span><span class="match-choice-arrow">▶</span></button><button class="match-choice action" id="open-action-match" type="button"><span class="match-choice-icon">✋</span><span><strong>Action Match</strong><small>うごきを みつけよう</small></span><span class="match-choice-arrow">▶</span></button></section>
+  </main>
+  <main class="app" id="action-screen" hidden aria-label="Action Match">
+    <header><div class="breakfast-controls"><button class="stage-back" id="action-back" type="button" aria-label="Word Match の選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="action-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="action-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="action-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
+    <section class="action-board" aria-label="動作をきいてカードをえらぶ"><button class="action-card" data-action="put" type="button" aria-label="Put"><img src="action-put-boy-v2.png" alt=""></button><button class="action-card" data-action="put" type="button" aria-label="Put"><img src="action-put-girl-v2.png" alt=""></button><button class="action-card" data-action="get" type="button" aria-label="Get"><img src="action-get-boy-v1.png" alt=""></button><button class="action-card" data-action="get" type="button" aria-label="Get"><img src="action-get-girl-v1.png" alt=""></button><button class="action-card" data-action="bring" type="button" aria-label="Bring"><img src="action-bring-boy-v1.png" alt=""></button><button class="action-card" data-action="bring" type="button" aria-label="Bring"><img src="action-bring-girl-v1.png" alt=""></button><button class="action-card" data-action="throw" type="button" aria-label="Throw away"><img src="action-throw-boy-v1.png" alt=""></button><button class="action-card" data-action="throw" type="button" aria-label="Throw away"><img src="action-throw-girl-v1.png" alt=""></button></section>
+  </main>
+  <main class="app" id="word-screen" hidden aria-label="Word Match">
+    <header><div class="breakfast-controls"><button class="stage-back" id="word-back" type="button" aria-label="ホームへ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="word-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="word-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="word-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="word-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="word-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
+    <section class="word-board" id="word-board" aria-label="音をきいて同じアイコンをえらぶ">
+      <div class="word-paw" aria-hidden="true"><span class="pad"></span><i></i><i></i><i></i><i></i></div><span class="word-title">🔎 Word Match</span><div class="word-caption" aria-live="polite"><span id="word-caption-english"></span><span class="word-jp" id="word-caption-jp"></span></div>
+      <button class="word-card" data-word="toothbrush" type="button" aria-label="Toothbrush"><img src="bathroom-item-toothbrush-v4.png" alt=""></button><button class="word-card" data-word="cup" type="button" aria-label="Cup"><img src="bathroom-item-cup-v5.png" alt=""></button><button class="word-card" data-word="towel" type="button" aria-label="Towel"><img src="bathroom-item-towel-v4.png" alt=""></button><button class="word-card" data-word="soap" type="button" aria-label="Soap"><img src="bathroom-item-soap-v4.png" alt=""></button><button class="word-card" data-word="toothpaste" type="button" aria-label="Toothpaste"><img src="bathroom-item-toothpaste-v4.png" alt=""></button><button class="word-card" data-word="comb" type="button" aria-label="Comb"><img src="bathroom-item-comb-v4.png" alt=""></button><button class="word-card" data-word="toast" type="button" aria-label="Toast"><span class="word-sprite" style="--word-sprite:0 0" aria-hidden="true"></span></button><button class="word-card" data-word="banana" type="button" aria-label="Banana"><span class="word-sprite" style="--word-sprite:50% 0" aria-hidden="true"></span></button><button class="word-card" data-word="milk" type="button" aria-label="Milk"><span class="word-sprite" style="--word-sprite:100% 0" aria-hidden="true"></span></button><button class="word-card" data-word="cereal" type="button" aria-label="Cereal"><span class="word-sprite" style="--word-sprite:0 100%" aria-hidden="true"></span></button><button class="word-card" data-word="spoon" type="button" aria-label="Spoon"><span class="word-sprite" style="--word-sprite:50% 100%" aria-hidden="true"></span></button><button class="word-card" data-word="plate" type="button" aria-label="Plate"><img src="breakfast-item-plate-v1.png" alt=""></button><button class="word-card" data-word="mug" type="button" aria-label="Mug"><img src="breakfast-item-mug-v1.png" alt=""></button><button class="word-card" data-word="fork" type="button" aria-label="Fork"><img src="breakfast-item-fork-v1.png" alt=""></button><button class="word-card" data-word="chopsticks" type="button" aria-label="Chopsticks"><img src="breakfast-item-chopsticks-v1.png" alt=""></button><button class="word-card" data-word="apple" type="button" aria-label="Apple"><img src="breakfast-item-apple-v1.png" alt=""></button><button class="word-card" data-word="bowl" type="button" aria-label="Bowl"><img src="word-item-bowl-v1.png" alt=""></button><button class="word-card" data-word="napkin" type="button" aria-label="Napkin"><span class="word-sprite" aria-hidden="true"></span></button><button class="word-card" data-word="sink" type="button" aria-label="Sink"><img src="word-target-sink-v1.png" alt=""></button><button class="word-card" data-word="tray" type="button" aria-label="Tray"><img src="word-target-tray-v1.png" alt=""></button><button class="word-card" data-word="rack" type="button" aria-label="Towel rack"><img src="word-target-rack-v1.png" alt=""></button><button class="word-card" data-word="basket" type="button" aria-label="Laundry basket"><img src="word-target-basket-v1.png" alt=""></button><button class="word-card" data-word="table" type="button" aria-label="Table"><img src="word-target-table-v1.png" alt=""></button><button class="word-card" data-word="boy" type="button" aria-label="Boy"><img src="word-target-boy-v1.png" alt=""></button><button class="word-card" data-word="girl" type="button" aria-label="Girl"><img src="word-target-girl-v1.png" alt=""></button><button class="word-card" data-word="book" type="button" aria-label="Book"><img src="living-item-book-v1.png" alt=""></button><button class="word-card" data-word="remote" type="button" aria-label="Remote"><img src="living-item-remote-v1.png" alt=""></button><button class="word-card" data-word="blanket" type="button" aria-label="Blanket"><img src="living-item-blanket-v1.png" alt=""></button><button class="word-card" data-word="blocks" type="button" aria-label="Blocks"><img src="living-item-blocks-v1.png" alt=""></button><button class="word-card" data-word="car" type="button" aria-label="Toy car"><img src="living-item-toy-car-v1.png" alt=""></button><button class="word-card" data-word="tissue" type="button" aria-label="Tissue"><img src="living-item-tissue-v3.png" alt=""></button><button class="word-card" data-word="crayons" type="button" aria-label="Crayons"><img src="living-item-crayons-v1.png" alt=""></button><button class="word-card" data-word="doll" data-label="Doll" data-jp="おにんぎょう" type="button" aria-label="Doll"><img src="living-item-doll-v1.png" alt=""></button><button class="word-card" data-word="cookie-wrapper" type="button" aria-label="Cookie"><img src="living-item-cookie-wrapper-v3.png" alt=""></button><button class="word-card" data-word="cat-drawing" data-label="Drawing" data-jp="え" type="button" aria-label="Drawing"><img src="living-item-cat-drawing-v3.png" alt=""></button><button class="word-card" data-word="bookshelf" type="button" aria-label="Bookshelf"><img src="word-target-bookshelf-v1.png" alt=""></button><button class="word-card" data-word="mom" type="button" aria-label="Mom"><img src="word-target-mom-v1.png" alt=""></button><button class="word-card" data-word="sofa" type="button" aria-label="Sofa"><img src="word-target-sofa-v1.png" alt=""></button><button class="word-card" data-word="toybox" type="button" aria-label="Toy box"><img src="word-target-toybox-v1.png" alt=""></button><button class="word-card" data-word="bin" type="button" aria-label="Trash can"><img src="word-target-bin-v1.png" alt=""></button>
+      <div class="word-finish" id="word-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>You found every word!</p><button class="round" id="word-play-again" type="button">Play again</button></div></div>
+    </section>
+  </main>
+  <main class="app" id="breakfast-screen" hidden aria-label="朝ごはんの試作画面">
+    <header><div class="breakfast-controls"><button class="stage-back" id="breakfast-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="breakfast-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="breakfast-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="breakfast-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="breakfast-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="breakfast-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
+    <section class="breakfast-scene" id="breakfast-scene" aria-label="朝ごはんのキッチン">
+      <svg viewBox="0 0 1086 1448" aria-hidden="true">
+        <image href="breakfast-stage-v7.jpg" width="1086" height="1448"/>
+        <g class="breakfast-target" id="sink-breakfast-target"><rect x="35" y="135" width="450" height="275"/><circle cx="450" cy="165" r="27"/><text x="450" y="165">1</text></g>
+        <g class="breakfast-target" id="girl-breakfast-target"><rect x="735" y="220" width="335" height="470"/><circle cx="1038" cy="250" r="27"/><text x="1038" y="250">2</text></g>
+        <g class="breakfast-target" id="table-target"><rect x="230" y="650" width="330" height="165"/><circle cx="530" cy="680" r="27"/><text x="530" y="680">3</text></g>
+        <g class="breakfast-target" id="plate-target"><rect x="270" y="875" width="290" height="235"/><circle cx="530" cy="905" r="27"/><text x="530" y="905">4</text></g>
+        <g class="breakfast-target" id="bowl-target"><rect x="580" y="700" width="220" height="190"/><circle cx="770" cy="730" r="27"/><text x="770" y="730">5</text></g>
+        <g class="breakfast-target" id="cup-target"><rect x="825" y="885" width="245" height="245"/><circle cx="1040" cy="915" r="27"/><text x="1040" y="915">6</text></g>
+      </svg>
+      <button class="breakfast-item" id="breakfast-item-toast" data-breakfast-item="toast" data-label="Toast" data-jp="トースト" aria-label="Toast" type="button"></button><button class="breakfast-item" id="breakfast-item-banana" data-breakfast-item="banana" data-label="Banana" data-jp="バナナ" aria-label="Banana" type="button"></button><button class="breakfast-item" id="breakfast-item-milk" data-breakfast-item="milk" data-label="Milk" data-jp="ミルク" aria-label="Milk carton" type="button"></button><button class="breakfast-item" id="breakfast-item-cereal" data-breakfast-item="cereal" data-label="Cereal" data-jp="シリアル" aria-label="Cereal" type="button"></button><button class="breakfast-item" id="breakfast-item-spoon" data-breakfast-item="spoon" data-label="Spoon" data-jp="スプーン" aria-label="Spoon" type="button"></button><button class="breakfast-item" id="breakfast-item-napkin" data-breakfast-item="napkin" data-label="Napkin" data-jp="ナプキン" aria-label="Napkin" type="button"></button><button class="breakfast-item extra" data-breakfast-item="plate" data-label="Plate" data-jp="おさら" aria-label="Plate" type="button"><img class="breakfast-item-art" src="breakfast-item-plate-v1.png" alt=""></button><button class="breakfast-item extra" data-breakfast-item="mug" data-label="Mug" data-jp="マグカップ" aria-label="Mug" type="button"><img class="breakfast-item-art" src="breakfast-item-mug-v1.png" alt=""></button><button class="breakfast-item extra" data-breakfast-item="fork" data-label="Fork" data-jp="フォーク" aria-label="Fork" type="button"><img class="breakfast-item-art" src="breakfast-item-fork-v1.png" alt=""></button><button class="breakfast-item extra" data-breakfast-item="chopsticks" data-label="Chopsticks" data-jp="おはし" aria-label="Chopsticks" type="button"><img class="breakfast-item-art" src="breakfast-item-chopsticks-v1.png" alt=""></button><button class="breakfast-item extra" data-breakfast-item="apple" data-label="Apple" data-jp="りんご" aria-label="Apple" type="button"><img class="breakfast-item-art" src="breakfast-item-apple-v1.png" alt=""></button>
+      <span class="breakfast-place-label" id="breakfast-label-sink" data-jp="シンク">Sink</span><span class="breakfast-place-label" id="breakfast-label-girl" data-jp="おんなのこ">Girl</span><span class="breakfast-place-label" id="breakfast-label-table" data-jp="テーブル">Table</span><span class="breakfast-place-label" id="breakfast-label-plate" data-jp="おさら">Plate</span><span class="breakfast-place-label" id="breakfast-label-bowl" data-jp="ボウル">Bowl</span><span class="breakfast-place-label" id="breakfast-label-cup" data-jp="マグカップ">Mug</span>
+      <div class="breakfast-instruction-caption" aria-live="polite"><span class="english" id="breakfast-caption-english"></span><span class="kana-text" id="breakfast-caption-kana"></span></div>
+      <div class="breakfast-toast" id="breakfast-toast" aria-live="assertive"></div>
+      <div class="breakfast-finish" id="breakfast-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Breakfast is ready. Great listening!</p><button class="round" id="breakfast-play-again" type="button">Play again</button></div></div>
+    </section>
+  </main>
+  <main class="app" id="living-screen" hidden aria-label="リビングのゲーム画面">
+    <header><div class="breakfast-controls"><button class="stage-back" id="living-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="living-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="living-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="living-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="living-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="living-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
+    <section class="living-scene" id="living-scene" aria-label="リビングのゲーム">
+      <svg viewBox="0 0 1086 1448" aria-hidden="true">
+        <image href="living-stage-v2.png" width="1086" height="1448"/>
+        <g class="living-target"><rect x="20" y="120" width="285" height="420"/><circle cx="273" cy="152" r="27"/><text x="273" y="152">1</text></g>
+        <g class="living-target"><rect x="180" y="870" width="835" height="325"/><circle cx="983" cy="900" r="27"/><text x="983" y="900">2</text></g>
+        <g class="living-target"><rect x="805" y="190" width="255" height="575"/><circle cx="1028" cy="220" r="27"/><text x="1028" y="220">3</text></g>
+        <g class="living-target"><rect x="430" y="365" width="315" height="395"/><circle cx="713" cy="395" r="27"/><text x="713" y="395">4</text></g>
+        <g class="living-target"><rect x="10" y="615" width="240" height="165"/><circle cx="218" cy="645" r="27"/><text x="218" y="645">5</text></g>
+        <g class="living-target"><rect x="285" y="570" width="125" height="255"/><circle cx="378" cy="600" r="27"/><text x="378" y="600">6</text></g>
+      </svg>
+      <button class="living-item" data-living-item="book" data-label="Book" data-jp="ほん" aria-label="Book" type="button"><img class="breakfast-item-art" src="living-item-book-v1.png" alt=""></button><button class="living-item" data-living-item="remote" data-label="Remote" data-jp="リモコン" aria-label="Remote" type="button"><img class="breakfast-item-art" src="living-item-remote-v1.png" alt=""></button><button class="living-item" data-living-item="blanket" data-label="Blanket" data-jp="ブランケット" aria-label="Blanket" type="button"><img class="breakfast-item-art" src="living-item-blanket-v1.png" alt=""></button><button class="living-item" data-living-item="blocks" data-label="Blocks" data-jp="つみき" aria-label="Blocks" type="button"><img class="breakfast-item-art" src="living-item-blocks-v1.png" alt=""></button><button class="living-item" data-living-item="car" data-label="Toy car" data-jp="ミニカー" aria-label="Toy car" type="button"><img class="breakfast-item-art" src="living-item-toy-car-v1.png" alt=""></button><button class="living-item" data-living-item="cup" data-label="Cup" data-jp="コップ" aria-label="Cup" type="button"><img class="breakfast-item-art" src="living-item-cup-v1.png" alt=""></button><button class="living-item" data-living-item="tissue" data-label="Tissue" data-jp="ティッシュ" aria-label="Tissue" type="button"><img class="breakfast-item-art" src="living-item-tissue-v3.png" alt=""></button><button class="living-item" data-living-item="crayons" data-label="Crayons" data-jp="クレヨン" aria-label="Crayons" type="button"><img class="breakfast-item-art" src="living-item-crayons-v1.png" alt=""></button><button class="living-item" data-living-item="doll" data-label="Doll" data-jp="おにんぎょう" aria-label="Doll" type="button"><img class="breakfast-item-art" src="living-item-doll-v1.png" alt=""></button><button class="living-item" data-living-item="cookie-wrapper" data-label="Cookie" data-jp="クッキー" aria-label="Cookie" type="button"><img class="breakfast-item-art" src="living-item-cookie-wrapper-v3.png" alt=""></button><button class="living-item" data-living-item="cat-drawing" data-label="Drawing" data-jp="え" aria-label="Drawing" type="button"><img class="breakfast-item-art" src="living-item-cat-drawing-v3.png" alt=""></button>
+      <span class="living-place-label" id="living-label-bookshelf" data-jp="ほんだな">Bookshelf</span><span class="living-place-label" id="living-label-table" data-jp="テーブル">Table</span><span class="living-place-label" id="living-label-mom" data-jp="ママ">Mom</span><span class="living-place-label" id="living-label-sofa" data-jp="ソファ">Sofa</span><span class="living-place-label" id="living-label-toybox" data-jp="おもちゃばこ">Toy box</span><span class="living-place-label" id="living-label-bin" data-jp="ゴミばこ">Trash can</span>
+      <div class="living-instruction-caption" aria-live="polite"><span class="english" id="living-caption-english"></span><span class="kana-text" id="living-caption-kana"></span></div>
+      <div class="living-toast" id="living-toast" aria-live="assertive"></div>
+      <div class="breakfast-finish" id="living-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>The living room looks lovely!</p><button class="round" id="living-play-again" type="button">Play again</button></div></div>
+    </section>
+  </main>
+  <main class="app" id="bedroom-screen" hidden aria-label="寝室のゲーム画面">
+    <header><div class="breakfast-controls"><button class="stage-back" id="bedroom-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="bedroom-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="bedroom-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="bedroom-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="bedroom-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="bedroom-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
+    <section class="living-scene" id="bedroom-scene" aria-label="寝室のゲーム">
+      <svg viewBox="0 0 1086 1448" aria-hidden="true"><image href="bedroom-stage-v1.png" width="1086" height="1448"/><g class="living-target"><rect x="15" y="100" width="250" height="600"/><circle cx="235" cy="130" r="27"/><text x="235" y="130">1</text></g><g class="living-target"><rect x="90" y="420" width="710" height="470"/><circle cx="770" cy="450" r="27"/><text x="770" y="450">2</text></g><g class="living-target"><rect x="785" y="180" width="290" height="560"/><circle cx="1044" cy="210" r="27"/><text x="1044" y="210">3</text></g><g class="living-target"><rect x="900" y="640" width="180" height="420"/><circle cx="1048" cy="670" r="27"/><text x="1048" y="670">4</text></g></svg>
+      <button class="living-item bedroom-item" data-bedroom-item="pajamas" data-label="Pajamas" data-jp="パジャマ" aria-label="Pajamas" type="button"><img class="breakfast-item-art" src="bedroom-item-pajamas-v1.png" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="book" data-label="Book" data-jp="ほん" aria-label="Book" type="button"><img class="breakfast-item-art" src="living-item-book-v1.png" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="stuffed-toy" data-label="Stuffed toy" data-jp="ぬいぐるみ" aria-label="Stuffed toy" type="button"><img class="breakfast-item-art" src="word-item-teddy-bear-v1.png" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="pillow" data-label="Pillow" data-jp="まくら" aria-label="Pillow" type="button"><img class="breakfast-item-art" src="bedroom-item-pillow-v1.png" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="socks" data-label="Socks" data-jp="くつした" aria-label="Socks" type="button"><img class="breakfast-item-art" src="bedroom-item-socks-v1.png" alt=""></button>
+      <div class="living-instruction-caption" aria-live="polite"><span class="english" id="bedroom-caption-english"></span><span class="kana-text" id="bedroom-caption-kana"></span></div><div class="living-toast" id="bedroom-toast" aria-live="assertive"></div><div class="breakfast-finish" id="bedroom-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png" alt=""><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Good night!</p><button class="round" id="bedroom-play-again" type="button">Play again</button></div></div>
+    </section>
+  </main>
+  <main class="app" id="game-screen" hidden>
+    <header><button class="stage-back" id="bathroom-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="bathroom-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round" id="home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round" id="reset" type="button" aria-label="リセット">↻</button><button class="round" id="kana" type="button" aria-pressed="false">もじ</button><button class="round" id="speaker" type="button" aria-label="もう一度聞く" aria-pressed="false">🔊</button></div></header>
+    <div class="prompt" id="prompt" aria-live="polite">Tap “Start game” to hear an instruction.</div>
+    <section class="scene-wrap" id="scene" aria-label="Bathroom game scene">
+      <svg viewBox="0 0 1086 1448" aria-hidden="true">
+        <image href="bathroom-stage-v5.jpg" width="1086" height="1448"/>
+        <g class="target" id="sink-zone"><rect x="30" y="295" width="350" height="150"/><circle cx="348" cy="325" r="29"/><text x="348" y="325">1</text></g>
+        <g class="target" id="organizer-zone"><rect x="390" y="290" width="360" height="120"/><circle cx="718" cy="320" r="29"/><text x="718" y="320">2</text></g>
+        <g class="target" id="rack-zone"><rect x="735" y="25" width="345" height="270"/><circle cx="1048" cy="55" r="29"/><text x="1048" y="55">3</text></g>
+        <g class="target" id="boy-zone"><rect x="760" y="330" width="320" height="730"/><circle cx="1048" cy="360" r="29"/><text x="1048" y="360">4</text></g>
+        <g class="target" id="basket-zone"><rect x="410" y="700" width="340" height="400"/><circle cx="718" cy="730" r="29"/><text x="718" y="730">5</text></g>
+      </svg>
+      <button class="item" id="toothbrush" data-item="toothbrush" data-label="Toothbrush" data-jp="はぶらし" aria-label="Toothbrush" type="button"><img class="item-art" src="bathroom-item-toothbrush-v4.png" alt=""></button>
+      <button class="item" id="cup" data-item="cup" data-label="Cup" data-jp="コップ" aria-label="Cup" type="button"><img class="item-art" src="bathroom-item-cup-v5.png" alt=""></button>
+      <button class="item" id="towel" data-item="towel" data-label="Towel" data-jp="タオル" aria-label="Towel" type="button"><img class="item-art" src="bathroom-item-towel-v4.png" alt=""></button>
+      <button class="item" id="soap" data-item="soap" data-label="Soap" data-jp="せっけん" aria-label="Soap" type="button"><img class="item-art" src="bathroom-item-soap-v4.png" alt=""></button>
+      <button class="item" id="toothpaste" data-item="toothpaste" data-label="Toothpaste" data-jp="はみがきこ" aria-label="Toothpaste" type="button"><img class="item-art" src="bathroom-item-toothpaste-v4.png" alt=""></button>
+      <button class="item" id="comb" data-item="comb" data-label="Comb" data-jp="くし" aria-label="Comb" type="button"><img class="item-art" src="bathroom-item-comb-v4.png" alt=""></button>
+      <div class="instruction-caption" id="instruction-caption"><span class="english" id="caption-english"></span><span class="kana-text" id="caption-kana"></span></div>
+      <span class="place-label" id="label-sink" data-jp="シンク">Sink</span><span class="place-label" id="label-organizer" data-jp="トレー">Tray</span><span class="place-label" id="label-rack" data-jp="タオルかけ">Towel rack</span><span class="place-label" id="label-boy" data-jp="おとこのこ">Boy</span><span class="place-label" id="label-basket" data-jp="せんたくかご">Laundry basket</span>
+      <div class="toast" id="toast" aria-live="assertive"></div>
+      <div class="start" id="start-panel"><div class="start-card"><img class="popup-cat" src="cat-mascot-v2-small.png" alt="白黒ねこ"><h2>Listen &amp; move!</h2><p>Tap start to turn on sound. Then listen, touch an object, and drag it to the right place.</p><button class="round" id="start" type="button">Start game 🔊</button></div></div>
+      <div class="finish" id="finish-panel" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>You moved every item. Great listening!</p><button class="round" id="play-again" type="button">Play again</button></div></div>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const tasks = [
+        {item:'toothbrush', target:'boy', caption:'はを みがこう。', phrases:['Brush your teeth.','It’s time to brush your teeth.','Can you brush your teeth, please?']},
+        {item:'toothbrush', target:'organizer', caption:'はぶらしを トレーに もどしてね。', phrases:['Put the toothbrush back on the tray.','Please put the toothbrush back on the tray.','Can you put the toothbrush back on the tray?']},
+        {item:'toothbrush', target:'sink', caption:'はぶらしを シンクで あらおう。', phrases:['Rinse your toothbrush in the sink.','Please rinse your toothbrush in the sink.','Can you rinse your toothbrush in the sink?']},
+        {item:'cup', target:'sink', caption:'こっぷを シンクに おいてね。', phrases:['Put your cup in the sink.','Please put your cup in the sink.','Can you put your cup in the sink?']},
+        {item:'cup', target:'boy', caption:'くちを ゆすごう。', phrases:['Rinse your mouth.','It’s time to rinse your mouth.','Can you rinse your mouth, please?']},
+        {item:'cup', target:'boy', caption:'うがいを しよう。', phrases:['Gargle with water.','It’s time to gargle.','Can you gargle with water, please?']},
+        {item:'towel', target:'rack', caption:'たおるを かけよう。', phrases:['Hang up your towel.','Please hang up your towel.','Can you put your towel back on the rack?']},
+        {item:'towel', target:'basket', caption:'たおるを せんたくかごに いれてね。', phrases:['Put your towel in the laundry basket.','Please put your towel in the laundry basket.','Can you put your towel in the basket?']},
+        {item:'towel', target:'boy', caption:'かおを ふこう。', phrases:['Wipe your face.','It’s time to wipe your face.','Can you wipe your face, please?']},
+        {item:'towel', target:'sink', caption:'たおるを シンクで ぬらそう。', phrases:['Wet your towel in the sink.','Please wet your towel in the sink.','Can you wet your towel in the sink?']},
+        {item:'soap', target:'organizer', caption:'せっけんを トレーに もどしてね。', phrases:['Put the soap back on the tray.','Please put the soap back on the tray.','Can you put the soap back on the tray?']},
+        {item:'soap', target:'boy', caption:'せっけんで てを あらおう。', phrases:['Wash your hands with soap.','It’s time to wash your hands.','Can you wash your hands with soap, please?']},
+        {item:'toothpaste', target:'organizer', caption:'はみがきこを トレーに もどしてね。', phrases:['Put the toothpaste back on the tray.','Please put the toothpaste back on the tray.','Can you put the toothpaste back on the tray?']},
+        {item:'toothpaste', target:'boy', caption:'はみがきこを もって。', phrases:['Hold the toothpaste.','Please hold the toothpaste.','Can you hold the toothpaste, please?']},
+        {item:'comb', target:'boy', caption:'かみを とかそう。', phrases:['Comb your hair.','It’s time to comb your hair.','Can you comb your hair, please?']},
+        {item:'comb', target:'organizer', caption:'くしを トレーに もどしてね。', phrases:['Put the comb back on the tray.','Please put the comb back on the tray.','Can you put the comb back on the tray?']}
+      ];
+      const zones = {sink:[30,295,380,445],organizer:[390,290,750,410],rack:[735,25,1080,295],boy:[760,330,1080,1060],basket:[410,700,750,1100]};
+      const itemNames = {toothbrush:'Toothbrush',cup:'Cup',towel:'Towel',soap:'Soap',toothpaste:'Toothpaste',comb:'Comb'};
+      const targetNames = {sink:'Sink',organizer:'Tray',rack:'Towel rack',boy:'Boy',basket:'Laundry basket'};
+      const homeScreen = document.querySelector('#home-screen'), placeScreen = document.querySelector('#place-screen'), wordScreen = document.querySelector('#word-screen'), breakfastScreen = document.querySelector('#breakfast-screen'), livingScreen = document.querySelector('#living-screen'), gameScreen = document.querySelector('#game-screen'), scene = document.querySelector('#scene'), speaker = document.querySelector('#speaker'), kanaButton = document.querySelector('#kana'), breakfastKanaButton = document.querySelector('#breakfast-kana'), livingKanaButton = document.querySelector('#living-kana'), wordKanaButton = document.querySelector('#word-kana'), prompt = document.querySelector('#prompt'), startPanel = document.querySelector('#start-panel'), finishPanel = document.querySelector('#finish-panel'), toast = document.querySelector('#toast'), captionEnglish = document.querySelector('#caption-english'), captionKana = document.querySelector('#caption-kana');
+      const matchModeScreen=document.querySelector('#match-mode-screen'), actionScreen=document.querySelector('#action-screen'), bedroomScreen=document.querySelector('#bedroom-screen'), bedroomScene=document.querySelector('#bedroom-scene'), bedroomSpeaker=document.querySelector('#bedroom-speaker'), bedroomCaptionEnglish=document.querySelector('#bedroom-caption-english'), bedroomCaptionKana=document.querySelector('#bedroom-caption-kana'), bedroomToast=document.querySelector('#bedroom-toast'), bedroomFinish=document.querySelector('#bedroom-finish'), bedroomKanaButton=document.querySelector('#bedroom-kana');
+      let current, currentPhrase, drag, voicesReady = false, speaking = false, audioContext, speechRate = .95, textDisplayStep = 0, activeUtterance = null;
+      const wordBoard=document.querySelector('#word-board'), wordSpeaker=document.querySelector('#word-speaker'), wordFinish=document.querySelector('#word-finish'), wordCaptionEnglish=document.querySelector('#word-caption-english'), wordCaptionJapanese=document.querySelector('#word-caption-jp');
+      const wordNames={toothbrush:'Toothbrush',cup:'Cup',towel:'Towel',soap:'Soap',toothpaste:'Toothpaste',comb:'Comb',toast:'Toast',banana:'Banana',milk:'Milk',cereal:'Cereal',spoon:'Spoon',plate:'Plate',mug:'Mug',fork:'Fork',chopsticks:'Chopsticks',apple:'Apple',bowl:'Bowl',napkin:'Napkin',sink:'Sink',tray:'Tray',rack:'Towel rack',basket:'Laundry basket',table:'Table',boy:'Boy',girl:'Girl',book:'Book',remote:'Remote',blanket:'Blanket',blocks:'Blocks',car:'Toy car',tissue:'Tissue',crayons:'Crayons',doll:'Doll','stuffed-toy':'Stuffed toy','cookie-wrapper':'Cookie','cat-drawing':'Drawing',bookshelf:'Bookshelf',mom:'Mom',sofa:'Sofa',toybox:'Toy box',bin:'Trash can',pajamas:'Pajamas',pillow:'Pillow',socks:'Socks',bed:'Bed',dad:'Dad',drawer:'Drawer'};
+      const wordJapanese={toothbrush:'はぶらし',cup:'コップ',towel:'タオル',soap:'せっけん',toothpaste:'はみがきこ',comb:'くし',toast:'トースト',banana:'バナナ',milk:'ミルク',cereal:'シリアル',spoon:'スプーン',plate:'おさら',mug:'マグカップ',fork:'フォーク',chopsticks:'おはし',apple:'りんご',bowl:'ボウル',napkin:'ナプキン',sink:'シンク',tray:'トレー',rack:'タオルかけ',basket:'せんたくかご',table:'テーブル',boy:'おとこのこ',girl:'おんなのこ',book:'ほん',remote:'リモコン',blanket:'ブランケット',blocks:'つみき',car:'ミニカー',tissue:'ティッシュ',crayons:'クレヨン',doll:'おにんぎょう','stuffed-toy':'ぬいぐるみ','cookie-wrapper':'クッキー','cat-drawing':'え',bookshelf:'ほんだな',mom:'ママ',sofa:'ソファ',toybox:'おもちゃばこ',bin:'ゴミばこ',pajamas:'パジャマ',pillow:'まくら',socks:'くつした',bed:'ベッド',dad:'パパ',drawer:'ドロアー'};
+      const teddyWordCard=document.createElement('button'); teddyWordCard.className='word-card'; teddyWordCard.dataset.word='stuffed-toy'; teddyWordCard.type='button'; teddyWordCard.setAttribute('aria-label','Stuffed toy'); teddyWordCard.innerHTML='<img src="word-item-teddy-bear-v1.png" alt="">'; wordBoard.insertBefore(teddyWordCard,wordFinish);
+      [['pajamas','bedroom-item-pajamas-v1.png'],['pillow','bedroom-item-pillow-v1.png'],['socks','bedroom-item-socks-v1.png']].forEach(([word,src])=>{ const card=document.createElement('button'); card.className='word-card'; card.dataset.word=word; card.type='button'; card.setAttribute('aria-label',wordNames[word]); card.innerHTML=`<img src="${src}" alt="">`; wordBoard.insertBefore(card,wordFinish); });
+      [['bed','word-target-bed-v1.png'],['dad','word-target-dad-v1.png'],['drawer','word-target-drawer-v1.png']].forEach(([word,src])=>{ const card=document.createElement('button'); card.className='word-card'; card.dataset.word=word; card.type='button'; card.setAttribute('aria-label',wordNames[word]); card.innerHTML=`<img src="${src}" alt="">`; wordBoard.insertBefore(card,wordFinish); });
+      document.querySelectorAll('.word-card').forEach(card=>{ const word=card.dataset.word; card.dataset.label=wordNames[word] || ''; card.dataset.jp=wordJapanese[word] || ''; });
+      let wordCurrent=null;
+      const breakfastTasks = [
+        {item:'toast', target:'plate', phrases:['Put the toast on the plate.','Please put the toast on the plate.','Can you put the toast on the plate?']},
+        {item:'toast', target:'girl', phrases:['Have your toast.','Eat your toast.','Please have some toast.']},
+        {item:'banana', target:'plate', phrases:['Put the banana on the plate.','Please put the banana on the plate.','Can you put the banana on the plate?']},
+        {item:'banana', target:'bowl', phrases:['Put the banana in the bowl.','Please put the banana in the bowl.','Can you put the banana in the bowl?']},
+        {item:'banana', target:'girl', phrases:['Have your banana.','It’s time to eat your banana.','Please eat your banana.']},
+        {item:'milk', target:'cup', phrases:['Pour the milk into the mug.','Please pour the milk into the mug.','Can you pour the milk into the mug?']},
+        {item:'milk', target:'bowl', phrases:['Pour the milk into the bowl.','Please pour the milk into the bowl.','Can you pour the milk into the bowl?']},
+        {item:'milk', target:'table', phrases:['Put the milk on the table.','Please put the milk on the table.','Can you put the milk on the table?']},
+        {item:'milk', target:'girl', phrases:['Drink your milk.','It’s time to drink your milk.','Please have some milk.']},
+        {item:'cereal', target:'bowl', phrases:['Pour the cereal into the bowl.','Please pour the cereal into the bowl.','Can you pour the cereal into the bowl?']},
+        {item:'cereal', target:'table', phrases:['Put the cereal on the table.','Please put the cereal on the table.','Can you put the cereal on the table?']},
+        {item:'cereal', target:'girl', phrases:['Have some cereal.','It’s time for cereal.','Please eat your cereal.']},
+        {item:'spoon', target:'bowl', phrases:['Put your spoon by the bowl.','Please put your spoon next to the bowl.','Can you put your spoon by the bowl?']},
+        {item:'spoon', target:'table', phrases:['Put your spoon on the table.','Please put your spoon on the table.','Can you put your spoon on the table?']},
+        {item:'spoon', target:'sink', phrases:['Put your spoon in the sink.','Please put your spoon in the sink.','Can you put your spoon in the sink?']},
+        {item:'spoon', target:'girl', phrases:['Hold your spoon.','Please hold your spoon.','Can you hold your spoon, please?']},
+        {item:'napkin', target:'table', phrases:['Put a napkin on the table.','Please put a napkin on the table.','Can you put a napkin on the table?']},
+        {item:'napkin', target:'girl', phrases:['Wipe your mouth with the napkin.','Please wipe your mouth with the napkin.','Can you wipe your mouth with the napkin?']},
+        {item:'plate', target:'table', phrases:['Put the plate on the table.','Please put the plate on the table.','Can you put the plate on the table?']},
+        {item:'plate', target:'sink', phrases:['Put the plate in the sink.','Please put the plate in the sink.','Can you put the plate in the sink?']},
+        {item:'mug', target:'table', phrases:['Put the mug on the table.','Please put the mug on the table.','Can you put the mug on the table?']},
+        {item:'mug', target:'sink', phrases:['Put the mug in the sink.','Please put the mug in the sink.','Can you put the mug in the sink?']},
+        {item:'mug', target:'girl', phrases:['Drink from your mug.','Please drink from your mug.','Can you drink from your mug, please?']},
+        {item:'fork', target:'table', phrases:['Put the fork on the table.','Please put the fork on the table.','Can you put the fork on the table?']},
+        {item:'fork', target:'sink', phrases:['Put the fork in the sink.','Please put the fork in the sink.','Can you put the fork in the sink?']},
+        {item:'fork', target:'girl', phrases:['Hold your fork.','Please hold your fork.','Can you hold your fork, please?']},
+        {item:'chopsticks', target:'bowl', phrases:['Put your chopsticks by the bowl.','Please put your chopsticks next to the bowl.','Can you put your chopsticks by the bowl?']},
+        {item:'chopsticks', target:'table', phrases:['Put your chopsticks on the table.','Please put your chopsticks on the table.','Can you put your chopsticks on the table?']},
+        {item:'chopsticks', target:'sink', phrases:['Put your chopsticks in the sink.','Please put your chopsticks in the sink.','Can you put your chopsticks in the sink?']},
+        {item:'chopsticks', target:'girl', phrases:['Hold your chopsticks.','Please hold your chopsticks.','Can you hold your chopsticks, please?']},
+        {item:'apple', target:'plate', phrases:['Put the apple on the plate.','Please put the apple on the plate.','Can you put the apple on the plate?']},
+        {item:'apple', target:'bowl', phrases:['Put the apple in the bowl.','Please put the apple in the bowl.','Can you put the apple in the bowl?']},
+        {item:'apple', target:'sink', phrases:['Wash the apple in the sink.','Please wash the apple in the sink.','Can you wash the apple in the sink?']},
+        {item:'apple', target:'girl', phrases:['Eat your apple.','Have your apple.','Can you eat your apple, please?']}
+      ];
+      const breakfastZones = {sink:[35,135,485,410],girl:[735,220,1070,690],table:[230,650,560,815],plate:[270,875,560,1110],bowl:[580,700,800,890],cup:[825,885,1070,1130]};
+      const breakfastItemNames = {toast:'Toast',banana:'Banana',milk:'Milk',cereal:'Cereal',spoon:'Spoon',napkin:'Napkin',plate:'Plate',mug:'Mug',fork:'Fork',chopsticks:'Chopsticks',apple:'Apple'};
+      const breakfastTargetNames = {sink:'Sink',girl:'Girl',table:'Table',plate:'Plate',bowl:'Bowl',cup:'Mug'};
+      const breakfastCaptions = {'toast:plate':'トーストを おさらに おいて。','toast:girl':'トーストを たべよう。','banana:plate':'バナナを おさらに おいて。','banana:bowl':'バナナを ボウルに いれて。','banana:girl':'バナナを たべよう。','milk:cup':'ミルクを マグカップに そそいで。','milk:bowl':'ミルクを ボウルに そそいで。','milk:table':'ミルクを テーブルに おいて。','milk:girl':'ミルクを のもう。','cereal:bowl':'シリアルを ボウルに いれて。','cereal:table':'シリアルを テーブルに おいて。','cereal:girl':'シリアルを たべよう。','spoon:bowl':'スプーンを ボウルの そばに おいて。','spoon:table':'スプーンを テーブルに おいて。','spoon:sink':'スプーンを シンクに いれて。','spoon:girl':'スプーンを もって。','napkin:table':'ナプキンを テーブルに おいて。','napkin:girl':'ナプキンで くちを ふいて。','plate:table':'おさらを テーブルに おいて。','plate:sink':'おさらを シンクに いれて。','mug:table':'マグカップを テーブルに おいて。','mug:sink':'マグカップを シンクに いれて。','mug:girl':'マグカップで のもう。','fork:table':'フォークを テーブルに おいて。','fork:sink':'フォークを シンクに いれて。','fork:girl':'フォークを もって。','chopsticks:bowl':'おはしを ボウルの そばに おいて。','chopsticks:table':'おはしを テーブルに おいて。','chopsticks:sink':'おはしを シンクに いれて。','chopsticks:girl':'おはしを もって。','apple:plate':'りんごを おさらに おいて。','apple:bowl':'りんごを ボウルに いれて。','apple:sink':'りんごを シンクで あらおう。','apple:girl':'りんごを たべよう。'};
+      const livingTasks = [
+        {item:'book',target:'bookshelf',caption:'ほんを ほんだなに いれて。',phrases:['Pick up the book and put it on the bookshelf.','Please pick up the book and put it on the bookshelf.','Can you pick up the book and put it on the bookshelf?']},
+        {item:'book',target:'table',caption:'ほんを テーブルに おいて。',phrases:['Put the book on the table.','Please put the book on the table.','Can you put the book on the table?']},
+        {item:'book',target:'mom',caption:'ほんを ママに もってきて。',phrases:['Bring me the book.','Please bring me the book.','Can you bring me the book?']},
+        {item:'book',target:'mom',caption:'この ほんを いっしょに よもう。',phrases:['Let’s read this book together.','Let’s read the book together.','Shall we read this book together?']},
+        {item:'remote',target:'table',caption:'リモコンを テーブルに おいて。',phrases:['Put the remote on the table.','Please put the remote on the table.','Can you put the remote on the table?']},
+        {item:'remote',target:'sofa',caption:'リモコンを ソファに おいて。',phrases:['Put the remote on the sofa.','Please put the remote on the sofa.','Can you put the remote on the sofa?']},
+        {item:'remote',target:'mom',caption:'テレビが みたいな。リモコンを もってきて。',phrases:['Can you get the remote for me?','Please get the remote for me.','I want to watch TV. Can you get the remote for me?']},
+        {item:'blanket',target:'sofa',caption:'ブランケットを ソファに かけて。',phrases:['Put the blanket on the sofa.','Please put the blanket on the sofa.','Can you put the blanket on the sofa?']},
+        {item:'blanket',target:'mom',caption:'さむいな。ブランケットを もってきて。',phrases:['Can you get the blanket for me? I’m cold.','Please get the blanket for me. I’m chilly.','I’m cold. Can you get the blanket for me?']},
+        {item:'blocks',target:'toybox',caption:'つみきを おもちゃばこに いれて。',phrases:['Pick up the blocks and put them in the toy box.','Please pick up the blocks and put them in the toy box.','Can you pick up the blocks and put them in the toy box?']},
+        {item:'blocks',target:'table',caption:'つみきを テーブルに おいて。',phrases:['Put the blocks on the table.','Please put the blocks on the table.','Can you put the blocks on the table?']},
+        {item:'blocks',target:'mom',caption:'つみきを ママに どうぞ。',phrases:['Bring the blocks to me.','Please bring me the blocks.','Can you bring the blocks to me?']},
+        {item:'car',target:'toybox',caption:'ミニカーを おもちゃばこに いれて。',phrases:['Pick up the toy car and put it in the toy box.','Please pick up the toy car and put it in the toy box.','Can you pick up the toy car and put it in the toy box?']},
+        {item:'car',target:'table',caption:'ミニカーを テーブルに おいて。',phrases:['Put the toy car on the table.','Please put the toy car on the table.','Can you put the toy car on the table?']},
+        {item:'car',target:'mom',caption:'ミニカーを ママに どうぞ。',phrases:['Bring the toy car to me.','Please bring me the toy car.','Can you bring the toy car to me?']},
+        {item:'cup',target:'table',caption:'コップを テーブルに おいて。',phrases:['Put the cup on the table.','Please put the cup on the table.','Can you put the cup on the table?']},
+        {item:'cup',target:'mom',caption:'のどが かわいたな。コップを もってきて。',phrases:['I’m thirsty. Can you bring me the cup?','Please bring me the cup. I’m thirsty.','I’m thirsty. Can you get the cup for me?']},
+        {item:'tissue',target:'table',caption:'ティッシュを テーブルに おいて。',phrases:['Put the tissue on the table.','Please put the tissue on the table.','Can you put the tissue on the table?']},
+        {item:'tissue',target:'mom',caption:'ティッシュを ママに どうぞ。',phrases:['Bring the tissue to me.','Please bring me the tissue.','Can you bring the tissue to me?']},
+        {item:'tissue',target:'bin',caption:'ティッシュを ゴミばこに いれて。',phrases:['Throw the tissue away.','Please put the tissue in the trash can.','Can you throw the tissue away?']},
+        {item:'crayons',target:'table',caption:'クレヨンを テーブルに おいて。',phrases:['Put the crayons on the table.','Please put the crayons on the table.','Can you put the crayons on the table?']},
+        {item:'crayons',target:'toybox',caption:'クレヨンを おもちゃばこに いれて。',phrases:['Pick up the crayons and put them in the toy box.','Please pick up the crayons and put them in the toy box.','Can you pick up the crayons and put them in the toy box?']},
+        {item:'doll',target:'toybox',caption:'{nounJp}を おもちゃばこに いれて。',randomNouns:[{en:'doll',jp:'おにんぎょう'},{en:'stuffed toy',jp:'ぬいぐるみ'}],phrases:['Put the {noun} in the toy box.','Please put the {noun} in the toy box.','Can you put the {noun} in the toy box?']},
+        {item:'doll',target:'sofa',caption:'{nounJp}を ソファに おいて。',randomNouns:[{en:'doll',jp:'おにんぎょう'},{en:'stuffed toy',jp:'ぬいぐるみ'}],phrases:['Put the {noun} on the sofa.','Please put the {noun} on the sofa.','Can you put the {noun} on the sofa?']},
+        {item:'doll',target:'mom',caption:'{nounJp}で いっしょに あそぼう。',randomNouns:[{en:'doll',jp:'おにんぎょう'},{en:'stuffed toy',jp:'ぬいぐるみ'}],phrases:['Let’s play with the {noun} together.','Let’s play with the {noun} together.','Shall we play with the {noun}?']},
+        {item:'cookie-wrapper',target:'bin',caption:'おかしの ふくろを すてて。',captions:['おかしの ふくろを すてて。','おかしの ふくろを ゴミばこに いれて。','おかしの ふくろを すてて。'],phrases:['Throw the snack wrapper away.','Please put the snack wrapper in the trash can.','Can you throw the snack wrapper away?']},
+        {item:'cookie-wrapper',target:'table',caption:'クッキーを テーブルに おいて。',phrases:['Put the cookie on the table.','Please put the cookie on the table.','Can you put the cookie on the table?']},
+        {item:'cat-drawing',target:'bin',caption:'かみを ゴミばこに いれて。',phrases:['Throw the paper away.','Please throw the paper away.','Can you throw the paper away?']},
+        {item:'cat-drawing',target:'table',caption:'えを テーブルに おいて。',phrases:['Put the drawing on the table.','Please put the drawing on the table.','Can you put the drawing on the table?']},
+        {item:'cat-drawing',target:'mom',caption:'えを みせて。',phrases:['Show me your drawing.','I want to see your drawing.','Can you show me your drawing?']}
+      ];
+      const livingZones={bookshelf:[20,120,305,540],table:[180,870,1015,1195],mom:[805,190,1060,765],sofa:[430,365,745,760],toybox:[10,615,250,780],bin:[285,570,410,825]};
+      const livingItemNames={book:'Book',remote:'Remote',blanket:'Blanket',blocks:'Blocks',car:'Toy car',cup:'Cup',tissue:'Tissue',crayons:'Crayons',doll:'Doll','cookie-wrapper':'Cookie','cat-drawing':'Drawing'};
+      const livingTargetNames={bookshelf:'Bookshelf',table:'Table',mom:'Mom',sofa:'Sofa',toybox:'Toy box',bin:'Trash can'};
+      const withTaskMeta=(sceneName,list,captions={})=>list.map((task,index)=>({id:`${sceneName}-${index}`,caption:task.caption || captions[`${task.item}:${task.target}`] || '',...task}));
+      const bathroomTasks=withTaskMeta('bathroom',tasks);
+      const breakfastTaskData=withTaskMeta('breakfast',breakfastTasks,breakfastCaptions);
+      const livingTaskData=withTaskMeta('living',livingTasks);
+      const bedroomTasks=[
+        {item:'pajamas',target:'drawer',caption:'パジャマを ドロアーに しまおう。',phrases:['Put the pajamas in the drawer.','Please put the pajamas in the drawer.','Can you put the pajamas in the drawer?']},
+        {item:'pajamas',target:'bed',caption:'パジャマを ベッドに おいて。',phrases:['Put the pajamas on the bed.','Please put the pajamas on the bed.','Can you put the pajamas on the bed?']},
+        {item:'book',target:'bookshelf',caption:'ほんを ほんだなに もどして。',phrases:['Put the book on the bookshelf.','Please put the book on the bookshelf.','Can you put the book on the bookshelf?']},
+        {item:'book',target:'dad',caption:'パパに ほんを もっていこう。',phrases:['Bring the book to Dad.','Please bring the book to Dad.','Can you bring the book to Dad?']},
+        {item:'stuffed-toy',target:'bed',caption:'ぬいぐるみを ベッドに おいて。',phrases:['Put the stuffed toy on the bed.','Please put the stuffed toy on the bed.','Can you put the stuffed toy on the bed?']},
+        {item:'stuffed-toy',target:'dad',caption:'パパに ぬいぐるみを みせて。',phrases:['Show Dad the stuffed toy.','Please show Dad the stuffed toy.','Can you show Dad the stuffed toy?']},
+        {item:'pillow',target:'bed',caption:'まくらを ベッドに おいて。',phrases:['Put the pillow on the bed.','Please put the pillow on the bed.','Can you put the pillow on the bed?']},
+        {item:'pillow',target:'dad',caption:'パパに まくらを もっていこう。',phrases:['Bring the pillow to Dad.','Please bring the pillow to Dad.','Can you bring the pillow to Dad?']},
+        {item:'socks',target:'drawer',caption:'くつしたを ドロアーに しまおう。',phrases:['Put the socks in the drawer.','Please put the socks in the drawer.','Can you put the socks in the drawer?']},
+        {item:'socks',target:'bed',caption:'くつしたを ベッドに おいて。',phrases:['Put the socks on the bed.','Please put the socks on the bed.','Can you put the socks on the bed?']}
+      ];
+      const bedroomTaskData=withTaskMeta('bedroom',bedroomTasks), bedroomZones={bookshelf:[15,100,265,700],bed:[90,420,800,890],dad:[785,180,1075,740],drawer:[900,640,1085,1060]}, bedroomItemNames={pajamas:'Pajamas',book:'Book','stuffed-toy':'Stuffed toy',pillow:'Pillow',socks:'Socks'}, bedroomTargetNames={bookshelf:'Bookshelf',bed:'Bed',dad:'Dad',drawer:'Drawer'};
+      const listenContent=Object.freeze({bathroom:{tasks:bathroomTasks,zones,itemNames,targetNames},breakfast:{tasks:breakfastTaskData,zones:breakfastZones,itemNames:breakfastItemNames,targetNames:breakfastTargetNames},living:{tasks:livingTaskData,zones:livingZones,itemNames:livingItemNames,targetNames:livingTargetNames},bedroom:{tasks:bedroomTaskData,zones:bedroomZones,itemNames:bedroomItemNames,targetNames:bedroomTargetNames}});
+      const breakfastScene = document.querySelector('#breakfast-scene'), breakfastSpeaker = document.querySelector('#breakfast-speaker'), breakfastToast = document.querySelector('#breakfast-toast'), breakfastFinish = document.querySelector('#breakfast-finish'), breakfastCaptionEnglish = document.querySelector('#breakfast-caption-english'), breakfastCaptionKana = document.querySelector('#breakfast-caption-kana');
+      let breakfastCurrent, breakfastPhrase, breakfastDrag, breakfastStarted = false, breakfastQueue = [];
+      const livingScene=document.querySelector('#living-scene'), livingSpeaker=document.querySelector('#living-speaker'), livingToast=document.querySelector('#living-toast'), livingFinish=document.querySelector('#living-finish'), livingCaptionEnglish=document.querySelector('#living-caption-english'), livingCaptionKana=document.querySelector('#living-caption-kana');
+      let livingCurrent, livingPhrase, livingDrag, livingQueue=[];
+      const traySlotCount=6;
+      const traySideInset=9;
+      function traySlotPosition(slot) { return `${(traySideInset + (slot/(traySlotCount-1))*(100-traySideInset*2)).toFixed(4)}%`; }
+      function centerVisibleArtwork(image) {
+        const measure=()=>{
+          if(!image.naturalWidth || !image.naturalHeight) return;
+          try {
+            const sourceWidth=image.naturalWidth, sourceHeight=image.naturalHeight, maxSide=160;
+            const scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight));
+            const width=Math.max(1,Math.round(sourceWidth*scale)), height=Math.max(1,Math.round(sourceHeight*scale));
+            const canvas=document.createElement('canvas'); canvas.width=width; canvas.height=height;
+            const context=canvas.getContext('2d',{willReadFrequently:true}); context.drawImage(image,0,0,width,height);
+            const pixels=context.getImageData(0,0,width,height).data;
+            let minX=width, maxX=-1;
+            for(let y=0;y<height;y++) for(let x=0;x<width;x++) if(pixels[(y*width+x)*4+3]>10) { minX=Math.min(minX,x); maxX=Math.max(maxX,x); }
+            if(maxX<minX) return;
+            const renderedWidth=58*sourceWidth/Math.max(sourceWidth,sourceHeight);
+            const visibleCenter=(((minX+maxX+1)/(2*width))-.5)*renderedWidth;
+            image.style.setProperty('--art-center-x',`${(-visibleCenter).toFixed(2)}px`);
+          } catch(_) {}
+        };
+        if(image.complete) requestAnimationFrame(measure); else image.addEventListener('load',measure,{once:true});
+      }
+      document.querySelector('[data-living-item="doll"] img').src='living-item-doll-and-teddy-v2.png';
+      document.querySelectorAll('.breakfast-item-art').forEach(centerVisibleArtwork);
+      const choose = a => a[Math.floor(Math.random()*a.length)];
+      const masteryStorageKey='ouchieigo-listen-mastery-v1', confusionStorageKey='ouchieigo-listen-confusions-v1';
+      let mastery={};
+      let confusions={};
+      try { mastery=JSON.parse(localStorage.getItem(masteryStorageKey) || '{}') || {}; } catch (_) { mastery={}; }
+      try { confusions=JSON.parse(localStorage.getItem(confusionStorageKey) || '{}') || {}; } catch (_) { confusions={}; }
+      function chooseTaskPhrase(task) { const variants=task.phrases, variantIndex=Math.floor(Math.random()*variants.length), noun=task.randomNouns ? choose(task.randomNouns) : null, baseCaption=task.captions?.[variantIndex] || task.caption; task.activeNoun=noun; task.activeCaption=noun ? baseCaption.replaceAll('{nounJp}',noun.jp) : baseCaption; return variants[variantIndex].replaceAll('{noun}',noun?.en || ''); }
+      function recordTaskSuccess(task) { if(!task) return; mastery[task.id]=Math.min(99,Number(mastery[task.id] || 0)+1); try { localStorage.setItem(masteryStorageKey,JSON.stringify(mastery)); } catch (_) {} }
+      const wordTargetAlias={organizer:'tray',rack:'rack',basket:'basket',sink:'sink',boy:'boy',girl:'girl',table:'table',plate:'plate',bowl:'bowl',cup:'mug'};
+      function targetAtPoint(point,zoneMap) { return Object.entries(zoneMap).find(([,zone])=>inside(point,zone))?.[0] || ''; }
+      function recordConfusion(sceneName,task,selectedItem,droppedTarget) { if(!task || !droppedTarget) return; const selectedWord=selectedItem, droppedWord=wordTargetAlias[droppedTarget] || droppedTarget, expectedItem=task.item, expectedTarget=wordTargetAlias[task.target] || task.target; const key=[sceneName,selectedWord,droppedWord,expectedItem,expectedTarget].join('|'); confusions[key]={scene:sceneName,selectedItem:selectedWord,droppedTarget:droppedWord,expectedItem,expectedTarget,count:Math.min(99,Number(confusions[key]?.count || 0)+1)}; try { localStorage.setItem(confusionStorageKey,JSON.stringify(confusions)); } catch (_) {} }
+      function reviewWordIds() { const totals={}; Object.values(confusions).forEach(entry=>{ const weight=Number(entry.count || 0); [entry.selectedItem,entry.droppedTarget,entry.expectedItem,entry.expectedTarget].forEach(word=>{ if(word) totals[word]=(totals[word] || 0)+weight; }); }); return Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([word])=>word); }
+      function validateListenContent() { const problems=[]; Object.entries(listenContent).forEach(([sceneName,content])=>{ const ids=new Set(); content.tasks.forEach(task=>{ if(ids.has(task.id)) problems.push(`${sceneName}: duplicate id ${task.id}`); ids.add(task.id); if(!content.itemNames[task.item]) problems.push(`${sceneName}: missing item ${task.item}`); if(!content.targetNames[task.target] || !content.zones[task.target]) problems.push(`${sceneName}: missing target ${task.target}`); if(!task.caption) problems.push(`${sceneName}: missing Japanese caption for ${task.id}`); if(!Array.isArray(task.phrases) || task.phrases.length!==3 || task.phrases.some(phrase=>!phrase.trim())) problems.push(`${sceneName}: invalid phrases for ${task.id}`); }); }); if(problems.length) console.warn('オウチエイゴ content check',problems); else console.info('オウチエイゴ content check: OK'); return problems; }
+      validateListenContent();
+      function allFinished() { return [...document.querySelectorAll('.item')].every(el => el.classList.contains('done')); }
+      function updateBreakfastCaption() { breakfastCaptionEnglish.textContent=breakfastPhrase || ''; breakfastCaptionKana.textContent=breakfastCurrent?.caption || ''; }
+      function selectTask() { const available = bathroomTasks.filter(t => !document.querySelector(`[data-item="${t.item}"]`).classList.contains('done')); current = available.length ? choose(available) : null; currentPhrase=''; updateCaption(); }
+      function updateCaption() { captionEnglish.textContent=currentPhrase || ''; captionKana.textContent=current?.caption || ''; }
+      const IS_SAFARI=/^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+      const SPEECH_DEBUG=new URLSearchParams(window.location.search).get('debug')==='1';
+      let pendingSpeech=null, speechStartTimer=null, speechDebugLog=null, speechDebugLines=[];
+      function appendDebugLine(line) { if(!SPEECH_DEBUG || !speechDebugLog) return; speechDebugLines.push(line); speechDebugLog.textContent=speechDebugLines.join('\n'); speechDebugLog.scrollTop=speechDebugLog.scrollHeight; }
+      function logSpeech(...args) { if(!SPEECH_DEBUG) return; console.log('[speech]',...args); appendDebugLine(args.map(value=>typeof value==='object' ? JSON.stringify(value) : String(value)).join(' ')); }
+      function getEnglishVoices() { return !('speechSynthesis' in window) ? [] : (speechSynthesis.getVoices() || []).filter(v=>(v.lang || '').toLowerCase().startsWith('en')); }
+      function speechVoiceSummary() { return getEnglishVoices().map(v=>({name:v.name,lang:v.lang,localService:v.localService,default:v.default})); }
+      function initSpeechDebug() { if(!SPEECH_DEBUG || speechDebugLog) return; const panel=document.createElement('aside'), head=document.createElement('div'), actions=document.createElement('div'), clear=document.createElement('button'), copy=document.createElement('button'); panel.className='speech-debug'; panel.setAttribute('aria-label','Speech synthesis diagnostics'); head.className='speech-debug-head'; head.append('Speech diagnostics'); actions.className='speech-debug-actions'; clear.type=copy.type='button'; clear.textContent='クリア'; copy.textContent='全文コピー'; clear.addEventListener('click',()=>{ speechDebugLines=[]; speechDebugLog.textContent=''; }); copy.addEventListener('click',()=>navigator.clipboard?.writeText(speechDebugLines.join('\n')).then(()=>{ copy.textContent='コピー済み'; setTimeout(()=>copy.textContent='全文コピー',1200); }).catch(()=>{ copy.textContent='コピー不可'; })); actions.append(clear,copy); head.append(actions); speechDebugLog=document.createElement('div'); speechDebugLog.className='speech-debug-log'; panel.append(head,speechDebugLog); document.body.append(panel); logSpeech('startup',{iframe:window.self!==window.top,userAgent:navigator.userAgent,englishVoices:speechVoiceSummary()}); }
+      function primeSpeech() { if (!('speechSynthesis' in window)) return; const count=getEnglishVoices().length; logSpeech('primeSpeech',{englishVoices:count,safari:IS_SAFARI}); if(IS_SAFARI) speechSynthesis.resume(); }
+      function unlockAudio() { const Audio=window.AudioContext || window.webkitAudioContext; if (Audio) { audioContext ||= new Audio(); if (audioContext.state==='suspended') audioContext.resume(); } primeSpeech(); }
+      function tone(frequency, start, length, type='sine') { if (!audioContext) return; const oscillator=audioContext.createOscillator(), gain=audioContext.createGain(); oscillator.type=type; oscillator.frequency.setValueAtTime(frequency, start); gain.gain.setValueAtTime(.0001, start); gain.gain.exponentialRampToValueAtTime(.13, start+.015); gain.gain.exponentialRampToValueAtTime(.0001, start+length); oscillator.connect(gain).connect(audioContext.destination); oscillator.start(start); oscillator.stop(start+length+.02); }
+      function correctSound() { unlockAudio(); if (!audioContext) return; const t=audioContext.currentTime+.02; tone(659,t,.16,'triangle'); tone(880,t+.14,.28,'triangle'); }
+      function wrongSound() { unlockAudio(); if (!audioContext) return; const t=audioContext.currentTime+.02; tone(392,t,.12,'triangle'); tone(330,t+.16,.18,'triangle'); }
+      function finishSound() { unlockAudio(); if (!audioContext) return; const t=audioContext.currentTime+.02; [523,659,784,1047].forEach((f,i)=>tone(f,t+i*.14,.34,'triangle')); }
+      function sceneSelectSound() { unlockAudio(); if (!audioContext) return; const t=audioContext.currentTime+.02; tone(523,t,.12,'triangle'); tone(784,t+.11,.22,'triangle'); }
+      function voice() { const english=getEnglishVoices(), local=english.filter(v=>v.localService), list=local.length ? local : english, preferred=['Samantha','Ava','Allison','Karen','Google US English','Microsoft Aria','Microsoft Jenny','Microsoft Zira']; return preferred.map(name=>list.find(v=>v.name.includes(name))).find(Boolean) || list.find(v=>/^en-US$/i.test(v.lang)) || list[0]; }
+      function onVoicesChanged() { const ready=getEnglishVoices().length>0; voicesReady=ready; logSpeech('voiceschanged',{englishVoices:getEnglishVoices().length,ready,voices:speechVoiceSummary()}); if(ready && pendingSpeech && !pendingSpeech.retried) { const pending=pendingSpeech; pendingSpeech=null; pending.retried=true; playSpeech(pending.utterance,true); } }
+      function addSpeechDiagnostics(u, selectedVoice) { if(!SPEECH_DEBUG || u._speechDiagnosticsBound) return; u._speechDiagnosticsBound=true; u.addEventListener('start',()=>{ if(pendingSpeech?.utterance===u) pendingSpeech=null; logSpeech('onstart',u.text,{voice:selectedVoice?.name || '(default)',lang:selectedVoice?.lang || u.lang,local:selectedVoice?.localService}); }); u.addEventListener('end',()=>logSpeech('onend',u.text)); u.addEventListener('error',event=>logSpeech('onerror',event.error || 'unknown',u.text)); }
+      function playSpeech(u, retried=false) { if (!u || !('speechSynthesis' in window)) { logSpeech('unsupported or empty utterance'); return; } const engine=window.speechSynthesis, selectedVoice=u.voice || voice(), voicesReadyNow=getEnglishVoices().length>0; if(selectedVoice && !u.voice) { u.voice=selectedVoice; u.lang=selectedVoice.lang || u.lang; } if(!voicesReadyNow && !retried) { pendingSpeech={utterance:u,retried:false}; logSpeech('voices not ready -> pending',u.text); } addSpeechDiagnostics(u,selectedVoice); activeUtterance=u; if(speechStartTimer) { clearTimeout(speechStartTimer); speechStartTimer=null; } const fire=()=>{ if(activeUtterance!==u) return; if(IS_SAFARI) engine.resume(); engine.speak(u); logSpeech('speak() called',{voice:selectedVoice?.name || '(default)',local:selectedVoice?.localService,pending:engine.pending,paused:engine.paused}); setTimeout(()=>logSpeech('300ms later',{speaking:engine.speaking,pending:engine.pending,paused:engine.paused}),300); }; if(engine.speaking || engine.pending) { engine.cancel(); logSpeech('cancel before replacement',{safari:IS_SAFARI}); if(IS_SAFARI) fire(); else speechStartTimer=setTimeout(fire,60); } else fire(); }
+      function updateWordCaption() { wordCaptionEnglish.textContent=wordCurrent ? wordNames[wordCurrent.dataset.word] : ''; wordCaptionJapanese.textContent=wordCurrent ? wordJapanese[wordCurrent.dataset.word] : ''; }
+      function selectWord() { const available=[...document.querySelectorAll('.word-card:not(.matched):not(.queued)')]; wordCurrent=available.length ? choose(available) : null; updateWordCaption(); }
+      function speakWord(repeat=false) { if(!wordCurrent || !('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(wordNames[wordCurrent.dataset.word]), v=voice(); u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; if(v) u.voice=v; u.onstart=()=>wordSpeaker.setAttribute('aria-pressed','true'); u.onend=u.onerror=()=>wordSpeaker.setAttribute('aria-pressed','false'); playSpeech(u); }
+      function wordWrongFeedback() { wrongSound(); setTimeout(()=>speakWord(true),500); }
+      function resetWord(shouldSpeak=true) { if ('speechSynthesis' in window) speechSynthesis.cancel(); wordFinish.classList.remove('show'); const cards=[...document.querySelectorAll('.word-card')].sort(()=>Math.random()-.5); cards.forEach((card,index)=>{ card.classList.remove('matched','queued'); wordBoard.append(card); if(index>=12) card.classList.add('queued'); }); selectWord(); if(shouldSpeak) setTimeout(()=>speakWord(),220); }
+      function finishWord() { wordCurrent=null; updateWordCaption(); wordFinish.classList.add('show'); finishSound(); }
+      function openWord() { homeScreen.hidden=true; matchModeScreen.hidden=false; unlockAudio(); sceneSelectSound(); }
+      function openItemMatch() { matchModeScreen.hidden=true; wordScreen.hidden=false; unlockAudio(); sceneSelectSound(); resetWord(); }
+      let actionCurrent='put';
+      function openActionMatch() { matchModeScreen.hidden=true; actionScreen.hidden=false; unlockAudio(); prepareActionCards(); selectAction(); }
+      function closeWord() { if ('speechSynthesis' in window) speechSynthesis.cancel(); wordScreen.hidden=true; matchModeScreen.hidden=false; }
+      function closeActionMatch() { if ('speechSynthesis' in window) speechSynthesis.cancel(); actionScreen.hidden=true; matchModeScreen.hidden=false; }
+      function closeMatchMode() { matchModeScreen.hidden=true; homeScreen.hidden=false; }
+      function prepareActionCards() { ['put','get','bring','throw'].forEach(action=>{ const variants=shuffle([...document.querySelectorAll(`[data-action="${action}"]`)]); variants.forEach((card,index)=>{ card.classList.remove('matched'); card.classList.toggle('queued',index!==0); }); }); }
+      function speakAction(repeat=false) { if(!('speechSynthesis' in window))return; const phrase={put:'Put it.',get:'Get it.',bring:'Bring it to me.',throw:'Throw it away.'}[actionCurrent]; const u=new SpeechSynthesisUtterance(phrase),v=voice();u.lang=v?.lang||'en-US';u.rate=speechRate;u.pitch=1;if(v)u.voice=v;playSpeech(u); }
+      function selectAction() { const choices=[...new Set([...document.querySelectorAll('[data-action]:not(.queued):not(.matched)')].map(card=>card.dataset.action))]; if(!choices.length) { prepareActionCards(); setTimeout(selectAction,260); return; } actionCurrent=choose(choices); speakAction(); }
+      document.querySelectorAll('.word-card').forEach(card=>card.addEventListener('click',()=>{ if(!wordCurrent || card.classList.contains('matched')) return; unlockAudio(); if(card===wordCurrent) { card.classList.add('matched'); correctSound(); setTimeout(()=>{ selectWord(); if(wordCurrent) speakWord(); else finishWord(); },650); } else wordWrongFeedback(); }));
+      function speakSceneIntro(message, done) { if (!('speechSynthesis' in window)) { done?.(); return; } const u=new SpeechSynthesisUtterance(message); const v=voice(); u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; if(v) u.voice=v; u.onend=()=>setTimeout(()=>done?.(),180); u.onerror=()=>done?.(); playSpeech(u); }
+      function speakName(name) { if (!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(name); const v=voice(); u.lang=v?.lang || 'en-US'; u.rate=Math.max(.7,speechRate-.06); u.pitch=1; if(v) u.voice=v; u.onstart=()=>{ prompt.textContent=name; }; playSpeech(u); }
+      function wrongFeedback() { wrongSound(); setTimeout(()=>speak(true),500); }
+      function speak(repeat=false) {
+        if (!current || !('speechSynthesis' in window)) { prompt.textContent='Sound is not available in this browser.'; return; }
+        if (!repeat || !currentPhrase) currentPhrase=chooseTaskPhrase(current); updateCaption(); const u = new SpeechSynthesisUtterance(currentPhrase); const v=voice(); u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; if(v) u.voice=v;
+        u.onstart=()=>{speaking=true; speaker.setAttribute('aria-pressed','true'); prompt.textContent='Listening… drag the object after you hear it.'};
+        u.onend=u.onerror=()=>{speaking=false; speaker.setAttribute('aria-pressed','false'); prompt.textContent='Touch an item and drag it. Tap 🔊 to hear the instruction again.'}; playSpeech(u);
+      }
+      function finishGame() { current=null; if ('speechSynthesis' in window) speechSynthesis.cancel(); finishPanel.classList.add('show'); prompt.textContent='You finished every item!'; finishSound(); }
+      function next() { selectTask(); if (!current) { finishGame(); return; } setTimeout(speak, 260); }
+      function celebrate(msg, state='right') { toast.textContent=msg; toast.classList.toggle('wrong',state==='wrong'); toast.classList.add('show'); setTimeout(()=>{toast.classList.remove('show','wrong');},1150); }
+      function resetGame() { if ('speechSynthesis' in window) speechSynthesis.cancel(); finishPanel.classList.remove('show'); document.querySelectorAll('.item').forEach(el=>el.classList.remove('done')); selectTask(); prompt.textContent='New game — listen carefully!'; if (voicesReady) setTimeout(speak, 120); }
+      const shuffle = list => [...list].sort(()=>Math.random()-.5);
+      function setBreakfastSlot(el, slot) { el.dataset.slot=slot; el.style.left=traySlotPosition(slot); el.style.top='86%'; }
+      function prepareBreakfastItems() {
+        const items=shuffle([...document.querySelectorAll('.breakfast-item')]);
+        breakfastQueue=items.slice(6);
+        items.forEach((el,index)=>{ el.classList.remove('done','queued'); if(index<6) setBreakfastSlot(el,index); else { el.classList.add('queued'); el.style.left=''; el.style.top=''; } });
+      }
+      function spawnBreakfastItem(slot) { if(!breakfastQueue.length) return; const index=Math.floor(Math.random()*breakfastQueue.length), el=breakfastQueue.splice(index,1)[0]; el.classList.remove('queued'); setBreakfastSlot(el,slot); }
+      function breakfastAllFinished() { return !breakfastQueue.length && [...document.querySelectorAll('.breakfast-item')].every(el=>el.classList.contains('done')); }
+      function selectBreakfastTask() { const available=breakfastTaskData.filter(t=>{ const el=document.querySelector(`[data-breakfast-item="${t.item}"]`); return !el.classList.contains('done') && !el.classList.contains('queued'); }); breakfastCurrent=available.length ? choose(available) : null; breakfastPhrase=''; updateBreakfastCaption(); }
+      function speakBreakfast(repeat=false) {
+        if (!breakfastCurrent || !('speechSynthesis' in window)) return;
+        if (!repeat || !breakfastPhrase) breakfastPhrase=chooseTaskPhrase(breakfastCurrent); updateBreakfastCaption();
+        const u=new SpeechSynthesisUtterance(breakfastPhrase), v=voice(); u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; if(v) u.voice=v;
+        u.onstart=()=>breakfastSpeaker.setAttribute('aria-pressed','true'); u.onend=u.onerror=()=>breakfastSpeaker.setAttribute('aria-pressed','false'); playSpeech(u);
+      }
+      function breakfastWrongFeedback() { wrongSound(); setTimeout(()=>speakBreakfast(true),500); }
+      function breakfastCelebrate(message, state='right') { breakfastToast.textContent=message; breakfastToast.classList.toggle('wrong',state==='wrong'); breakfastToast.classList.add('show'); setTimeout(()=>{breakfastToast.classList.remove('show','wrong');},1150); }
+      function finishBreakfast() { breakfastCurrent=null; if ('speechSynthesis' in window) speechSynthesis.cancel(); breakfastFinish.classList.add('show'); finishSound(); }
+      function nextBreakfast() { selectBreakfastTask(); if (!breakfastCurrent) { finishBreakfast(); return; } setTimeout(()=>speakBreakfast(),260); }
+      function resetBreakfast(shouldSpeak=true) { if ('speechSynthesis' in window) speechSynthesis.cancel(); breakfastFinish.classList.remove('show'); prepareBreakfastItems(); breakfastStarted=true; selectBreakfastTask(); if (shouldSpeak && breakfastCurrent) speakBreakfast(); }
+      function toBreakfastPoint(e) { const r=breakfastScene.getBoundingClientRect(); return [(e.clientX-r.left)*1086/r.width,(e.clientY-r.top)*1448/r.height]; }
+      function insideBreakfast(p,z) { return p[0]>=z[0] && p[0]<=z[2] && p[1]>=z[1] && p[1]<=z[3]; }
+      breakfastScene.addEventListener('pointerdown', e=>{ if (breakfastDrag || e.target.closest?.('.breakfast-item')) return; const p=toBreakfastPoint(e); for (const [target,zone] of Object.entries(breakfastZones)) if (insideBreakfast(p,zone)) { unlockAudio(); speakName(breakfastTargetNames[target]); return; } });
+      document.querySelectorAll('.breakfast-item').forEach(el=>{
+        el.addEventListener('pointerdown',e=>{ unlockAudio(); speakName(breakfastItemNames[el.dataset.breakfastItem]); if (!breakfastStarted || el.classList.contains('done') || el.classList.contains('queued')) return; e.preventDefault(); breakfastDrag={el,id:e.pointerId,startX:e.clientX,startY:e.clientY,moved:false}; el.setPointerCapture(e.pointerId); });
+        el.addEventListener('pointermove',e=>{ if (!breakfastDrag || breakfastDrag.id!==e.pointerId) return; if (!breakfastDrag.moved && Math.hypot(e.clientX-breakfastDrag.startX,e.clientY-breakfastDrag.startY)<9) return; if (!breakfastDrag.moved) { breakfastDrag.moved=true; el.classList.add('drag'); breakfastScene.classList.add('breakfast-dragging'); } const r=breakfastScene.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top-27; el.style.left=`${Math.max(24,Math.min(r.width-24,x))}px`; el.style.top=`${Math.max(-5,Math.min(r.height-49,y))}px`; });
+        const end=e=>{ if (!breakfastDrag || breakfastDrag.id!==e.pointerId) return; const moved=breakfastDrag.moved, p=toBreakfastPoint(e), slot=Number(el.dataset.slot); el.releasePointerCapture?.(e.pointerId); el.classList.remove('drag'); breakfastScene.classList.remove('breakfast-dragging'); breakfastDrag=null; if(!moved) { setBreakfastSlot(el,slot); return; } const right=el.dataset.breakfastItem===breakfastCurrent.item && insideBreakfast(p,breakfastZones[breakfastCurrent.target]); if(right) { recordTaskSuccess(breakfastCurrent); el.classList.add('done'); spawnBreakfastItem(slot); correctSound(); breakfastCelebrate('できたね！'); setTimeout(nextBreakfast,1300); } else { recordConfusion('breakfast',breakfastCurrent,el.dataset.breakfastItem,targetAtPoint(p,breakfastZones)); setBreakfastSlot(el,slot); breakfastWrongFeedback(); } };
+        const cancel=e=>{ if(!breakfastDrag || breakfastDrag.id!==e.pointerId) return; const slot=Number(el.dataset.slot); el.releasePointerCapture?.(e.pointerId); el.classList.remove('drag'); breakfastScene.classList.remove('breakfast-dragging'); setBreakfastSlot(el,slot); breakfastDrag=null; };
+        el.addEventListener('pointerup',end); el.addEventListener('pointercancel',cancel);
+      });
+      function updateLivingItemLabels() { const cookie=document.querySelector('[data-living-item="cookie-wrapper"]'), isWrapper=livingCurrent?.item==='cookie-wrapper' && livingCurrent?.target==='bin'; if(!cookie) return; const label=isWrapper ? 'Snack wrapper' : 'Cookie', japanese=isWrapper ? 'おかしの ふくろ' : 'クッキー'; cookie.dataset.label=label; cookie.dataset.jp=japanese; cookie.setAttribute('aria-label',label); }
+      function updateLivingCaption() { livingCaptionEnglish.textContent=livingPhrase || ''; livingCaptionKana.textContent=livingCurrent?.activeCaption || livingCurrent?.caption || ''; }
+      function setLivingSlot(el,slot) { el.dataset.slot=slot; el.style.left=traySlotPosition(slot); el.style.top='86%'; }
+      function prepareLivingItems() { const items=shuffle([...livingScene.querySelectorAll('.living-item')]); livingQueue=items.slice(6); items.forEach((el,index)=>{ el.classList.remove('done','queued'); if(index<6) setLivingSlot(el,index); else { el.classList.add('queued'); el.style.left=''; el.style.top=''; } }); }
+      function spawnLivingItem(slot) { if(!livingQueue.length) return; const index=Math.floor(Math.random()*livingQueue.length), el=livingQueue.splice(index,1)[0]; el.classList.remove('queued'); setLivingSlot(el,slot); }
+      function selectLivingTask() { const available=livingTaskData.filter(task=>{ const el=document.querySelector(`[data-living-item="${task.item}"]`); return !el.classList.contains('done') && !el.classList.contains('queued'); }); livingCurrent=available.length ? choose(available) : null; if(livingCurrent) { livingCurrent.activeCaption=''; livingCurrent.activeNoun=null; } livingPhrase=''; updateLivingItemLabels(); updateLivingCaption(); }
+      function speakLiving(repeat=false) { if(!livingCurrent || !('speechSynthesis' in window)) return; if(!repeat || !livingPhrase) livingPhrase=chooseTaskPhrase(livingCurrent); updateLivingCaption(); const u=new SpeechSynthesisUtterance(livingPhrase), v=voice(); u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; if(v) u.voice=v; u.onstart=()=>livingSpeaker.setAttribute('aria-pressed','true'); u.onend=u.onerror=()=>livingSpeaker.setAttribute('aria-pressed','false'); playSpeech(u); }
+      function livingWrongFeedback() { wrongSound(); setTimeout(()=>speakLiving(true),500); }
+      function livingCelebrate(message,state='right') { livingToast.textContent=message; livingToast.classList.toggle('wrong',state==='wrong'); livingToast.classList.add('show'); setTimeout(()=>livingToast.classList.remove('show','wrong'),1150); }
+      function finishLiving() { livingCurrent=null; updateLivingCaption(); if('speechSynthesis' in window) speechSynthesis.cancel(); livingFinish.classList.add('show'); finishSound(); }
+      function nextLiving() { selectLivingTask(); if(!livingCurrent) { finishLiving(); return; } setTimeout(()=>speakLiving(),260); }
+      function resetLiving(shouldSpeak=true) { if('speechSynthesis' in window) speechSynthesis.cancel(); livingFinish.classList.remove('show'); prepareLivingItems(); selectLivingTask(); if(shouldSpeak && livingCurrent) speakLiving(); }
+      function toLivingPoint(e) { const r=livingScene.getBoundingClientRect(); return [(e.clientX-r.left)*1086/r.width,(e.clientY-r.top)*1448/r.height]; }
+      function insideLiving(point,zone) { return point[0]>=zone[0] && point[0]<=zone[2] && point[1]>=zone[1] && point[1]<=zone[3]; }
+      livingScene.addEventListener('pointerdown',e=>{ if(livingDrag || e.target.closest?.('.living-item')) return; const point=toLivingPoint(e); for(const [target,zone] of Object.entries(livingZones)) if(insideLiving(point,zone)) { unlockAudio(); speakName(livingTargetNames[target]); return; } });
+      livingScene.querySelectorAll('.living-item').forEach(el=>{
+        el.addEventListener('pointerdown',e=>{ unlockAudio(); speakName(el.dataset.livingItem==='doll' ? (livingCurrent?.activeNoun?.en || 'doll') : el.dataset.label); if(!livingCurrent || el.classList.contains('done') || el.classList.contains('queued')) return; e.preventDefault(); livingDrag={el,id:e.pointerId,startX:e.clientX,startY:e.clientY,moved:false}; el.setPointerCapture(e.pointerId); });
+        el.addEventListener('pointermove',e=>{ if(!livingDrag || livingDrag.id!==e.pointerId) return; if(!livingDrag.moved && Math.hypot(e.clientX-livingDrag.startX,e.clientY-livingDrag.startY)<9) return; if(!livingDrag.moved) { livingDrag.moved=true; el.classList.add('drag'); livingScene.classList.add('living-dragging'); } const rect=livingScene.getBoundingClientRect(), x=e.clientX-rect.left, y=e.clientY-rect.top-27; el.style.left=`${Math.max(24,Math.min(rect.width-24,x))}px`; el.style.top=`${Math.max(-5,Math.min(rect.height-49,y))}px`; });
+        const end=e=>{ if(!livingDrag || livingDrag.id!==e.pointerId) return; const moved=livingDrag.moved, point=toLivingPoint(e), slot=Number(el.dataset.slot); el.releasePointerCapture?.(e.pointerId); el.classList.remove('drag'); livingScene.classList.remove('living-dragging'); livingDrag=null; if(!moved) { setLivingSlot(el,slot); return; } const right=el.dataset.livingItem===livingCurrent.item && insideLiving(point,livingZones[livingCurrent.target]); if(right) { recordTaskSuccess(livingCurrent); el.classList.add('done'); spawnLivingItem(slot); correctSound(); livingCelebrate('できたね！'); setTimeout(nextLiving,1300); } else { recordConfusion('living',livingCurrent,el.dataset.livingItem,targetAtPoint(point,livingZones)); setLivingSlot(el,slot); livingWrongFeedback(); } };
+        const cancel=e=>{ if(!livingDrag || livingDrag.id!==e.pointerId) return; const slot=Number(el.dataset.slot); el.releasePointerCapture?.(e.pointerId); el.classList.remove('drag'); livingScene.classList.remove('living-dragging'); setLivingSlot(el,slot); livingDrag=null; };
+        el.addEventListener('pointerup',end); el.addEventListener('pointercancel',cancel);
+      });
+      let bedroomCurrent=null, bedroomPhrase='', bedroomDrag=null, bedroomQueue=[];
+      function updateBedroomCaption() { bedroomCaptionEnglish.textContent=bedroomPhrase; bedroomCaptionKana.textContent=bedroomCurrent?.caption || ''; }
+      function setBedroomSlot(el,slot) { el.dataset.slot=slot; el.style.left=traySlotPosition(slot); el.style.top='86%'; }
+      function prepareBedroomItems() { const items=shuffle([...document.querySelectorAll('.bedroom-item')]); bedroomQueue=items.slice(6); items.forEach((el,index)=>{ el.classList.remove('done','queued'); if(index<6) setBedroomSlot(el,index); else { el.classList.add('queued'); el.style.left=''; el.style.top=''; } }); }
+      function selectBedroomTask() { const available=bedroomTaskData.filter(task=>{ const el=document.querySelector(`[data-bedroom-item="${task.item}"]`); return !el.classList.contains('done') && !el.classList.contains('queued'); }); bedroomCurrent=available.length?choose(available):null; bedroomPhrase=''; updateBedroomCaption(); }
+      function speakBedroom(repeat=false) { if(!bedroomCurrent || !('speechSynthesis' in window)) return; if(!repeat || !bedroomPhrase) bedroomPhrase=chooseTaskPhrase(bedroomCurrent); updateBedroomCaption(); const u=new SpeechSynthesisUtterance(bedroomPhrase),v=voice(); u.lang=v?.lang||'en-US'; u.rate=speechRate; u.pitch=1; if(v)u.voice=v; u.onstart=()=>bedroomSpeaker.setAttribute('aria-pressed','true'); u.onend=u.onerror=()=>bedroomSpeaker.setAttribute('aria-pressed','false'); playSpeech(u); }
+      function nextBedroom() { selectBedroomTask(); if(!bedroomCurrent) { bedroomFinish.classList.add('show'); finishSound(); return; } setTimeout(()=>speakBedroom(),260); }
+      function resetBedroom(shouldSpeak=true) { if('speechSynthesis' in window)speechSynthesis.cancel(); bedroomFinish.classList.remove('show'); prepareBedroomItems(); selectBedroomTask(); if(shouldSpeak&&bedroomCurrent)speakBedroom(); }
+      function toBedroomPoint(e) { const r=bedroomScene.getBoundingClientRect(); return [(e.clientX-r.left)*1086/r.width,(e.clientY-r.top)*1448/r.height]; }
+      bedroomScene.addEventListener('pointerdown',e=>{ if(bedroomDrag||e.target.closest?.('.bedroom-item'))return; const p=toBedroomPoint(e); for(const [target,zone] of Object.entries(bedroomZones))if(insideLiving(p,zone)){unlockAudio();speakName(bedroomTargetNames[target]);return;} });
+      document.querySelectorAll('.bedroom-item').forEach(el=>{ el.addEventListener('pointerdown',e=>{ unlockAudio();speakName(el.dataset.label);if(!bedroomCurrent||el.classList.contains('done')||el.classList.contains('queued'))return;e.preventDefault();bedroomDrag={el,id:e.pointerId,startX:e.clientX,startY:e.clientY,moved:false};el.setPointerCapture(e.pointerId); }); el.addEventListener('pointermove',e=>{if(!bedroomDrag||bedroomDrag.id!==e.pointerId)return;if(!bedroomDrag.moved&&Math.hypot(e.clientX-bedroomDrag.startX,e.clientY-bedroomDrag.startY)<9)return;if(!bedroomDrag.moved){bedroomDrag.moved=true;el.classList.add('drag');bedroomScene.classList.add('living-dragging');}const r=bedroomScene.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top-27;el.style.left=`${Math.max(24,Math.min(r.width-24,x))}px`;el.style.top=`${Math.max(-5,Math.min(r.height-49,y))}px`;}); const end=e=>{if(!bedroomDrag||bedroomDrag.id!==e.pointerId)return;const moved=bedroomDrag.moved,p=toBedroomPoint(e),slot=Number(el.dataset.slot);el.releasePointerCapture?.(e.pointerId);el.classList.remove('drag');bedroomScene.classList.remove('living-dragging');bedroomDrag=null;if(!moved){setBedroomSlot(el,slot);return;}const right=el.dataset.bedroomItem===bedroomCurrent.item&&insideLiving(p,bedroomZones[bedroomCurrent.target]);if(right){recordTaskSuccess(bedroomCurrent);el.classList.add('done');correctSound();bedroomToast.textContent='できたね！';bedroomToast.classList.add('show');setTimeout(()=>bedroomToast.classList.remove('show'),1150);setTimeout(nextBedroom,1300);}else{recordConfusion('bedroom',bedroomCurrent,el.dataset.bedroomItem,targetAtPoint(p,bedroomZones));setBedroomSlot(el,slot);wrongSound();setTimeout(()=>speakBedroom(true),500);}}; const cancel=e=>{if(!bedroomDrag||bedroomDrag.id!==e.pointerId)return;const slot=Number(el.dataset.slot);el.releasePointerCapture?.(e.pointerId);el.classList.remove('drag');bedroomScene.classList.remove('living-dragging');setBedroomSlot(el,slot);bedroomDrag=null;};el.addEventListener('pointerup',end);el.addEventListener('pointercancel',cancel); });
+      function openPlaces() { homeScreen.hidden=true; placeScreen.hidden=false; }
+      function backToGames() { placeScreen.hidden=true; homeScreen.hidden=false; }
+      function openBathroom() { placeScreen.hidden=true; gameScreen.hidden=false; unlockAudio(); voicesReady=true; startPanel.classList.add('hidden'); finishPanel.classList.remove('show'); document.querySelectorAll('.item').forEach(el=>el.classList.remove('done')); selectTask(); sceneSelectSound(); speakSceneIntro('Let’s go to the bathroom.',()=>speak()); }
+      function openBreakfast() { placeScreen.hidden=true; breakfastScreen.hidden=false; unlockAudio(); resetBreakfast(false); sceneSelectSound(); speakSceneIntro('Let’s have breakfast!',()=>speakBreakfast()); }
+      function openLiving() { placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving()); }
+      function openBedroom() { placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom()); }
+      function backToPlaces() { if ('speechSynthesis' in window) speechSynthesis.cancel(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
+      function returnHome() { if ('speechSynthesis' in window) speechSynthesis.cancel(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
+      document.querySelector('#open-word').addEventListener('click', openWord);
+      document.querySelector('#open-listen').addEventListener('click', openPlaces);
+      document.querySelector('#back-games').addEventListener('click', backToGames);
+      document.querySelector('#open-bathroom').addEventListener('click', openBathroom);
+      document.querySelector('#open-breakfast').addEventListener('click', openBreakfast);
+      document.querySelector('#open-living').addEventListener('click', openLiving);
+      document.querySelector('#open-bedroom').addEventListener('click', openBedroom);
+      document.querySelector('#breakfast-back').addEventListener('click', backToPlaces);
+      document.querySelector('#living-back').addEventListener('click', backToPlaces);
+      document.querySelector('#bedroom-back').addEventListener('click', backToPlaces);
+      document.querySelector('#bathroom-back').addEventListener('click', backToPlaces);
+      document.querySelector('#breakfast-home').addEventListener('click', returnHome);
+      document.querySelector('#breakfast-reset').addEventListener('click',()=>{ unlockAudio(); resetBreakfast(); });
+      breakfastSpeaker.addEventListener('click',()=>{ unlockAudio(); if (!breakfastStarted) resetBreakfast(); else speakBreakfast(true); });
+      document.querySelector('#breakfast-play-again').addEventListener('click',()=>{ unlockAudio(); resetBreakfast(); });
+      document.querySelector('#living-home').addEventListener('click',returnHome);
+      document.querySelector('#living-reset').addEventListener('click',()=>{ unlockAudio(); resetLiving(); });
+      livingSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!livingCurrent) resetLiving(false); speakLiving(true); });
+      document.querySelector('#living-play-again').addEventListener('click',()=>{ unlockAudio(); resetLiving(); });
+      document.querySelector('#bedroom-home').addEventListener('click',returnHome);
+      document.querySelector('#bedroom-reset').addEventListener('click',()=>{ unlockAudio(); resetBedroom(); });
+      bedroomSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!bedroomCurrent)resetBedroom(false); speakBedroom(true); });
+      document.querySelector('#bedroom-play-again').addEventListener('click',()=>{ unlockAudio(); resetBedroom(); });
+      document.querySelector('#word-back').addEventListener('click', closeWord);
+      document.querySelector('#word-home').addEventListener('click', returnHome);
+      document.querySelector('#match-mode-back').addEventListener('click',closeMatchMode);
+      document.querySelector('#match-mode-home').addEventListener('click',returnHome);
+      document.querySelector('#open-item-match').addEventListener('click',openItemMatch);
+      document.querySelector('#open-action-match').addEventListener('click',openActionMatch);
+      document.querySelector('#action-back').addEventListener('click',closeActionMatch);
+      document.querySelector('#action-home').addEventListener('click',returnHome);
+      document.querySelector('#action-speaker').addEventListener('click',()=>{ unlockAudio(); speakAction(true); });
+      document.querySelectorAll('[data-action]').forEach(card=>card.addEventListener('click',()=>{ if(card.classList.contains('queued')||card.classList.contains('matched'))return; unlockAudio(); if(card.dataset.action===actionCurrent) { card.classList.add('matched'); correctSound(); setTimeout(selectAction,600); } else { wrongSound(); setTimeout(()=>speakAction(true),500); } }));
+      document.querySelector('#word-reset').addEventListener('click',()=>{ unlockAudio(); resetWord(); });
+      wordSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!wordCurrent) resetWord(false); speakWord(true); });
+      document.querySelector('#word-play-again').addEventListener('click',()=>{ unlockAudio(); resetWord(); });
+      document.querySelector('#home').addEventListener('click', returnHome);
+      document.querySelector('#start').addEventListener('click', () => { unlockAudio(); voicesReady=true; startPanel.classList.add('hidden'); selectTask(); speak(); });
+      speaker.addEventListener('click', () => { unlockAudio(); if (!voicesReady) { voicesReady=true; startPanel.classList.add('hidden'); selectTask(); } speak(); });
+      document.querySelector('#reset').addEventListener('click', () => { unlockAudio(); if (!voicesReady) { voicesReady=true; startPanel.classList.add('hidden'); } resetGame(); });
+      function cycleTextDisplay() { textDisplayStep=(textDisplayStep+1)%3; document.body.classList.toggle('text-english',textDisplayStep===1); document.body.classList.toggle('text-bilingual',textDisplayStep===2); const labels=['字幕を表示','英語と日本語の字幕を表示','字幕を非表示']; [kanaButton, breakfastKanaButton, livingKanaButton, bedroomKanaButton, wordKanaButton].forEach(control=>{ control.setAttribute('aria-pressed',String(textDisplayStep!==0)); control.setAttribute('aria-label',labels[textDisplayStep]); }); updateCaption(); updateBreakfastCaption(); updateLivingCaption(); updateBedroomCaption(); updateWordCaption(); }
+      [kanaButton, breakfastKanaButton, livingKanaButton, bedroomKanaButton, wordKanaButton].forEach(button=>button.addEventListener('click', cycleTextDisplay));
+      document.querySelector('#play-again').addEventListener('click', () => { unlockAudio(); resetGame(); });
+      document.querySelectorAll('.speech-speed-input').forEach(slider=>slider.addEventListener('input',()=>{ speechRate=Number(slider.value); document.querySelectorAll('.speech-speed-input').forEach(other=>{ if(other!==slider) other.value=String(speechRate); }); }));
+      if ('speechSynthesis' in window) { speechSynthesis.addEventListener('voiceschanged',onVoicesChanged); voicesReady=getEnglishVoices().length>0; }
+      initSpeechDebug();
+      function toScenePoint(e) { const r=scene.getBoundingClientRect(); return [(e.clientX-r.left)*1086/r.width,(e.clientY-r.top)*1448/r.height]; }
+      function inside(p, z) { return p[0]>=z[0] && p[0]<=z[2] && p[1]>=z[1] && p[1]<=z[3]; }
+      scene.addEventListener('pointerdown', e => { if (drag || e.target.closest?.('.item')) return; const p=toScenePoint(e); for (const [target, zone] of Object.entries(zones)) { if (inside(p, zone)) { unlockAudio(); speakName(targetNames[target]); return; } } });
+      document.querySelectorAll('.item').forEach(el => {
+        el.addEventListener('pointerdown', e => { unlockAudio(); speakName(itemNames[el.dataset.item]); if (!current || el.classList.contains('done')) return; e.preventDefault(); drag={el, id:e.pointerId, startX:e.clientX, startY:e.clientY, moved:false}; el.setPointerCapture(e.pointerId); });
+        el.addEventListener('pointermove', e => { if (!drag || drag.id!==e.pointerId) return; if (!drag.moved && Math.hypot(e.clientX-drag.startX, e.clientY-drag.startY)<9) return; if (!drag.moved) { drag.moved=true; el.classList.add('drag'); scene.classList.add('dragging'); } const r=scene.getBoundingClientRect(); const x=e.clientX-r.left-24, y=e.clientY-r.top-27; el.style.left=`${Math.max(-5,Math.min(r.width-43,x))}px`; el.style.top=`${Math.max(-5,Math.min(r.height-49,y))}px`; });
+        const end = e => { if (!drag || drag.id!==e.pointerId) return; const moved=drag.moved; const p=toScenePoint(e); el.releasePointerCapture?.(e.pointerId); el.classList.remove('drag'); scene.classList.remove('dragging'); el.style.left=''; el.style.top=''; drag=null; if (!moved) return; const right=el.dataset.item===current.item && inside(p,zones[current.target]); if(right) { recordTaskSuccess(current); el.classList.add('done'); correctSound(); celebrate('できたね！'); setTimeout(next, 1300); } else { recordConfusion('bathroom',current,el.dataset.item,targetAtPoint(p,zones)); wrongFeedback(); } };
+        const cancel = e => { if (!drag || drag.id!==e.pointerId) return; el.releasePointerCapture?.(e.pointerId); el.classList.remove('drag'); scene.classList.remove('dragging'); el.style.left=''; el.style.top=''; drag=null; };
+        el.addEventListener('pointerup', end); el.addEventListener('pointercancel', cancel);
+      });
+    })();
+  </script>
+</body>
+</html>
