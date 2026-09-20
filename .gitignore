@@ -1,0 +1,7 @@
+# Keep editable image originals on the Mac; GitHub Pages serves only optimized assets.
+/source-images/
+
+# Local image-tool environments and temporary files.
+/.venv/
+/.tools/
+*.DS_Store

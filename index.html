@@ -65,8 +65,8 @@
     .mode-status { position:relative; z-index:1; padding:5px 7px; border-radius:999px; background:#fff4; color:#fff; font-size:10px; font-weight:900; }
     .place-top-title { display:flex; align-items:center; gap:10px; font-size:21px; font-weight:900; text-shadow:0 2px 0 #c84451; }
     .back-games { width:38px; height:38px; display:grid; place-items:center; padding:0; border:0; border-radius:50%; background:#6b9db5; box-shadow:0 3px 0 #47778e; color:#fff; font:800 18px inherit; cursor:pointer; }
-    .breakfast-scene, .living-scene { position:relative; width:100%; aspect-ratio:.75; overflow:hidden; background:#fff7e2; touch-action:none; user-select:none; }
-    .breakfast-scene svg, .living-scene svg { display:block; width:100%; height:100%; }
+    .breakfast-scene, .living-scene { position:relative; flex:none; width:100%; height:auto; aspect-ratio:.75; overflow:hidden; background:#fff7e2; touch-action:none; user-select:none; }
+    .breakfast-scene svg, .living-scene svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
     .breakfast-title { position:absolute; z-index:2; left:16px; top:14px; padding:8px 13px; border-radius:999px; background:#ff8c47; box-shadow:0 3px 0 #c76c42; color:#fff; font-size:16px; font-weight:900; }
     .breakfast-controls { display:flex; justify-content:space-between; align-items:center; width:100%; }
     .breakfast-controls .controls { margin-left:auto; }
@@ -160,8 +160,11 @@
     .speed-animal:last-child { background:#dff2ff; box-shadow:0 2px 0 #4e92c3; }
     #game-screen > header > .controls { margin-left:auto; }
     .prompt { display:none; }
-    .scene-wrap { position:relative; width:100%; aspect-ratio:.75; max-height:calc(100svh - 120px); min-height:420px; overflow:hidden; touch-action:none; user-select:none; }
-    svg { display:block; width:100%; height:100%; }
+    .scene-wrap { position:relative; flex:none; width:100%; height:auto; aspect-ratio:.75; overflow:hidden; touch-action:none; user-select:none; }
+    .scene-wrap svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
+    #breakfast-screen, #living-screen, #bedroom-screen, #game-screen { background:repeating-linear-gradient(7deg,#bd742d 0 3px,#c98238 4px 7px,#b86e28 8px 10px); }
+    .scene-loading::before { content:"Loading..."; position:absolute; z-index:40; inset:0; display:grid; place-items:center; background:linear-gradient(160deg,#fff9e8,#ffe5c5); color:#754c35; font-size:20px; font-weight:900; }
+    .scene-loading svg image { visibility:hidden; }
     .target { opacity:0; pointer-events:none; transition:opacity .12s; }
     .dragging .target { opacity:1; }
     .target.target-hint { opacity:1; animation:targetHint 1s ease-in-out; }
@@ -669,10 +672,23 @@
       bindListenSceneInteractions({descriptor:listenScenes.bedroom,getDrag:()=>bedroomDrag,setDrag:value=>{bedroomDrag=value;},setSlot:setBedroomSlot,toPoint:toBedroomPoint,dragClass:'living-dragging',itemName:el=>el.dataset.label,tray:true,onCorrect:(el,slot)=>{spawnBedroomItem(slot);correctSound();bedroomToast.textContent='できたね！';bedroomToast.classList.add('show');setTimeout(()=>bedroomToast.classList.remove('show'),1150);setTimeout(nextBedroom,1300);},onWrong:bedroomWrongFeedback});
       function openPlaces() { homeScreen.hidden=true; placeScreen.hidden=false; }
       function backToGames() { placeScreen.hidden=true; homeScreen.hidden=false; }
-      function openBathroom() { placeScreen.hidden=true; gameScreen.hidden=false; unlockAudio(); voicesReady=true; resetGame(false); sceneSelectSound(); speakSceneIntro('Let’s go to the bathroom.',()=>speak()); }
-      function openBreakfast() { placeScreen.hidden=true; breakfastScreen.hidden=false; unlockAudio(); resetBreakfast(false); sceneSelectSound(); speakSceneIntro('Let’s have breakfast!',()=>speakBreakfast()); }
-      function openLiving() { placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving()); }
-      function openBedroom() { placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom()); }
+      function prepareSceneImage(sceneElement) {
+        if(sceneElement.dataset.imageReady) return;
+        sceneElement.classList.add('scene-loading');
+        sceneElement.setAttribute('aria-busy','true');
+        if(sceneElement.dataset.imageLoading) return;
+        sceneElement.dataset.imageLoading='true';
+        const source=sceneElement.querySelector('svg image').getAttribute('href');
+        const preload=new Image();
+        const reveal=()=>{ sceneElement.dataset.imageReady='true'; sceneElement.classList.remove('scene-loading'); sceneElement.removeAttribute('aria-busy'); };
+        preload.onload=()=>{ if(preload.decode) preload.decode().then(reveal,reveal); else reveal(); };
+        preload.onerror=reveal;
+        preload.src=source;
+      }
+      function openBathroom() { prepareSceneImage(scene); placeScreen.hidden=true; gameScreen.hidden=false; unlockAudio(); voicesReady=true; resetGame(false); sceneSelectSound(); speakSceneIntro('Let’s go to the bathroom.',()=>speak()); }
+      function openBreakfast() { prepareSceneImage(breakfastScene); placeScreen.hidden=true; breakfastScreen.hidden=false; unlockAudio(); resetBreakfast(false); sceneSelectSound(); speakSceneIntro('Let’s have breakfast!',()=>speakBreakfast()); }
+      function openLiving() { prepareSceneImage(livingScene); placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving()); }
+      function openBedroom() { prepareSceneImage(bedroomScene); placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom()); }
       function backToPlaces() { if ('speechSynthesis' in window) speechSynthesis.cancel(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
       function returnHome() { if ('speechSynthesis' in window) speechSynthesis.cancel(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
       document.querySelector('#open-word').addEventListener('click', openWord);
