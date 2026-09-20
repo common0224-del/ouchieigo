@@ -32,6 +32,8 @@ cd "/Users/y.komon/Documents/Codex/2026-09-14/referenced-chatgpt-conversation-th
 
 この作業に先立ち、リポジトリ全体の作業前バックアップもこのアプリの2階層上にある `backups/ouchieigo-pre-history-rewrite-20260920/` に保存しました。ただし同じMac内なので、故障対策として上記の外付けバックアップも作成してください。`git add -A` を実行しても `source-images/` は追加されません。
 
+2026-09-20に公開リポジトリの履歴を書き換え、現在の `main` の履歴から元画像を除去しました。ただしGitHubの旧コミットIDを直接指定したURLは、書き換え直後も元画像を返しました。**現在の履歴から辿れないことと、過去のURLが無効になったことは別です。**完全な非公開化を保証できないため、旧URLの扱いはGitHub Supportへの相談が必要です。GitHubの[公式説明](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)では、非機密データのキャッシュ削除依頼は対応対象外となる可能性があることにも注意してください。
+
 ## 未使用画像
 
 所有者の確認後に削除した42枚の記録は [UNUSED-IMAGES.md](UNUSED-IMAGES.md) にあります。元画像は `source-images/unused/` に残っています。
@@ -39,7 +41,7 @@ cd "/Users/y.komon/Documents/Codex/2026-09-14/referenced-chatgpt-conversation-th
 ## ChromeでSlow 3Gの表示確認
 
 1. Chromeの通常タブで公開アプリを開きます。Macでは `command + option + I` でDevToolsを開きます（または画面を右クリックして「検証」）。DevToolsの幅を広げすぎず、スマホ表示を確認するなら左上の端末アイコンを押して iPhone 相当の幅（例：390px）を選びます。
-2. DevToolsの **Network** タブを開き、上部の **Disable cache** にチェックを入れます。DevToolsを開いている間だけ有効です。速度メニュー（通常は **No throttling**）から **Slow 3G** を選びます。見えない場合はNetwork上部の `»` やメニューを確認してください。
+2. DevToolsの **Network** タブを開き、上部の **Disable cache** にチェックを入れます。DevToolsを開いている間だけ有効です。速度メニュー（通常は **No throttling**）から **Slow 3G** を選びます。現在のChromeで名称が **3G** の場合はそれを選びます。見えない場合はNetwork上部の `»` やメニューを確認してください。操作画面は[Chrome公式手順](https://developer.chrome.com/docs/devtools/network/reference/)も参照できます。
 3. アプリを再読み込みします。洗面所・朝ごはん・リビング・寝室をそれぞれ開き、画像が出る前と出た後をスクリーンショットで比べてください。初回画面だけでなく、各場面へ入るたびにNetworkの転送と画面を見ます。
 4. 各場面では、背景の長方形・下のトレー・字幕の位置を見ます。画像待ちの間は同じ大きさの「Loading...」表示になり、画像が出ても**背景の上下端、トレーの上端、字幕の枠が動かない**のが正常です。数百pxの空白が突然現れる／消える、トレーが下へ飛ぶ・切れる、字幕がずれる場合は問題です。木目の背景が画面下まで続くことも確認してください。
 5. 問題があったら、**場面名・Chromeのバージョン・端末表示幅・Slow 3GとDisable cacheの設定が見えるDevToolsのスクリーンショット・画像読み込み前後のスクリーンショット・およその待ち時間**を教えてください。可能ならNetworkタブで失敗した画像の名前とHTTPステータス、Consoleの赤いエラーも添えてください。
