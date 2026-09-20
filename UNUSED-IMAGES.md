@@ -1,6 +1,6 @@
 # 未使用WebP画像の一覧
 
-`index.html` と `speech-test.html` のHTML・CSS・JavaScriptから参照されていない、ルート直下のWebP画像です。過去版の `index.before-*.html` は現在のアプリではないため除外しました。42枚・合計約3.19MiBです。確認前に削除しません。
+`index.html` と `speech-test.html` のHTML・CSS・JavaScriptから参照されていなかったWebP画像の削除記録です。過去版の `index.before-*.html` は現在のアプリではないため除外しました。所有者の承認を受け、42枚・合計3,349,846バイト（約3.19MiB）を公開用ルートから削除しました。対応する元画像はMac内の `source-images/unused/` に保管しています。
 
 | ファイル | サイズ |
 |---|---:|
