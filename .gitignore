@@ -4,4 +4,5 @@
 # Local image-tool environments and temporary files.
 /.venv/
 /.tools/
+/tests/artifacts/
 *.DS_Store

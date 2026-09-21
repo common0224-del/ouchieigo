@@ -2,6 +2,10 @@
 
 このフォルダーがWebアプリの本体です。公開画面は `index.html` です。
 
+## Think & Say の試作
+
+外観確認用のページは [think-and-say-prototype.html](think-and-say-prototype.html) です。既存のゲームにはまだ組み込んでおらず、ドラッグと音声は未実装です。左右3枚ずつのカードを吹き出しに運ぶ配置と、既存画面に合わせた見た目を確認できます。
+
 ## 画像を追加・差し替える手順
 
 1. 元のPNG/JPGを、このMacの `source-images/` に入れます。既存画像の差し替えは同じファイル名で保存します。元画像はGitHubへ公開されません。
@@ -37,6 +41,28 @@ cd "/Users/y.komon/Documents/Codex/2026-09-14/referenced-chatgpt-conversation-th
 ## 未使用画像
 
 所有者の確認後に削除した42枚の記録は [UNUSED-IMAGES.md](UNUSED-IMAGES.md) にあります。元画像は `source-images/unused/` に残っています。
+
+## Listen & Do の自動テスト
+
+ターミナルで次の2行をそのまま実行します。
+
+```zsh
+cd "/Users/y.komon/Documents/Codex/2026-09-14/referenced-chatgpt-conversation-this-is-an/outputs/everyday-english-kids-v10"
+zsh tests/run-listen-drag-recovery.zsh
+```
+
+成功時は、4場面それぞれの完了数・不正解回数・枠外ドロップ回数に続いて、最後に次のように表示されます。
+
+```text
+PASS chromium: 4場面すべて完了し、進行不能状態はありませんでした。
+  bathroom: 6/6完了、不正解2回、枠外3回
+  breakfast: 11/11完了、不正解4回、枠外6回
+  living: 11/11完了、不正解4回、枠外6回
+  bedroom: 8/8完了、不正解3回、枠外4回
+AUTOMATED TEST PASSED
+```
+
+失敗時は、場面名・何回目か・実行中だった操作・ゲームの内部状態・原因分類・ブラウザコンソールが表示されます。画面のスクリーンショットは `tests/artifacts/` に保存され、保存先もターミナルに表示されます。その出力全体とスクリーンショットを共有してください。
 
 ## ChromeでSlow 3Gの表示確認
 
