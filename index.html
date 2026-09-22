@@ -147,11 +147,10 @@
     #action-screen { min-height:0; }
     .action-board { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4,minmax(0,1fr)); gap:8px; padding:10px 14px 14px; overflow:hidden; background:repeating-linear-gradient(8deg,#c98644 0 3px,#d99d59 4px 8px,#ba7134 9px 12px); }
     .action-card { display:grid; place-items:center; min-width:0; min-height:0; overflow:hidden; border:3px solid #fff9; border-radius:18px; background:linear-gradient(145deg,#fffdf4,#f6dfc1); box-shadow:0 4px 0 #8a4d26,0 6px 10px #41251655; cursor:pointer; transition:opacity .2s,transform .2s; }
-    .action-card:active { transform:translateY(3px); box-shadow:0 2px 0 #8a4d26,0 4px 8px #41251655; }
-    .action-art { position:relative; display:block; max-width:100%; max-height:100%; pointer-events:none; }
-    .action-art img { display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; }
-    .action-sequence-arrow { position:absolute; z-index:2; top:50%; width:31px; height:31px; display:grid; place-items:center; transform:translate(-50%,-50%); border:3px solid #fffdf4; border-radius:50%; background:#fff4df; box-shadow:0 3px 0 #aa6a3f,0 5px 7px #54352666; pointer-events:none; }
-    .action-sequence-arrow::after { content:""; display:block; width:14px; height:16px; margin-left:3px; background:var(--orange); clip-path:polygon(0 0,100% 50%,0 100%); filter:drop-shadow(0 1px 0 #aa5e34); }
+    .action-card:active { transform:translateY(3px); box-shadow:0 2px 0 #8a4d26,0 4px 8px #41251655; } .action-card img { display:block; width:auto; height:100%; max-width:100%; aspect-ratio:16/9; object-fit:contain; pointer-events:none; }
+    .action-divider-blue { position:relative; }
+    .action-divider-blue::before, .action-divider-blue::after { content:""; position:absolute; z-index:1; top:0; bottom:0; width:7px; background:linear-gradient(90deg,#fff8ec 0 2px,#79cbe5 2px 5px,#fff8ec 5px); pointer-events:none; }
+    .action-divider-blue::before { left:calc(29% + 4px); } .action-divider-blue::after { left:calc(64% - 3px); }
     .action-card.queued { display:none; }
     .action-card.matched { opacity:0; transform:scale(.72); pointer-events:none; }
     .word-card::before, .word-card::after { position:absolute; z-index:2; display:none; left:4px; right:4px; overflow:hidden; color:#654632; font-weight:900; line-height:1.05; text-align:center; text-overflow:ellipsis; white-space:nowrap; pointer-events:none; text-shadow:0 1px 0 #fff; }
@@ -279,17 +278,7 @@
   </main>
   <main class="app" id="action-screen" hidden aria-label="Action Match">
     <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="action-back" type="button" aria-label="Word Match の選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="action-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="action-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="action-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
-    <section class="action-board" aria-label="動作をきいてカードをえらぶ">
-      <button class="action-card" data-action="put" data-panels="2" type="button" aria-label="Put"><span class="action-art"><img src="action-put-boy-v4.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="put" data-panels="2" type="button" aria-label="Put"><span class="action-art"><img src="action-put-girl-v3.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="get" data-panels="2" type="button" aria-label="Get"><span class="action-art"><img src="action-get-boy-v2.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="get" data-panels="2" type="button" aria-label="Get"><span class="action-art"><img src="action-get-girl-v2.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="bring" data-panels="2" type="button" aria-label="Bring"><span class="action-art"><img src="action-bring-boy-v2.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="bring" data-panels="2" type="button" aria-label="Bring"><span class="action-art"><img src="action-bring-girl-v2.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="throw" data-panels="3" data-cuts="30,66" type="button" aria-label="Throw away"><span class="action-art"><img src="action-throw-boy-v2.png.webp" alt=""></span></button>
-      <button class="action-card" data-action="throw" data-panels="3" data-cuts="30,66" type="button" aria-label="Throw away"><span class="action-art"><img src="action-throw-girl-v2.png.webp" alt=""></span></button>
-      <div class="breakfast-finish" id="action-finish" aria-live="assertive"><div class="finish-card"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great action words!</p><button class="round" id="action-play-again" type="button">Play again</button></div></div>
-    </section>
+    <section class="action-board" aria-label="動作をきいてカードをえらぶ"><button class="action-card" data-action="put" type="button" aria-label="Put"><img src="action-put-boy-v4.png.webp" alt=""></button><button class="action-card" data-action="put" type="button" aria-label="Put"><img src="action-put-girl-v3.png.webp" alt=""></button><button class="action-card" data-action="get" type="button" aria-label="Get"><img src="action-get-boy-v2.png.webp" alt=""></button><button class="action-card" data-action="get" type="button" aria-label="Get"><img src="action-get-girl-v2.png.webp" alt=""></button><button class="action-card" data-action="bring" type="button" aria-label="Bring"><img src="action-bring-boy-v2.png.webp" alt=""></button><button class="action-card" data-action="bring" type="button" aria-label="Bring"><img src="action-bring-girl-v2.png.webp" alt=""></button><button class="action-card" data-action="throw" type="button" aria-label="Throw away"><img src="action-throw-boy-v2.png.webp" alt=""></button><button class="action-card action-divider-blue" data-action="throw" type="button" aria-label="Throw away"><img src="action-throw-girl-v2.png.webp" alt=""></button><div class="breakfast-finish" id="action-finish" aria-live="assertive"><div class="finish-card"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great action words!</p><button class="round" id="action-play-again" type="button">Play again</button></div></div></section>
   </main>
   <main class="app" id="word-screen" hidden aria-label="Word Match">
     <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="word-back" type="button" aria-label="ホームへ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="word-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="word-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="word-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="word-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="word-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
@@ -643,40 +632,7 @@
       function openWord() { homeScreen.hidden=true; matchModeScreen.hidden=false; unlockAudio(); sceneSelectSound(); }
       function openItemMatch() { matchModeScreen.hidden=true; wordScreen.hidden=false; unlockAudio(); sceneSelectSound(); resetWord(); }
       let actionCurrent='put';
-      const actionCards=[...actionScreen.querySelectorAll('.action-card')];
-      function layoutActionCards() {
-        for(const card of actionCards) {
-          if(!card.clientWidth || !card.clientHeight) continue;
-          const art=card.querySelector('.action-art');
-          if(!art) continue;
-          const width=Math.min(card.clientWidth,card.clientHeight*16/9);
-          art.style.width=`${width}px`;
-          art.style.height=`${width*9/16}px`;
-        }
-      }
-      function setupActionSequenceArrows() {
-        for(const card of actionCards) {
-          const panels=Number(card.dataset.panels), art=card.querySelector('.action-art');
-          if(!art || !Number.isInteger(panels) || panels<2) continue;
-          const cuts=card.dataset.cuts ? card.dataset.cuts.split(',').map(Number) : Array.from({length:panels-1},(_,i)=>100*(i+1)/panels);
-          if(cuts.length!==panels-1 || cuts.some((cut,i)=>!Number.isFinite(cut) || cut<=0 || cut>=100 || (i>0 && cut<=cuts[i-1]))) { console.warn('Invalid Action Match panel boundaries',card); continue; }
-          for(const cut of cuts) {
-            const arrow=document.createElement('span');
-            arrow.className='action-sequence-arrow';
-            arrow.style.left=`${cut}%`;
-            arrow.setAttribute('aria-hidden','true');
-            art.append(arrow);
-          }
-        }
-        if('ResizeObserver' in window) {
-          const observer=new ResizeObserver(layoutActionCards);
-          actionCards.forEach(card=>observer.observe(card));
-        }
-        window.addEventListener('resize',layoutActionCards);
-        layoutActionCards();
-      }
-      setupActionSequenceArrows();
-      function openActionMatch() { matchModeScreen.hidden=true; actionScreen.hidden=false; unlockAudio(); prepareActionCards(); layoutActionCards(); selectAction(); }
+      function openActionMatch() { matchModeScreen.hidden=true; actionScreen.hidden=false; unlockAudio(); prepareActionCards(); selectAction(); }
       function closeWord() { stopSpeech(); wordScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeActionMatch() { stopSpeech(); actionScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeMatchMode() { matchModeScreen.hidden=true; homeScreen.hidden=false; }
