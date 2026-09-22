@@ -33,7 +33,14 @@ async function inspect(page,id,kind,width,height) {
       result.art=result.items.map(item=>{ const element=[...stage.querySelectorAll('.item,.breakfast-item,.living-item')].find(el=>(el.id || el.dataset.label || el.getAttribute('aria-label'))===item.name); const img=element?.querySelector('img'); return img ? {name:item.name,...rect(img)} : null; }).filter(Boolean);
       result.zones=[...svg.querySelectorAll('g.target rect,g.breakfast-target rect,g.living-target rect')].map((el,index)=>({name:el.parentElement.id || `${index+1}`,...rect(el)}));
     } else if(kind==='word') result.cards=visible('.word-card:not(.queued)');
-    else if(kind==='action') result.cards=visible('.action-card:not(.queued)');
+    else if(kind==='action') {
+      result.cards=visible('.action-card:not(.queued)');
+      result.actionSequences=[...root.querySelectorAll('.action-card')].map(card=>{
+        const art=card.querySelector('.action-art');
+        const cuts=card.dataset.cuts ? card.dataset.cuts.split(',').map(Number) : Array.from({length:Number(card.dataset.panels)-1},(_,i)=>100*(i+1)/Number(card.dataset.panels));
+        return {name:card.dataset.action,panels:Number(card.dataset.panels),cuts,visible:getComputedStyle(card).display!=='none',art:rect(art),markers:[...card.querySelectorAll('.action-sequence-arrow')].map(marker=>({rect:rect(marker),pointerEvents:getComputedStyle(marker).pointerEvents}))};
+      });
+    }
     else if(kind==='place') result.cards=visible('.place-card');
     return result;
   },{id,kind});
@@ -50,6 +57,21 @@ async function inspect(page,id,kind,width,height) {
   }
   if(kind==='word') assert.equal(result.cards.length,12,`${id}: expected 12 visible cards`);
   if(kind==='action') assert.equal(result.cards.length,4,`${id}: expected 4 visible cards`);
+  if(kind==='action') {
+    assert.equal(result.actionSequences.length,8,`${id}: expected 8 Action Match images`);
+    for(const sequence of result.actionSequences) {
+      assert.equal(sequence.markers.length,sequence.panels-1,`${id}: ${sequence.name} arrow count differs from panel count`);
+      if(!sequence.visible) continue;
+      assert(sequence.art.w>0 && sequence.art.h>0,`${id}: ${sequence.name} artwork is not sized`);
+      assert(Math.abs(sequence.art.w/sequence.art.h-16/9)<0.02,`${id}: ${sequence.name} artwork ratio changed`);
+      for(let i=0;i<sequence.markers.length;i++) {
+        const marker=sequence.markers[i], expectedX=sequence.art.x+sequence.art.w*sequence.cuts[i]/100, expectedY=sequence.art.y+sequence.art.h/2;
+        assert(marker.rect.w>=30 && marker.rect.h>=30,`${id}: ${sequence.name} arrow ${i+1} collapsed`);
+        assert(Math.abs(marker.rect.x+marker.rect.w/2-expectedX)<1.5 && Math.abs(marker.rect.y+marker.rect.h/2-expectedY)<1.5,`${id}: ${sequence.name} arrow ${i+1} is off the artwork boundary`);
+        assert.equal(marker.pointerEvents,'none',`${id}: ${sequence.name} arrow ${i+1} intercepts taps`);
+      }
+    }
+  }
   if(kind==='place') assert.equal(result.cards.length,4,`${id}: expected 4 place cards`);
   if(kind==='scene') {
     assert(Math.abs(result.scene.y-result.header.bottom)<tolerance && Math.abs(result.scene.bottom-result.root.bottom)<tolerance,`${id}: header/scene/tray has a gap`);
