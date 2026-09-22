@@ -77,6 +77,10 @@
     .breakfast-target rect, .living-target rect { fill:#fff7a8; fill-opacity:.48; stroke:#e5a500; stroke-width:9; stroke-dasharray:24 16; rx:28; }
     .breakfast-target circle, .living-target circle { fill:#fff; stroke:#e5a500; stroke-width:6; }
     .breakfast-target text, .living-target text { font-size:32px; font-weight:800; fill:#8e6500; text-anchor:middle; dominant-baseline:middle; }
+    .debug-zones .target, .debug-zones .breakfast-target, .debug-zones .living-target { opacity:1; }
+    .debug-zones .target rect, .debug-zones .breakfast-target rect, .debug-zones .living-target rect { fill:#40d7ff; fill-opacity:.16; stroke:#00b9ed; stroke-width:7; stroke-dasharray:18 10; }
+    .drop-debug-point { pointer-events:none; fill:#f52238; stroke:#fff; stroke-width:8; filter:drop-shadow(0 2px 3px #2b172caa); }
+    .drop-debug-point.correct { fill:#24a964; }
     .breakfast-item, .living-item { position:absolute; z-index:5; width:48px; height:54px; display:grid; place-items:center; overflow:visible; border:0; border-radius:48%; background:transparent; box-shadow:none; cursor:grab; touch-action:none; transform:translateX(-50%); -webkit-tap-highlight-color:transparent; }
     .breakfast-item::before { content:""; position:absolute; inset:0; background:url('breakfast-items-v2.png.webp') var(--item-sprite) / 300% 200% no-repeat; pointer-events:none; }
     .breakfast-item.extra::before { display:none; }
@@ -289,12 +293,6 @@
     <section class="breakfast-scene" id="breakfast-scene" aria-label="朝ごはんのキッチン">
       <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
         <image href="breakfast-stage-v7.jpg.webp" width="1086" height="1448"/>
-        <g class="breakfast-target" id="sink-breakfast-target"><rect x="35" y="135" width="450" height="275"/><circle cx="450" cy="165" r="27"/><text x="450" y="165">1</text></g>
-        <g class="breakfast-target" id="girl-breakfast-target"><rect x="735" y="220" width="335" height="470"/><circle cx="1038" cy="250" r="27"/><text x="1038" y="250">2</text></g>
-        <g class="breakfast-target" id="table-target"><rect x="230" y="650" width="330" height="165"/><circle cx="530" cy="680" r="27"/><text x="530" y="680">3</text></g>
-        <g class="breakfast-target" id="plate-target"><rect x="270" y="875" width="290" height="235"/><circle cx="530" cy="905" r="27"/><text x="530" y="905">4</text></g>
-        <g class="breakfast-target" id="bowl-target"><rect x="580" y="700" width="220" height="190"/><circle cx="770" cy="730" r="27"/><text x="770" y="730">5</text></g>
-        <g class="breakfast-target" id="cup-target"><rect x="825" y="885" width="245" height="245"/><circle cx="1040" cy="915" r="27"/><text x="1040" y="915">6</text></g>
       </svg>
       <button class="breakfast-item" id="breakfast-item-toast" data-breakfast-item="toast" data-label="Toast" data-jp="トースト" aria-label="Toast" type="button"></button><button class="breakfast-item" id="breakfast-item-banana" data-breakfast-item="banana" data-label="Banana" data-jp="バナナ" aria-label="Banana" type="button"></button><button class="breakfast-item" id="breakfast-item-milk" data-breakfast-item="milk" data-label="Milk" data-jp="ミルク" aria-label="Milk carton" type="button"></button><button class="breakfast-item" id="breakfast-item-cereal" data-breakfast-item="cereal" data-label="Cereal" data-jp="シリアル" aria-label="Cereal" type="button"></button><button class="breakfast-item" id="breakfast-item-spoon" data-breakfast-item="spoon" data-label="Spoon" data-jp="スプーン" aria-label="Spoon" type="button"></button><button class="breakfast-item" id="breakfast-item-napkin" data-breakfast-item="napkin" data-label="Napkin" data-jp="ナプキン" aria-label="Napkin" type="button"></button><button class="breakfast-item extra" data-breakfast-item="plate" data-label="Plate" data-jp="おさら" aria-label="Plate" type="button"><img class="breakfast-item-art" src="breakfast-item-plate-v1.png.webp" alt=""></button><button class="breakfast-item extra" data-breakfast-item="mug" data-label="Mug" data-jp="マグカップ" aria-label="Mug" type="button"><img class="breakfast-item-art" src="breakfast-item-mug-v1.png.webp" alt=""></button><button class="breakfast-item extra" data-breakfast-item="fork" data-label="Fork" data-jp="フォーク" aria-label="Fork" type="button"><img class="breakfast-item-art" src="breakfast-item-fork-v1.png.webp" alt=""></button><button class="breakfast-item extra" data-breakfast-item="chopsticks" data-label="Chopsticks" data-jp="おはし" aria-label="Chopsticks" type="button"><img class="breakfast-item-art" src="breakfast-item-chopsticks-v1.png.webp" alt=""></button><button class="breakfast-item extra" data-breakfast-item="apple" data-label="Apple" data-jp="りんご" aria-label="Apple" type="button"><img class="breakfast-item-art" src="breakfast-item-apple-v1.png.webp" alt=""></button>
       <span class="breakfast-place-label" id="breakfast-label-sink" data-jp="シンク">Sink</span><span class="breakfast-place-label" id="breakfast-label-girl" data-jp="おんなのこ">Girl</span><span class="breakfast-place-label" id="breakfast-label-table" data-jp="テーブル">Table</span><span class="breakfast-place-label" id="breakfast-label-plate" data-jp="おさら">Plate</span><span class="breakfast-place-label" id="breakfast-label-bowl" data-jp="ボウル">Bowl</span><span class="breakfast-place-label" id="breakfast-label-cup" data-jp="マグカップ">Mug</span>
@@ -308,12 +306,6 @@
     <section class="living-scene" id="living-scene" aria-label="リビングのゲーム">
       <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
         <image href="living-stage-v2.png.webp" width="1086" height="1448"/>
-        <g class="living-target"><rect x="20" y="120" width="285" height="420"/><circle cx="273" cy="152" r="27"/><text x="273" y="152">1</text></g>
-        <g class="living-target"><rect x="180" y="870" width="835" height="325"/><circle cx="983" cy="900" r="27"/><text x="983" y="900">2</text></g>
-        <g class="living-target"><rect x="805" y="190" width="255" height="575"/><circle cx="1028" cy="220" r="27"/><text x="1028" y="220">3</text></g>
-        <g class="living-target"><rect x="430" y="365" width="315" height="395"/><circle cx="713" cy="395" r="27"/><text x="713" y="395">4</text></g>
-        <g class="living-target"><rect x="10" y="615" width="240" height="165"/><circle cx="218" cy="645" r="27"/><text x="218" y="645">5</text></g>
-        <g class="living-target"><rect x="285" y="570" width="125" height="255"/><circle cx="378" cy="600" r="27"/><text x="378" y="600">6</text></g>
       </svg>
       <button class="living-item" data-living-item="book" data-label="Book" data-jp="ほん" aria-label="Book" type="button"><img class="breakfast-item-art" src="living-item-book-v1.png.webp" alt=""></button><button class="living-item" data-living-item="remote" data-label="Remote" data-jp="リモコン" aria-label="Remote" type="button"><img class="breakfast-item-art" src="living-item-remote-v1.png.webp" alt=""></button><button class="living-item" data-living-item="blanket" data-label="Blanket" data-jp="ブランケット" aria-label="Blanket" type="button"><img class="breakfast-item-art" src="living-item-blanket-v1.png.webp" alt=""></button><button class="living-item" data-living-item="blocks" data-label="Blocks" data-jp="つみき" aria-label="Blocks" type="button"><img class="breakfast-item-art" src="living-item-blocks-v1.png.webp" alt=""></button><button class="living-item" data-living-item="car" data-label="Toy car" data-jp="ミニカー" aria-label="Toy car" type="button"><img class="breakfast-item-art" src="living-item-toy-car-v1.png.webp" alt=""></button><button class="living-item" data-living-item="cup" data-label="Cup" data-jp="コップ" aria-label="Cup" type="button"><img class="breakfast-item-art" src="living-item-cup-v1.png.webp" alt=""></button><button class="living-item" data-living-item="tissue" data-label="Tissue" data-jp="ティッシュ" aria-label="Tissue" type="button"><img class="breakfast-item-art" src="living-item-tissue-v3.png.webp" alt=""></button><button class="living-item" data-living-item="crayons" data-label="Crayons" data-jp="クレヨン" aria-label="Crayons" type="button"><img class="breakfast-item-art" src="living-item-crayons-v1.png.webp" alt=""></button><button class="living-item" data-living-item="doll" data-label="Doll" data-jp="おにんぎょう" aria-label="Doll" type="button"><img class="breakfast-item-art" src="living-item-doll-v1.png.webp" alt=""></button><button class="living-item" data-living-item="cookie-wrapper" data-label="Cookie" data-jp="クッキー" aria-label="Cookie" type="button"><img class="breakfast-item-art" src="living-item-cookie-wrapper-v3.png.webp" alt=""></button><button class="living-item" data-living-item="cat-drawing" data-label="Drawing" data-jp="え" aria-label="Drawing" type="button"><img class="breakfast-item-art" src="living-item-cat-drawing-v3.png.webp" alt=""></button>
       <span class="living-place-label" id="living-label-bookshelf" data-jp="ほんだな">Bookshelf</span><span class="living-place-label" id="living-label-table" data-jp="テーブル">Table</span><span class="living-place-label" id="living-label-mom" data-jp="ママ">Mom</span><span class="living-place-label" id="living-label-sofa" data-jp="ソファ">Sofa</span><span class="living-place-label" id="living-label-toybox" data-jp="おもちゃばこ">Toy box</span><span class="living-place-label" id="living-label-bin" data-jp="ゴミばこ">Trash can</span>
@@ -325,7 +317,7 @@
   <main class="app" id="bedroom-screen" hidden aria-label="寝室のゲーム画面">
     <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="bedroom-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true">🐢</span><input class="speech-speed-input" id="bedroom-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true">🐰</span></label><div class="controls"><button class="round compact-control" id="bedroom-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="bedroom-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="bedroom-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="bedroom-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
     <section class="living-scene" id="bedroom-scene" aria-label="寝室のゲーム">
-      <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true"><image href="bedroom-stage-v2.png.webp" width="1086" height="1448"/><g class="living-target"><rect x="15" y="100" width="255" height="310"/><circle cx="240" cy="130" r="27"/><text x="240" y="130">1</text></g><g class="living-target"><rect x="70" y="445" width="480" height="420"/><circle cx="520" cy="475" r="27"/><text x="520" y="475">2</text></g><g class="living-target"><rect x="815" y="185" width="265" height="440"/><circle cx="1045" cy="215" r="27"/><text x="1045" y="215">3</text></g><g class="living-target"><rect x="930" y="650" width="150" height="365"/><circle cx="1050" cy="680" r="27"/><text x="1050" y="680">4</text></g><g class="living-target"><rect x="635" y="350" width="155" height="260"/><circle cx="760" cy="380" r="27"/><text x="760" y="380">5</text></g><g class="living-target"><rect x="585" y="640" width="175" height="365"/><circle cx="730" cy="670" r="27"/><text x="730" y="670">6</text></g><g class="living-target"><rect x="765" y="940" width="140" height="200"/><circle cx="875" cy="970" r="27"/><text x="875" y="970">7</text></g></svg>
+      <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true"><image href="bedroom-stage-v2.png.webp" width="1086" height="1448"/></svg>
       <button class="living-item bedroom-item" data-bedroom-item="pajamas" data-label="Pajamas" data-jp="パジャマ" aria-label="Pajamas" type="button"><img class="breakfast-item-art" src="bedroom-item-pajamas-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="book" data-label="Book" data-jp="ほん" aria-label="Book" type="button"><img class="breakfast-item-art" src="living-item-book-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="pillow" data-label="Pillow" data-jp="まくら" aria-label="Pillow" type="button"><img class="breakfast-item-art" src="bedroom-item-pillow-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="socks" data-label="Socks" data-jp="くつした" aria-label="Socks" type="button"><img class="breakfast-item-art" src="bedroom-item-socks-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="alarm-clock" data-label="Alarm clock" data-jp="めざましどけい" aria-label="Alarm clock" type="button"><img class="breakfast-item-art" src="bedroom-item-alarm-clock-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="nightcap" data-label="Nightcap" data-jp="ナイトキャップ" aria-label="Nightcap" type="button"><img class="breakfast-item-art" src="bedroom-item-nightcap-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="blanket" data-label="Blanket" data-jp="もうふ" aria-label="Blanket" type="button"><img class="breakfast-item-art" src="living-item-blanket-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="doll-toy" data-label="Doll and stuffed toy" data-jp="おにんぎょうと ぬいぐるみ" aria-label="Doll and stuffed toy" type="button"><img class="breakfast-item-art" src="living-item-doll-and-teddy-v2.png.webp" alt=""></button>
       <span class="living-place-label" id="bedroom-label-bookshelf" data-jp="ほんだな">Bookshelf</span><span class="living-place-label" id="bedroom-label-bed" data-jp="ベッド">Bed</span><span class="living-place-label" id="bedroom-label-dad" data-jp="パパ">Dad</span><span class="living-place-label" id="bedroom-label-drawer" data-jp="ドロアー">Drawer</span><span class="living-place-label" id="bedroom-label-night-table" data-jp="ナイトテーブル">Night table</span><span class="living-place-label" id="bedroom-label-boy" data-jp="おとこのこ">Boy</span><span class="living-place-label" id="bedroom-label-basket" data-jp="せんたくかご">Laundry basket</span>
       <div class="living-instruction-caption" aria-live="polite"><span class="english" id="bedroom-caption-english"></span><span class="kana-text" id="bedroom-caption-kana"></span></div><div class="living-toast" id="bedroom-toast" aria-live="assertive"></div><div class="breakfast-finish" id="bedroom-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt=""><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Good night!</p><button class="round" id="bedroom-play-again" type="button">Play again</button></div></div>
@@ -337,11 +329,6 @@
     <section class="scene-wrap" id="scene" aria-label="Bathroom game scene">
       <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
         <image href="bathroom-stage-v5.jpg.webp" width="1086" height="1448"/>
-        <g class="target" id="sink-zone"><rect x="30" y="295" width="350" height="150"/><circle cx="348" cy="325" r="29"/><text x="348" y="325">1</text></g>
-        <g class="target" id="organizer-zone"><rect x="390" y="290" width="340" height="120"/><circle cx="698" cy="320" r="29"/><text x="698" y="320">2</text></g>
-        <g class="target" id="rack-zone"><rect x="735" y="25" width="345" height="270"/><circle cx="1048" cy="55" r="29"/><text x="1048" y="55">3</text></g>
-        <g class="target" id="boy-zone"><rect x="760" y="330" width="320" height="730"/><circle cx="1048" cy="360" r="29"/><text x="1048" y="360">4</text></g>
-        <g class="target" id="basket-zone"><rect x="410" y="700" width="340" height="400"/><circle cx="718" cy="730" r="29"/><text x="718" y="730">5</text></g>
       </svg>
       <button class="item" id="toothbrush" data-item="toothbrush" data-label="Toothbrush" data-jp="はぶらし" aria-label="Toothbrush" type="button"><img class="item-art" src="bathroom-item-toothbrush-v4.png.webp" alt=""></button>
       <button class="item" id="cup" data-item="cup" data-label="Cup" data-jp="コップ" aria-label="Cup" type="button"><img class="item-art" src="bathroom-item-cup-v5.png.webp" alt=""></button>
@@ -535,7 +522,30 @@
       const wordTargetAlias={organizer:'tray',rack:'rack',basket:'basket',sink:'sink',boy:'boy',girl:'girl',table:'table',plate:'plate',bowl:'bowl',cup:'mug'};
       function targetAtPoint(point,zoneMap) { return Object.entries(zoneMap).find(([,zone])=>inside(point,zone))?.[0] || ''; }
       const targetHintTimers=new WeakMap();
-      function configureTargetHints(sceneElement,zoneMap) { const targetGroups=[...sceneElement.querySelectorAll('svg > g.target, svg > g.breakfast-target, svg > g.living-target')]; Object.keys(zoneMap).forEach((target,index)=>{ if(targetGroups[index]) targetGroups[index].dataset.target=target; }); }
+      function configureTargetHints(sceneElement,zoneMap) {
+        const svg=sceneElement.querySelector('svg'), namespace='http://www.w3.org/2000/svg';
+        const targetClass=sceneElement===scene ? 'target' : sceneElement===breakfastScene ? 'breakfast-target' : 'living-target';
+        svg.querySelectorAll('g.target, g.breakfast-target, g.living-target').forEach(group=>group.remove());
+        Object.entries(zoneMap).forEach(([target,[left,top,right,bottom]],index)=>{
+          const group=document.createElementNS(namespace,'g'), rect=document.createElementNS(namespace,'rect');
+          const circle=document.createElementNS(namespace,'circle'), label=document.createElementNS(namespace,'text');
+          const labelX=right-32, labelY=top+32;
+          group.classList.add(targetClass); group.dataset.target=target;
+          for(const [key,value] of Object.entries({x:left,y:top,width:right-left,height:bottom-top})) rect.setAttribute(key,value);
+          circle.setAttribute('cx',labelX); circle.setAttribute('cy',labelY); circle.setAttribute('r',targetClass==='target' ? 29 : 27);
+          label.setAttribute('x',labelX); label.setAttribute('y',labelY); label.textContent=String(index+1);
+          group.append(rect,circle,label); svg.append(group);
+        });
+        if(SPEECH_DEBUG) sceneElement.classList.add('debug-zones');
+      }
+      function showDropDebugPoint(sceneElement,point,correct) {
+        if(!SPEECH_DEBUG || !point.every(Number.isFinite)) return;
+        const svg=sceneElement.querySelector('svg'), marker=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        svg.querySelectorAll('.drop-debug-point').forEach(oldMarker=>oldMarker.remove());
+        marker.classList.add('drop-debug-point'); marker.setAttribute('cx',point[0]); marker.setAttribute('cy',point[1]); marker.setAttribute('r','25');
+        if(correct) marker.classList.add('correct');
+        svg.append(marker); setTimeout(()=>marker.remove(),2500);
+      }
       function showTargetHint(sceneElement,target) { const group=sceneElement.querySelector(`svg > g[data-target="${target}"]`); if(!group) return; clearTimeout(targetHintTimers.get(group)); group.classList.add('target-hint'); targetHintTimers.set(group,setTimeout(()=>group.classList.remove('target-hint'),1000)); }
       function resetMistakes(sceneName) { consecutiveMistakes[sceneName]=0; }
       function handleSceneMistake(sceneName,sceneElement,target,targetNames,replay) { const mistakes=(consecutiveMistakes[sceneName] || 0)+1; consecutiveMistakes[sceneName]=mistakes; wrongSound(); showTargetHint(sceneElement,target); if(mistakes>=2) { setTimeout(()=>speakName(targetNames[target],sceneName),160); setTimeout(()=>replay(true),900); } else setTimeout(()=>replay(true),500); }
@@ -757,9 +767,13 @@
             scheduleReconcile(reason,100);
             return true;
           }
-          const point=toPoint(event), item=el.dataset[itemDataKey];
-          logSpeech('drop verdict',{scene:sceneName,item,expectedItem:task.item,target:task.target,point,zone:sceneZones[task.target],cancelled,moved});
-          if(item===task.item && inZone(point,sceneZones[task.target])) {
+          const artwork=el.querySelector('img') || el, artRect=artwork.getBoundingClientRect();
+          const artCenter={clientX:artRect.left+artRect.width/2,clientY:artRect.top+artRect.height/2};
+          const point=toPoint(artCenter), item=el.dataset[itemDataKey];
+          const correct=item===task.item && inZone(point,sceneZones[task.target]);
+          showDropDebugPoint(sceneElement,point,correct);
+          logSpeech('drop verdict',{scene:sceneName,item,expectedItem:task.item,target:task.target,point,pointer:toPoint(event),zone:sceneZones[task.target],correct,cancelled,moved});
+          if(correct) {
             transitioning=true;
             recordTaskSuccess(task);
             resetMistakes(sceneName);

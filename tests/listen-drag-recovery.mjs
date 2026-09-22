@@ -14,7 +14,7 @@ const sceneNames=['bathroom','breakfast','living','bedroom'];
 const engines=process.env.RUN_WEBKIT==='1' ? [['webkit',webkit,{}]] : [['chromium',chromium,process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}]];
 const artifactDirectory=path.resolve('tests','artifacts');
 const delay=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
-let currentOperation={scene:'startup',round:0,action:'open browser'};
+let currentOperation={scene:'startup',round:0,action:'open browser'}, currentViewport='';
 
 async function state(page,sceneName) { return page.evaluate(name=>window.__ouchieigoTest.state(name),sceneName); }
 async function events(page) { return page.evaluate(()=>window.__ouchieigoTest.events()); }
@@ -25,17 +25,23 @@ async function assertNoUnexpectedActivity(page,phase) {
   assert.equal(hidden.length,0,`${phase}: hidden scene speech: ${JSON.stringify(hidden)}`);
 }
 
-async function pointFor(page,sceneName,kind) {
+async function pointFor(page,sceneName,kind,position='center') {
   const snapshot=await state(page,sceneName);
-  return page.evaluate(({sceneId,name,target,outside})=>{
-    const svg=document.querySelector(`#${sceneId} svg`),matrix=svg?.getScreenCTM();
-    if(!matrix) throw new Error(`${name}: SVG has no screen transform`);
-    const zone=outside ? null : window.__ouchieigoTest.zone(name,target);
-    const x=zone ? (zone[0]+zone[2])/2 : 543;
-    const y=zone ? (zone[1]+zone[3])/2 : 1320;
-    const point=new DOMPoint(x,y).matrixTransform(matrix);
-    return {x:point.x,y:point.y};
-  },{sceneId:snapshot.sceneId,name:sceneName,target:snapshot.target,outside:kind==='outside'});
+  return page.evaluate(({sceneId,name,target,outside,position})=>{
+    const scene=document.getElementById(sceneId),svg=scene.querySelector('svg');
+    if(outside) { const stage=scene.getBoundingClientRect(),art=svg.getBoundingClientRect(); return {x:art.left+art.width/2,y:Math.min(stage.bottom-25,art.bottom+65)}; }
+    const rect=svg.querySelector(`g[data-target="${target}"] rect`);
+    if(!rect) throw new Error(`${name}: rendered target ${target} not found`);
+    const box=rect.getBoundingClientRect(), stage=scene.getBoundingClientRect();
+    // A full item remains on screen during dragging, so use the reachable part
+    // of a drawn zone when that zone touches a screen edge.
+    const left=Math.max(box.left,stage.left+27), right=Math.min(box.right,stage.right-27);
+    const top=Math.max(box.top,stage.top+27), bottom=Math.min(box.bottom,stage.bottom-27);
+    if(right<=left || bottom<=top) throw new Error(`${name}: rendered target ${target} cannot be reached by an item center`);
+    const fractions={center:[.5,.5],left:[.15,.5],right:[.85,.5],top:[.5,.15],bottom:[.5,.85]};
+    const [fx,fy]=fractions[position];
+    return {x:left+(right-left)*fx,y:top+(bottom-top)*fy};
+  },{sceneId:snapshot.sceneId,name:sceneName,target:snapshot.target,outside:kind==='outside',position});
 }
 
 async function itemLocator(page,sceneName,item) {
@@ -43,15 +49,38 @@ async function itemLocator(page,sceneName,item) {
   return page.locator(selector);
 }
 
-async function dragCurrent(page,sceneName,kind='correct') {
+async function artworkCenter(item) {
+  return item.evaluate(element=>{
+    const artwork=element.querySelector('img') || element, rect=artwork.getBoundingClientRect();
+    return {x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+  });
+}
+
+async function alignArtworkCenter(page,item,destination) {
+  let pointer={...destination};
+  await page.mouse.move(pointer.x,pointer.y,{steps:5});
+  for(let attempt=0;attempt<3;attempt++) {
+    const center=await artworkCenter(item), dx=destination.x-center.x, dy=destination.y-center.y;
+    if(Math.hypot(dx,dy)<=1.5) return center;
+    pointer={x:pointer.x+dx,y:pointer.y+dy};
+    await page.mouse.move(pointer.x,pointer.y,{steps:2});
+  }
+  const center=await artworkCenter(item);
+  assert(Math.hypot(destination.x-center.x,destination.y-center.y)<=2.5,
+    `artwork center could not reach rendered target: wanted=${JSON.stringify(destination)}, actual=${JSON.stringify(center)}`);
+  return center;
+}
+
+async function dragCurrent(page,sceneName,kind='correct',position='center') {
   const before=await state(page,sceneName), item=await itemLocator(page,sceneName,before.item), itemBox=await item.boundingBox();
   assert(itemBox,`${sceneName}: current item ${before.item} is not visible`);
-  const destination=await pointFor(page,sceneName,kind==='correct' ? 'correct' : 'outside');
+  const destination=await pointFor(page,sceneName,kind==='correct' ? 'correct' : 'outside',position);
   await page.mouse.move(itemBox.x+itemBox.width/2,itemBox.y+itemBox.height/2);
   await page.mouse.down();
   const started=await state(page,sceneName);
   assert.equal(started.active,true,`${sceneName}: pointerdown did not start drag; item may be covered by another element`);
-  await page.mouse.move(destination.x,destination.y,{steps:5});
+  if(kind==='correct') await alignArtworkCenter(page,item,destination);
+  else await page.mouse.move(destination.x,destination.y,{steps:5});
   await page.mouse.up();
   return before;
 }
@@ -136,7 +165,10 @@ async function runScene(page,sceneName) {
       assert.equal(restored.active,false,`${sceneName}: outside drop left an active drag`);
     }
     currentOperation.action='correct drop and advance';
-    const currentBeforeCorrect=await dragCurrent(page,sceneName,'correct');
+    const edgePositions=['center','left','right','top','bottom'];
+    const position=edgePositions[rounds%edgePositions.length];
+    currentOperation.action=`correct drop (${position}) and advance`;
+    const currentBeforeCorrect=await dragCurrent(page,sceneName,'correct',position);
     const duringTransition=await state(page,sceneName);
     assert.equal(duringTransition.done,currentBeforeCorrect.done+1,`${sceneName}: correct drop did not mark item done`);
     assert.equal(duringTransition.transitioning,true,`${sceneName}: correct drop did not enter transition state`);
@@ -164,6 +196,7 @@ async function saveFailure(page,engineName,consoleEntries,error) {
   try { await page.screenshot({path:screenshotPath,fullPage:true}); } catch (_) {}
   console.error('\n========== AUTOMATED TEST FAILED ==========');
   console.error(`場面: ${currentOperation.scene}`);
+  console.error(`画面サイズ: ${currentViewport}`);
   console.error(`操作回数: ${currentOperation.round}`);
   console.error(`操作: ${currentOperation.action}`);
   console.error(`実際の状態: ${JSON.stringify(actual)}`);
@@ -177,26 +210,30 @@ async function saveFailure(page,engineName,consoleEntries,error) {
 let failed=false;
 for(const [engineName,engine,launchOptions] of engines) {
   const browser=await engine.launch({headless:true,...launchOptions});
-  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-  const consoleEntries=[];
-  page.on('console',message=>consoleEntries.push(`[${message.type()}] ${message.text()}`));
-  page.on('pageerror',error=>consoleEntries.push(`[pageerror] ${error.stack || error}`));
   try {
-    await page.goto(appUrl,{waitUntil:'load'});
-    // Include the 2.5-second recovery watchdog window while still on Home.
-    await delay(3000);
-    const startup=await events(page);
-    assert.equal(startup.speech.length,0,`home screen startup called speak(): ${JSON.stringify(startup.speech)}`);
-    await assertNoUnexpectedActivity(page,'home screen startup');
-    const results={};
-    for(const sceneName of sceneNames) results[sceneName]=await runScene(page,sceneName);
-    console.log(`PASS ${engineName}: ホーム起動時 speak() 0件、通常プレイ中の自動回復 0件、非表示場面の読み上げ 0件。`);
-    console.log('4場面すべて完了し、進行不能状態はありませんでした。');
-    for(const [sceneName,result] of Object.entries(results)) console.log(`  ${sceneName}: ${result.rounds}/${result.total}完了、不正解${result.incorrectDrops}回、枠外${result.outsideDrops}回`);
-    console.log('AUTOMATED TEST PASSED');
-  } catch (error) {
-    failed=true;
-    await saveFailure(page,engineName,consoleEntries,error);
+    for(const [width,height] of [[375,667],[390,844],[430,932]]) {
+      currentViewport=`${width}×${height}`;
+      const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
+      const consoleEntries=[];
+      page.on('console',message=>consoleEntries.push(`[${message.type()}] ${message.text()}`));
+      page.on('pageerror',error=>consoleEntries.push(`[pageerror] ${error.stack || error}`));
+      try {
+        await page.goto(appUrl,{waitUntil:'load'});
+        // Include the 2.5-second recovery watchdog window while still on Home.
+        await delay(3000);
+        const startup=await events(page);
+        assert.equal(startup.speech.length,0,`home screen startup called speak(): ${JSON.stringify(startup.speech)}`);
+        await assertNoUnexpectedActivity(page,'home screen startup');
+        const results={};
+        for(const sceneName of sceneNames) results[sceneName]=await runScene(page,sceneName);
+        console.log(`PASS ${engineName} ${currentViewport}: ホーム起動時 speak() 0件、通常プレイ中の自動回復 0件、非表示場面の読み上げ 0件。`);
+        for(const [sceneName,result] of Object.entries(results)) console.log(`  ${sceneName}: ${result.rounds}/${result.total}完了、不正解${result.incorrectDrops}回、枠外${result.outsideDrops}回`);
+      } catch (error) {
+        failed=true;
+        await saveFailure(page,engineName,consoleEntries,error);
+      } finally { await page.close(); }
+    }
   } finally { await browser.close(); }
 }
 if(failed) process.exitCode=1;
+else console.log('AUTOMATED TEST PASSED: 3 sizes × 4 scenes, center and near-edge drops');
