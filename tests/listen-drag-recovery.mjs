@@ -26,11 +26,16 @@ async function assertNoUnexpectedActivity(page,phase) {
 }
 
 async function pointFor(page,sceneName,kind) {
-  const snapshot=await state(page,sceneName), sceneBox=await page.locator(`#${snapshot.sceneId}`).boundingBox();
-  assert(sceneBox,`${sceneName}: scene has no layout box`);
-  if(kind==='outside') return {x:sceneBox.x+sceneBox.width*.5,y:sceneBox.y+sceneBox.height*(1320/1448)};
-  const zone=await page.evaluate(({name,target})=>window.__ouchieigoTest.zone(name,target),{name:sceneName,target:snapshot.target});
-  return {x:sceneBox.x+sceneBox.width*((zone[0]+zone[2])/2/1086),y:sceneBox.y+sceneBox.height*((zone[1]+zone[3])/2/1448)};
+  const snapshot=await state(page,sceneName);
+  return page.evaluate(({sceneId,name,target,outside})=>{
+    const svg=document.querySelector(`#${sceneId} svg`),matrix=svg?.getScreenCTM();
+    if(!matrix) throw new Error(`${name}: SVG has no screen transform`);
+    const zone=outside ? null : window.__ouchieigoTest.zone(name,target);
+    const x=zone ? (zone[0]+zone[2])/2 : 543;
+    const y=zone ? (zone[1]+zone[3])/2 : 1320;
+    const point=new DOMPoint(x,y).matrixTransform(matrix);
+    return {x:point.x,y:point.y};
+  },{sceneId:snapshot.sceneId,name:sceneName,target:snapshot.target,outside:kind==='outside'});
 }
 
 async function itemLocator(page,sceneName,item) {

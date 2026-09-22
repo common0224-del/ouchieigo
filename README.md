@@ -4,7 +4,9 @@
 
 ## Think & Say の試作
 
-外観確認用のページは [think-and-say-prototype.html](think-and-say-prototype.html) です。既存のゲームにはまだ組み込んでおらず、ドラッグと音声は未実装です。左右3枚ずつのカードを吹き出しに運ぶ配置と、既存画面に合わせた見た目を確認できます。
+採用しなかった外観モックは、このMacの `private-prototypes/` に移しました。Gitの追跡対象・GitHub Pagesの公開対象からは外します。既存のゲームには組み込んでいません。今後の試作も同じ非公開フォルダーに置き、採用したものだけ本体へ移してください。
+
+現在の「main ブランチのルートを Pages で配信」する方式では、`tests/`、`docs/`、スクリプトや README もURLを知る人には取得できます。これらに秘密情報は置いていませんが、公開アプリには不要です。今後は GitHub Actions で `index.html` と実際に参照する WebP だけを配布用ディレクトリへ集め、Pages へその成果物だけをデプロイする方式を推奨します。この公開方式の切り替えは、既存サイトのURL・更新手順に影響するため、今回は実施していません。
 
 ## 画像を追加・差し替える手順
 
@@ -63,6 +65,23 @@ AUTOMATED TEST PASSED
 ```
 
 失敗時は、場面名・何回目か・実行中だった操作・ゲームの内部状態・原因分類・ブラウザコンソールが表示されます。画面のスクリーンショットは `tests/artifacts/` に保存され、保存先もターミナルに表示されます。その出力全体とスクリーンショットを共有してください。
+
+## 全画面レイアウトの自動確認
+
+MacのChromeで、375×667・390×844・430×932 の3サイズについて、ホーム・場所選択・Word Match選択・Item Match・Action Match・Listen & Doの4場面を確認します。ヘッダーの48px操作、画面外へ切れたカードとアイテム、トレーの位置、届け先の重複を検査し、各画面のスクリーンショットを `tests/artifacts/responsive/` に保存します。
+
+```zsh
+cd "/Users/y.komon/Documents/Codex/2026-09-14/referenced-chatgpt-conversation-this-is-an/outputs/everyday-english-kids-v10"
+zsh tests/run-layout-check.zsh
+```
+
+両方を続けて確認する場合は、次の1行を実行してください。途中で失敗したらそこで止まり、失敗したテストのスクリーンショットを `tests/artifacts/` に保存します。最後に `RESPONSIVE LAYOUT PASSED: 3 sizes × 9 screens` と表示されれば、両テストが成功しています。
+
+```zsh
+zsh tests/run-all.zsh
+```
+
+成功時の最後の行は `RESPONSIVE LAYOUT PASSED: 3 sizes × 9 screens.` です。失敗時は画面名・サイズ・原因と `FAILED.png` の保存先が表示されます。表示が成功しても、保存された画像で場面の絵・字幕・トレーの見た目を確認してください。
 
 ## ChromeでSlow 3Gの表示確認
 

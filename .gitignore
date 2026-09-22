@@ -5,4 +5,5 @@
 /.venv/
 /.tools/
 /tests/artifacts/
+/private-prototypes/
 *.DS_Store
