@@ -82,7 +82,7 @@ async function inspectActionImages(page,engineName,width,height,variant,opening)
   await page.waitForFunction(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued) img')].every(img=>img.complete && img.naturalWidth>0),null,{timeout:12000});
   const cards=await page.evaluate(()=>{
     const rect=element=>{ const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}; };
-    const pseudo=(card,selector)=>{ const style=getComputedStyle(card,selector); return {content:style.content,width:style.width,height:style.height,left:style.left,top:style.top,position:style.position,pointerEvents:style.pointerEvents}; };
+    const pseudo=(card,selector)=>{ const style=getComputedStyle(card,selector); return {content:style.content,width:style.width,height:style.height,left:style.left,top:style.top,position:style.position,pointerEvents:style.pointerEvents,backgroundImage:style.backgroundImage}; };
     return [...document.querySelectorAll('#action-screen .action-card:not(.queued)')].map(card=>{
       const img=card.querySelector('img');
       const image=rect(img),scale=Math.min(image.w/img.naturalWidth,image.h/img.naturalHeight),renderedWidth=img.naturalWidth*scale,renderedHeight=img.naturalHeight*scale;
@@ -106,22 +106,22 @@ async function inspectActionImages(page,engineName,width,height,variant,opening)
     assert(Math.abs(card.rendered.w/card.rendered.h-card.naturalWidth/card.naturalHeight)<0.025,`${label}: rendered artwork is stretched: ${JSON.stringify(card)}`);
     assert(near(card.image.x+card.image.w/2,card.card.x+card.card.w/2),`${label}: image is not horizontally centered`);
     if(card.panels===2) {
-      assert.equal(card.before.content,'""',`${label}: one center badge is required for two panels`);
-      assert.equal(card.after.content,'""',`${label}: badge triangle is missing`);
-      assert.equal(Number.parseFloat(card.before.width),31,`${label}: badge width changed`);
-      assert.equal(Number.parseFloat(card.before.height),31,`${label}: badge height changed`);
-      assert.equal(card.before.position,'absolute',`${label}: badge participates in image layout`);
-      assert.equal(card.before.pointerEvents,'none',`${label}: badge can intercept taps`);
-      assert.equal(card.after.pointerEvents,'none',`${label}: triangle can intercept taps`);
-      assert(near(offset(card.before.left,card.clientWidth),card.clientWidth/2) && near(offset(card.before.top,card.clientHeight),card.clientHeight/2),`${label}: badge is not centered on the two-panel boundary: ${JSON.stringify(card.before)}`);
-      assert.equal(card.after.position,'absolute',`${label}: triangle participates in image layout`);
-      assert.equal(Number.parseFloat(card.after.width),14,`${label}: triangle width changed`);
-      assert.equal(Number.parseFloat(card.after.height),16,`${label}: triangle height changed`);
-      assert(near(offset(card.after.left,card.clientWidth),card.clientWidth/2+2) && near(offset(card.after.top,card.clientHeight),card.clientHeight/2),`${label}: triangle is not centered on the two-panel boundary: ${JSON.stringify(card.after)}`);
+      for(const [arrow,pseudo,expectedX] of [['left',card.before,card.clientWidth/2-10],['right',card.after,card.clientWidth/2+10]]) {
+        assert.equal(pseudo.content,'""',`${label}: ${arrow} arrow is missing`);
+        assert.equal(Number.parseFloat(pseudo.width),18,`${label}: ${arrow} arrow width changed`);
+        assert.equal(Number.parseFloat(pseudo.height),22,`${label}: ${arrow} arrow height changed`);
+        assert.equal(pseudo.position,'absolute',`${label}: ${arrow} arrow participates in image layout`);
+        assert.equal(pseudo.pointerEvents,'none',`${label}: ${arrow} arrow can intercept taps`);
+        assert(near(offset(pseudo.left,card.clientWidth),expectedX) && near(offset(pseudo.top,card.clientHeight),card.clientHeight/2),`${label}: ${arrow} arrow is not at the two-panel boundary: ${JSON.stringify(pseudo)}`);
+        const artwork=decodeURIComponent(pseudo.backgroundImage);
+        assert(artwork.includes('#d74748') && artwork.includes('#fffdf4'),`${label}: ${arrow} arrow must have the approved red fill and white outline`);
+      }
+      assert.equal(card.before.backgroundImage,card.after.backgroundImage,`${label}: double arrows use different artwork`);
     } else {
       assert.equal(card.panels,3,`${label}: unexpected panel count`);
       assert(!card.legacyDivider,`${label}: legacy divider duplicates the lines painted in the throw image`);
-      assert(!(Number.parseFloat(card.before.width)===31 && Number.parseFloat(card.before.height)===31),`${label}: current non-equal throw image must not show a triangle`);
+      assert.notEqual(card.before.content,'""',`${label}: current non-equal throw image must not show a left arrow`);
+      assert.notEqual(card.after.content,'""',`${label}: current non-equal throw image must not show a right arrow`);
     }
   }
   const taps=await page.evaluate(()=>{
@@ -133,7 +133,7 @@ async function inspectActionImages(page,engineName,width,height,variant,opening)
   for(const tap of taps) {
     await page.mouse.click(tap.x,tap.y);
     const hit=await page.evaluate(name=>window.__actionTapHits[name]||0,tap.name);
-    assert.equal(hit,1,`${engineName} ${width}×${height} ${tap.name}: center triangle blocked the card tap`);
+    assert.equal(hit,1,`${engineName} ${width}×${height} ${tap.name}: double arrow blocked the card tap`);
   }
   await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-action-variant${variant}-open${opening}.png`)});
   console.log(`PASS ${engineName} ${width}×${height} Action Match variant ${variant+1}: four loaded images, sizes, boundaries, and tap targets`);
@@ -161,7 +161,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         await page.locator('#word-home').click();
         await page.locator('#open-word').click(); await page.locator('#open-action-match').click(); await capture('action-screen','action');
         const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
-        assert.deepEqual(panelCounts,{two:6,three:2,total:8},`${engineName} ${width}×${height}: Action Match panel metadata must cover six two-panel and two throw images`);
+        assert.deepEqual(panelCounts,{two:7,three:1,total:8},`${engineName} ${width}×${height}: Action Match panel metadata must cover seven two-panel images and one three-panel throw image`);
         current=`${engineName} ${width}×${height} Action Match images, first opening`;
         const first=[];
         for(const variant of [0,1]) first.push(await inspectActionImages(page,engineName,width,height,variant,1));
