@@ -16,13 +16,13 @@ GREEN_CUTOFF = 205
 GREEN_RANGE = 220
 
 
-def remove_green(source: Path, destination: Path) -> None:
+def remove_green(source: Path, destination: Path, green_cutoff: int = GREEN_CUTOFF) -> None:
     image = Image.open(source).convert("RGB")
     output = Image.new("RGBA", image.size)
     result = []
     for red, green, blue in image.getdata():
         dominance = green - max(red, blue)
-        if dominance >= GREEN_CUTOFF:
+        if dominance >= green_cutoff:
             result.append((0, 0, 0, 0))
             continue
         alpha = min(1.0, max(0.0, 1.0 - dominance / GREEN_RANGE))
@@ -47,5 +47,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path, help="PNG with chroma-green background")
     parser.add_argument("destination", type=Path, help="RGBA PNG for WebP conversion")
+    parser.add_argument("--green-cutoff", type=int, default=GREEN_CUTOFF,
+                        help="Green dominance to clear; lower for less saturated generated backdrops")
     arguments = parser.parse_args()
-    remove_green(arguments.source, arguments.destination)
+    remove_green(arguments.source, arguments.destination, arguments.green_cutoff)

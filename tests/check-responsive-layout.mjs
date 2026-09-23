@@ -161,7 +161,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         await page.locator('#word-home').click();
         await page.locator('#open-word').click(); await page.locator('#open-action-match').click(); await capture('action-screen','action');
         const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
-        assert.deepEqual(panelCounts,{two:7,three:1,total:8},`${engineName} ${width}×${height}: Action Match panel metadata must cover seven two-panel images and one three-panel throw image`);
+        assert.deepEqual(panelCounts,{two:8,three:0,total:8},`${engineName} ${width}×${height}: Action Match panel metadata must cover eight two-panel images and no three-panel images`);
         current=`${engineName} ${width}×${height} Action Match images, first opening`;
         const first=[];
         for(const variant of [0,1]) first.push(await inspectActionImages(page,engineName,width,height,variant,1));

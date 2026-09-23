@@ -2,6 +2,19 @@
 
 2026-09-22 の計画作成時点の `index.html` が参照した、人物を含む公開用 WebP の棚卸し。現在の公開用画像は `index.html` を、確定した人物基準は [`characters.md`](characters.md) と [`characters/`](characters/) を正とする。この表の `word-target-girl-v1` はその後v2に置き換わった。猫、ぬいぐるみ、壁の絵など家族本人ではない図像は「人物」に数えない。
 
+## 完了状況（2026-09-24）
+
+計画時の比較表と制作手順は履歴として残す。Item Match の女の子は `word-target-girl-v2.png.webp` に差し替え済み。Action Match の8枚も所有者の承認を得て差し替え済みで、現在の参照先は次のとおり。いずれも区切り線なしの等幅2コマ、`data-panels="2"` である。
+
+| 動作 | 男の子 | 女の子 |
+|---|---|---|
+| put | `action-put-boy-v5.png.webp` | `action-put-girl-v4.png.webp` |
+| get | `action-get-boy-v4.png.webp` | `action-get-girl-v3.png.webp` |
+| bring | `action-bring-boy-v3.png.webp` | `action-bring-girl-v3.png.webp` |
+| throw away | `action-throw-boy-v3.png.webp` | `action-throw-girl-v4.png.webp` |
+
+計画時に「作り直し」だった8枚は、Item Match の女の子1枚と当時未制作の Action Match 7枚を指す。先に承認されていた `action-put-boy` も後に区切り線なしのv5へ更新され、現在はAction Match全8枚の統一が完了した。旧公開画像は `source-images/legacy/` に保管した。
+
 ## 1. 人物が描かれた公開用画像（全17枚）
 
 「基準との差」は髪／顔／服の順。「一致」は基準画像そのもの、または画面で見分けられる相違がないという意味。背景の猫などはこの列の判定対象外。
