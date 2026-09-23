@@ -14,8 +14,8 @@
 | `word-target-mom-v1.png.webp` | Item Match | ママ | 茶色の低いまとめ髪、黄色いカーディガン、生成りの上衣、緑のスカート。リビングのママに近い。 |
 | `word-target-dad-v1.png.webp` | Item Match | パパ | 濃い茶色のややウェーブした短髪・ひげなし・水色のパジャマ。寝室のパパに近い。 |
 | `action-put-boy-v4.png.webp` | Action Match | 男の子 | 基準画像に合わせた茶色の横流し短髪・大きな茶色の目・青い星柄パジャマ。旧v3は非公開保管。 |
-| `action-get-boy-v2.png.webp` | Action Match | 男の子 | 上と同じ外観。 |
-| `action-bring-boy-v2.png.webp` | Action Match | 男の子、ママ | 男の子は上と同じ。ママは茶色の長いウェーブ髪を下ろし、生成りの上衣と青いジーンズ。リビングのママと髪型・服が違う。 |
+| `action-get-boy-v3.png.webp` | Action Match | 男の子 | 基準画像に合わせた茶色の短髪・青い星柄パジャマ。旧v2は非公開保管。 |
+| `action-bring-boy-v3.png.webp` | Action Match | 男の子、ママ | 男の子は青い星柄パジャマ、ママは低いまとめ髪・生成りの上衣・緑のロングスカート。旧v2は非公開保管。 |
 | `action-throw-boy-v2.png.webp` | Action Match | 男の子 | 上と同じ外観。 |
 | `action-put-girl-v3.png.webp` | Action Match | 女の子 | 明るい茶色の高いポニーテール、ピンクの髪留め、ピンクの星柄パジャマ。 |
 | `action-get-girl-v2.png.webp` | Action Match | 女の子 | 上と同じ外観。 |
@@ -45,8 +45,8 @@
 ## 統一作業の範囲と順序
 
 - 場面背景は描き直さない。背景内の物の位置とドロップ判定枠・テストを維持するため、背景以外の小さな画像を背景に合わせる。リビング・寝室など背景内の猫も今回は描き直さない。
-- 当初の作り直し対象は Action Match の8枚（put / get / bring / throw × 男の子・女の子）と、Item Match の女の子の計9枚。`action-put-boy-v4.png.webp` と `word-target-girl-v2.png.webp` は承認済み・公開用へ差し替え済みであり、残りは Action Match の7枚。
-- 旧 `action-put-boy-v3` と `word-target-girl-v1` の元PNGとWebPはMac上の `source-images/legacy/` に保管している。女の子の新しい全身基準画像は `docs/characters/word-target-girl-v2.png.webp`。次の候補は `action-get-boy` の1枚だけで、所有者の承認まで公開画像を差し替えない。
-- 以後は `action-get-boy` → `action-bring-boy` → `action-throw-boy` → `action-put-girl` → `action-get-girl` → `action-bring-girl` → `action-throw-girl` の順に、1枚ずつ承認を得て進める。
+- 当初の作り直し対象は Action Match の8枚（put / get / bring / throw × 男の子・女の子）と、Item Match の女の子の計9枚。`action-put-boy-v4.png.webp`、`action-get-boy-v3.png.webp`、`action-bring-boy-v3.png.webp`、`word-target-girl-v2.png.webp` は承認済み・公開用へ差し替え済みであり、残りは Action Match の5枚。
+- 旧 `action-put-boy-v3`、`action-get-boy-v2`、`action-bring-boy-v2`、`word-target-girl-v1` の元PNGとWebPはMac上の `source-images/legacy/` に保管している。女の子の新しい全身基準画像は `docs/characters/word-target-girl-v2.png.webp`。次の候補は `action-throw-boy` で、所有者の承認まで公開画像を差し替えない。
+- 以後は `action-throw-boy` → `action-put-girl` → `action-get-girl` → `action-bring-girl` → `action-throw-girl` の順に、1枚ずつ承認を得て進める。
 - 顔立ち・髪型・髪色は基準画像に合わせる。Action Match はコマを等幅にし、境界にアプリ側の三角を重ねる余白を確保する。画像内に区切り線や矢印は描かず、小道具の画風と大きさを統一する。`throw` はまず2コマ案を提示し、動作が分かりにくければ3コマを残す判断もできる。元画像の動作が読めることを優先する。
 - 出力はWebP quality 84、Action Match は長辺800px以内とする。差し替え後は自動テスト、特にレイアウトテストを実行する。
