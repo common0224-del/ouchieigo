@@ -632,11 +632,30 @@
       function openWord() { homeScreen.hidden=true; matchModeScreen.hidden=false; unlockAudio(); sceneSelectSound(); }
       function openItemMatch() { matchModeScreen.hidden=true; wordScreen.hidden=false; unlockAudio(); sceneSelectSound(); resetWord(); }
       let actionCurrent='put';
+      const actionBoard=document.querySelector('#action-screen .action-board');
+      const actionCards=[...actionBoard.querySelectorAll('.action-card')];
       function openActionMatch() { matchModeScreen.hidden=true; actionScreen.hidden=false; unlockAudio(); prepareActionCards(); selectAction(); }
       function closeWord() { stopSpeech(); wordScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeActionMatch() { stopSpeech(); actionScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeMatchMode() { matchModeScreen.hidden=true; homeScreen.hidden=false; }
-      function prepareActionCards() { actionFinish.classList.remove('show'); ['put','get','bring','throw'].forEach(action=>{ const variants=shuffle([...document.querySelectorAll(`[data-action="${action}"]`)]); variants.forEach((card,index)=>{ card.classList.remove('matched'); card.classList.toggle('queued',index!==0); }); }); }
+      function prepareActionCards() {
+        actionFinish.classList.remove('show');
+        const selected=[];
+        for(const action of ['put','get','bring','throw']) {
+          const variants=shuffle(actionCards.filter(card=>card.dataset.action===action));
+          variants.forEach((card,index)=>{
+            card.classList.remove('matched');
+            card.classList.toggle('queued',index!==0);
+            card.removeAttribute('aria-hidden');
+            card.tabIndex=0;
+          });
+          selected.push(variants[0]);
+        }
+        // DOM order is visual, keyboard, and screen-reader order. Hidden variants
+        // stay outside the four visible grid slots; matched cards keep their slot.
+        for(const card of actionCards.filter(card=>card.classList.contains('queued'))) actionBoard.insertBefore(card,actionFinish);
+        for(const card of shuffle(selected)) actionBoard.insertBefore(card,actionFinish);
+      }
       function speakAction(repeat=false) { if(actionScreen.hidden || !actionCurrent || !('speechSynthesis' in window))return; const phrase={put:'Put it.',get:'Get it.',bring:'Bring it to me.',throw:'Throw it away.'}[actionCurrent]; const u=new SpeechSynthesisUtterance(phrase),v=voice();u.lang=v?.lang||'en-US';u.rate=speechRate;u.pitch=1;u._instructionSpeech=true;if(v)u.voice=v;u.onstart=()=>{ if(isCurrentUtterance(u)) actionSpeaker.setAttribute('aria-pressed','true'); };u.onend=u.onerror=()=>{ if(isCurrentUtterance(u)) actionSpeaker.setAttribute('aria-pressed','false'); };playSpeech(u); }
       function finishAction() { actionCurrent=null; stopSpeech(); actionFinish.classList.add('show'); finishSound(); }
       function selectAction() { const choices=[...new Set([...document.querySelectorAll('[data-action]:not(.queued):not(.matched)')].map(card=>card.dataset.action))]; if(!choices.length) { finishAction(); return; } actionCurrent=choose(choices); speakAction(); }
@@ -660,7 +679,7 @@
       function celebrate(msg, state='right') { toast.textContent=msg; toast.classList.toggle('wrong',state==='wrong'); toast.classList.add('show'); setTimeout(()=>{toast.classList.remove('show','wrong');},1150); }
       const listenInteractionControllers={};
       function resetGame(shouldSpeak=true) { stopSpeech(); listenInteractionControllers.bathroom?.cancelActive('reset'); clearRecentTasks('bathroom'); finishPanel.classList.remove('show'); document.querySelectorAll('.item').forEach(el=>{ el.classList.remove('done','drag'); el.style.left=''; el.style.top=''; el.dataset.listenState='tray'; }); selectTask(); listenStarted.bathroom=true; prompt.textContent='New game — listen carefully!'; if (shouldSpeak && voicesReady) setTimeout(speak, 120); }
-      const shuffle = list => [...list].sort(()=>Math.random()-.5);
+      const shuffle = list => { const result=[...list]; for(let index=result.length-1;index>0;index--) { const swapIndex=Math.floor(Math.random()*(index+1)); [result[index],result[swapIndex]]=[result[swapIndex],result[index]]; } return result; };
       function setBreakfastSlot(el, slot) { el.dataset.slot=slot; el.style.left=traySlotPosition(slot); el.style.top=''; el.dataset.listenState='tray'; }
       function prepareBreakfastItems() {
         const items=shuffle([...document.querySelectorAll('.breakfast-item')]);
@@ -895,7 +914,7 @@
       document.querySelector('#action-back').addEventListener('click',closeActionMatch);
       document.querySelector('#action-home').addEventListener('click',returnHome);
       document.querySelector('#action-speaker').addEventListener('click',()=>{ unlockAudio(); speakAction(true); });
-      document.querySelectorAll('[data-action]').forEach(card=>card.addEventListener('click',()=>{ if(card.classList.contains('queued')||card.classList.contains('matched'))return; unlockAudio(); if(card.dataset.action===actionCurrent) { card.classList.add('matched'); correctSound(); setTimeout(selectAction,600); } else { wrongSound(); setTimeout(()=>speakAction(true),500); } }));
+      document.querySelectorAll('[data-action]').forEach(card=>card.addEventListener('click',()=>{ if(card.classList.contains('queued')||card.classList.contains('matched'))return; unlockAudio(); if(card.dataset.action===actionCurrent) { card.classList.add('matched'); card.setAttribute('aria-hidden','true'); card.tabIndex=-1; correctSound(); setTimeout(selectAction,600); } else { wrongSound(); setTimeout(()=>speakAction(true),500); } }));
       document.querySelector('#action-play-again').addEventListener('click',()=>{ unlockAudio(); prepareActionCards(); selectAction(); });
       document.querySelector('#word-reset').addEventListener('click',()=>{ unlockAudio(); resetWord(); });
       wordSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!wordCurrent) resetWord(false); speakWord(true); });

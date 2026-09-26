@@ -13,6 +13,10 @@ const output=path.join(root,'tests','artifacts','responsive');
 fs.mkdirSync(output,{recursive:true});
 const url=pathToFileURL(path.join(root,'index.html')).href;
 const sizes=[[375,667],[390,844],[430,932]];
+const actionFixtures=[
+  {name:'swap',draws:[0,0,0,0,0,0,0,0],expected:['action-get-girl-v4.png.webp','action-bring-girl-v4.png.webp','action-throw-girl-v5.png.webp','action-put-girl-v5.png.webp']},
+  {name:'keep',draws:[0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99],expected:['action-put-boy-v5.png.webp','action-get-boy-v4.png.webp','action-bring-boy-v3.png.webp','action-throw-boy-v3.png.webp']},
+];
 const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene']];
 const engines=[
   ['chromium',chromium,process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}],
@@ -71,14 +75,61 @@ async function inspect(page,id,kind,width,height) {
   console.log(`PASS ${width}×${height} ${id}: controls ${result.controls.length}, ${kind==='scene' ? `tray items ${result.items.length}, zones ${result.zones.length}` : `cards ${(result.cards || []).length}`}`);
 }
 
-async function inspectActionImages(page,engineName,width,height,variant,opening) {
-  await page.evaluate(index=>{
+async function inspectActionSelection(page,engineName,width,height,fixture,opening) {
+  const cards=await page.evaluate(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued)')].map(card=>{
+    const rect=card.getBoundingClientRect();
+    return {name:card.querySelector('img').getAttribute('src'),action:card.dataset.action,y:rect.y,hidden:card.getAttribute('aria-hidden'),tabIndex:card.tabIndex};
+  }));
+  const label=`${engineName} ${width}×${height} ${fixture.name}, opening ${opening}`;
+  assert.equal(cards.length,4,`${label}: expected four visible Action Match cards`);
+  assert.equal(new Set(cards.map(card=>card.action)).size,4,`${label}: action words are duplicated`);
+  assert.deepEqual(cards.map(card=>card.name),fixture.expected,`${label}: seeded selection or visual/DOM order is incorrect`);
+  for(let i=0;i<cards.length;i++) {
+    assert.equal(cards[i].hidden,null,`${label}: visible card is hidden from accessibility`);
+    assert.equal(cards[i].tabIndex,0,`${label}: visible card is missing from keyboard order`);
+    if(i) assert(cards[i].y>cards[i-1].y,`${label}: DOM order differs from visual top-to-bottom order`);
+  }
+  console.log(`PASS ${label}: four distinct words in seeded visual and accessibility order`);
+  return cards;
+}
+
+async function inspectMatchedSlots(page,selected,label) {
+  await page.evaluate(names=>{
+    const visible=new Set(names);
+    for(const card of document.querySelectorAll('#action-screen .action-card')) {
+      card.classList.toggle('queued',!visible.has(card.querySelector('img').getAttribute('src')));
+    }
+  },selected.map(card=>card.name));
+  let matchedName=null;
+  for(const card of selected) {
+    await page.locator(`#action-screen .action-card:has(img[src="${card.name}"])`).click();
+    const matched=await page.evaluate(()=>[...document.querySelectorAll('#action-screen .action-card.matched')].map(card=>card.querySelector('img').getAttribute('src')));
+    if(matched.length) { matchedName=matched[0]; break; }
+  }
+  assert(matchedName,`${label}: none of the four cards was accepted as correct`);
+  await page.waitForTimeout(700);
+  const after=await page.evaluate(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued)')].map(card=>({name:card.querySelector('img').getAttribute('src'),matched:card.classList.contains('matched'),hidden:card.getAttribute('aria-hidden'),tabIndex:card.tabIndex,y:card.getBoundingClientRect().y})));
+  assert.deepEqual(after.map(card=>card.name),selected.map(card=>card.name),`${label}: cards were reordered after a correct answer`);
+  for(let i=0;i<after.length;i++) {
+    if(after[i].name===matchedName) {
+      assert(after[i].matched && after[i].hidden==='true' && after[i].tabIndex===-1,`${label}: matched card is still accessible`);
+    } else {
+      assert(Math.abs(after[i].y-selected[i].y)<=1.5,`${label}: remaining card ${after[i].name} moved after a correct answer`);
+    }
+  }
+  console.log(`PASS ${label}: correct answer keeps four grid slots and remaining-card order`);
+}
+
+async function inspectActionImages(page,engineName,width,height,gender,opening,fixtureName) {
+  await page.evaluate(gender=>{
     for(const action of ['put','get','bring','throw']) {
       const cards=[...document.querySelectorAll(`#action-screen .action-card[data-action="${action}"]`)];
       if(cards.length!==2) throw new Error(`${action}: expected two image variants`);
-      cards.forEach((card,cardIndex)=>card.classList.toggle('queued',cardIndex!==index));
+      const selected=cards.find(card=>card.querySelector('img')?.getAttribute('src')?.includes(`-${gender}-`));
+      if(!selected) throw new Error(`${action}: missing ${gender} image`);
+      cards.forEach(card=>card.classList.toggle('queued',card!==selected));
     }
-  },variant);
+  },gender);
   await page.waitForFunction(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued) img')].every(img=>img.complete && img.naturalWidth>0),null,{timeout:12000});
   const cards=await page.evaluate(()=>{
     const rect=element=>{ const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}; };
@@ -135,8 +186,8 @@ async function inspectActionImages(page,engineName,width,height,variant,opening)
     const hit=await page.evaluate(name=>window.__actionTapHits[name]||0,tap.name);
     assert.equal(hit,1,`${engineName} ${width}×${height} ${tap.name}: double arrow blocked the card tap`);
   }
-  await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-action-variant${variant}-open${opening}.png`)});
-  console.log(`PASS ${engineName} ${width}×${height} Action Match variant ${variant+1}: four loaded images, sizes, boundaries, and tap targets`);
+  await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-action-${fixtureName}-${gender}-open${opening}.png`)});
+  console.log(`PASS ${engineName} ${width}×${height} Action Match ${fixtureName}/${gender}: four loaded images, sizes, boundaries, and tap targets`);
   return cards;
 }
 
@@ -151,6 +202,11 @@ for(const [engineName,engine,launchOptions] of engines) {
   try {
     for(const [width,height] of sizes) {
       const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
+      await page.addInitScript(()=>{
+        const originalRandom=Math.random;
+        window.__setActionTestRandom=draws=>{ let index=0; Math.random=()=>draws[index++%draws.length]; };
+        window.__restoreActionTestRandom=()=>{ Math.random=originalRandom; };
+      });
       let current='startup';
       try {
         await page.goto(url,{waitUntil:'load'});
@@ -159,26 +215,42 @@ for(const [engineName,engine,launchOptions] of engines) {
         await page.locator('#open-word').click(); await capture('match-mode-screen','mode');
         await page.locator('#open-item-match').click(); await capture('word-screen','word');
         await page.locator('#word-home').click();
-        await page.locator('#open-word').click(); await page.locator('#open-action-match').click(); await capture('action-screen','action');
-        const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
-        assert.deepEqual(panelCounts,{two:8,three:0,total:8},`${engineName} ${width}×${height}: Action Match panel metadata must cover eight two-panel images and no three-panel images`);
-        current=`${engineName} ${width}×${height} Action Match images, first opening`;
-        const first=[];
-        for(const variant of [0,1]) first.push(await inspectActionImages(page,engineName,width,height,variant,1));
-        assert.equal(new Set(first.flat().map(card=>card.name)).size,8,`${current}: all eight Action Match images were not inspected`);
-        await page.locator('#action-home').click();
-        await page.locator('#open-word').click(); await page.locator('#open-action-match').click();
-        current=`${engineName} ${width}×${height} Action Match images, second opening`;
-        for(const variant of [0,1]) {
-          const second=await inspectActionImages(page,engineName,width,height,variant,2);
-          for(let i=0;i<second.length;i++) {
-            assert.equal(second[i].name,first[variant][i].name,`${current}: image order changed`);
+        for(const fixture of actionFixtures) {
+          const openings=[];
+          for(const opening of [1,2]) {
+            await page.locator('#open-word').click();
+            await page.evaluate(draws=>window.__setActionTestRandom(draws),fixture.draws);
+            await page.locator('#open-action-match').click();
+            current=`${engineName} ${width}×${height} Action Match ${fixture.name}, opening ${opening}`;
+            if(fixture===actionFixtures[0] && opening===1) {
+              await capture('action-screen','action');
+              const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
+              assert.deepEqual(panelCounts,{two:8,three:0,total:8},`${current}: Action Match panel metadata must cover eight two-panel images and no three-panel images`);
+            }
+            const selected=await inspectActionSelection(page,engineName,width,height,fixture,opening);
+            const inspected=new Map();
+            for(const gender of ['boy','girl']) {
+              for(const card of await inspectActionImages(page,engineName,width,height,gender,opening,fixture.name)) {
+                assert(!inspected.has(card.name),`${current}: duplicate image identity ${card.name}`);
+                inspected.set(card.name,card);
+              }
+            }
+            assert.equal(inspected.size,8,`${current}: all eight Action Match images were not inspected`);
+            openings.push({selected,inspected});
+            if(opening===1) await inspectMatchedSlots(page,selected,current);
+            await page.locator('#action-home').click();
+          }
+          assert.deepEqual(openings[1].selected,openings[0].selected,`${current}: same random draws changed the visible order after reopening`);
+          for(const [name,first] of openings[0].inspected) {
+            const second=openings[1].inspected.get(name);
+            assert(second,`${current}: image ${name} disappeared after reopening`);
             for(const part of ['card','image']) for(const coordinate of ['x','y','w','h']) {
-              assert(Math.abs(second[i][part][coordinate]-first[variant][i][part][coordinate])<=1.5,`${current}: ${second[i].name} ${part}.${coordinate} changed after reopening`);
+              assert(Math.abs(second[part][coordinate]-first[part][coordinate])<=1.5,`${current}: ${name} ${part}.${coordinate} changed after reopening`);
             }
           }
         }
-        await page.locator('#action-home').click(); await page.locator('#open-listen').click(); await capture('place-screen','place');
+        await page.evaluate(()=>window.__restoreActionTestRandom());
+        await page.locator('#open-listen').click(); await capture('place-screen','place');
         for(const [name,openId,screenId,backId] of scenes) {
           await page.locator(`#${openId}`).click(); await capture(screenId,'scene'); await page.locator(`#${backId}`).click();
         }
