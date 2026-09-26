@@ -359,10 +359,190 @@ Do not change any character's hairstyle, hair color, face, or selected approved 
 Critical: EXACTLY TWO panels, not three. No divider lines or arrows inside the art. No ponytail, pink scrunchie, shoes or socks. No floating tissue outside the bin in the second panel. No closed lid hiding the tissue. Keep the trash bin stationary in both panels.
 ```
 
+## 2026-09-25 — `action-put-girl-v5-candidate`（2026-09-26承認・公開へ反映）
+
+- 用途：Action Match の女の子版 `put` を、コップ→机へ変更した。2026-09-26に所有者がv5を承認。候補を公開用 `action-put-girl-v5.png.webp` へ複写して `index.html` を切り替え、旧v4 WebPは `source-images/legacy/` に移した。`data-panels="2"` を確認済み。
+- 添付基準画像：`docs/characters/word-target-girl-v2.png.webp`（全身）、`docs/characters/breakfast-stage-v7.jpg.webp`（顔・髪）、`action-put-girl-v4.png.webp`（現行のタッチ・構図）、`living-item-cup-v1.png.webp`（コップ）、`word-target-table-v1.png.webp`（机）。後者2点は参考のみで、画像内に貼り付けていない。
+- 組み込み imagegenで初稿生成後、中央の矢印用余白を広げる編集、カード内での人物の大きさを現行に近づける編集を順に実施。最終緑背景原稿は `source-images/generation-inputs/action-put-girl-v5-green.png`（1774×887、1,480,918 bytes）。`scripts/chroma-key-green.py` で透過。当初は `cwebp -q 84 -resize 800 400` で800×400px・48,872 bytesの候補を作成したが、他のAction Match画像と異なる比率だった。
+- **2026-09-25のサイズ修正：** 絵を再生成せず、同じ透過原稿を800×400pxへ等比縮小して、上下各25pxの透明余白を追加した。`cwebp -q 84` で `private-prototypes/action-put-girl-v5-candidate.png.webp` を **800×450px（16:9）、61,094 bytes** に更新。旧800×400px版は `private-prototypes/action-put-girl-v5-candidate-800x400.png.webp` に保管。絵の縦横比は変わらず歪みなし。固定サイズのカードでは透明余白の分だけ絵が少し小さく表示される。現行公開v4は58,406 bytes。
+- 透過テスト：公開用55枚と**修正後候補**1枚すべてPASS。候補の四隅アルファ0/0/0/0。`private-prototypes/action-put-girl-v5-edge-check.png` で淡色・濃色上の輪郭を確認し、目立つ緑の縁はなし。人物・現行版との比較は `private-prototypes/action-put-girl-v5-comparison.png`、修正後のカード表示の**オフライン合成**は `private-prototypes/action-put-girl-v5-card-preview.png`。ブラウザのスクリーンショットではない。
+
+### 初稿に使ったプロンプト全文
+
+```text
+Use case: illustration-story
+Asset type: one Action Match game-card illustration, a SINGLE horizontal image containing two equal-width sequential panels.
+
+Input image roles: Image 1 docs/characters/word-target-girl-v2.png.webp is the authoritative full-body GIRL reference. Image 2 docs/characters/breakfast-stage-v7.jpg.webp is her authoritative face, dark-brown high bun and blue scrunchie reference. Image 3 action-put-girl-v4.png.webp is the approved current Action Match rendering, two-panel spacing, girl proportions and action staging reference. Image 4 living-item-cup-v1.png.webp is a pink two-handled cup with white hearts, object appearance reference only: redraw it, do not paste it. Image 5 word-target-table-v1.png.webp is a warm wooden table reference only: redraw it, do not paste it.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors.
+
+[SCENE]
+Who: The GIRL alone in her approved default pink star pajamas, barefoot.
+Action: Left panel: the GIRL is holding the pink cup in her hand beside a wooden table; the tabletop is empty. Right panel: the same GIRL has just placed the very same cup on top of the same wooden table; her hand has released it. The table remains in precisely the same relative location, shape, scale, and viewpoint within each panel. The before/after gesture must clearly communicate PUT, not get or carry.
+Expression: Cheerful, concentrated and clearly readable; the same girl's face and hair in both panels.
+Objects: Exactly one pink two-handled cup with small white hearts, referenced from Image 4, and one warm wooden table, referenced from Image 5. Redraw these in the approved Action Match illustration style. No extra cups, no other props.
+Composition: Two side-by-side equal-width panels, reading left to right. The GIRL stands on the left side and the table sits on the right side WITHIN EACH panel, consistent scale and position. Keep the full girl and table inside their own half. The app overlays a red double-arrow group about 40x22 CSS px at the vertical and horizontal center of the finished card, on the exact 50% boundary. Leave a completely clear vertical gutter around that boundary (approximately x=45%-55% of the full image), with no face, hand, cup, table, or other important object there. Keep all important action and objects within the upper 80% of the image.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Critical output: One continuous wide image containing exactly TWO panels, no drawn panel border, separator, arrows, letters, watermark, shadows or checkerboard in the green backdrop.
+```
+
+### 中央余白の調整に使ったプロンプト全文
+
+```text
+Use case: precise-object-edit
+Input image 1 is the edit target, an approved-style two-panel Action Match illustration. Keep the same girl in both panels, her exact face, high bun, blue scrunchie, pink star pajamas and bare feet; keep the same pink heart cup, same wood table, same actions, exact bright cel-shaded picture-book style, pure #00FF00 backdrop, and equal-width two-panel left-to-right sequence. ONLY improve central spacing: move and modestly reduce the characters and tables WITHIN their respective panels so that the central 15% of the full image (about x=42.5%-57.5% width) is COMPLETELY SOLID GREEN at ALL heights, especially the vertical middle where the app places its double arrow. In each panel, girl remains left, table remains right; table must appear in the identical relative position in both panels, same size and view. The cup is held in left panel and set on table in right panel. Full bodies and table visible. No cut-off. Keep actions and cup in upper 80%. Do not add or change any object or character. No divider, no arrow, no letters, no extra people or props, no green halos, no checkerboard.
+```
+
+### 人物・机の大きさの調整に使ったプロンプト全文
+
+```text
+Use case: precise-object-edit
+Image 1 is the edit target. Preserve the exact two-panel put-the-cup-on-the-table story, girl's canonical face/high dark-brown bun/BLUE scrunchie/pink-white-star pajamas/bare feet, one pink heart cup, one matching wooden table per panel, and vivid children's picture-book cel shading. Preserve the PURE SOLID GREEN #00FF00 background, equal panel widths, and the completely empty central vertical gutter x=42.5%-57.5%; keep all objects away from that gutter. Improve only the scale and vertical placement: enlarge the girl and table in EACH panel about 20% so they use the card height comparably to Image 2, with top of hair near 5% image height and lower table legs/feet near 83% image height; do not crop the full girl or table. Keep the cup and her hand entirely within upper 75% image height. Girl left and table right within each half, table identical shape/position/scale in both halves. No divider, no arrow, no letters, no extra people or props, no green halos, no checkerboard. Image 2 is a size and card-fill reference only; do not copy its red block or blue table.
+```
+
 ### ゴミ箱の位置調整に使った画像編集プロンプト全文
 
 ```text
 Precisely edit this existing two-panel children's illustration on pure green (#00FF00) background. Keep the entire image pixel-identical as much as possible. The ONLY change: in the RIGHT panel, move the gray open metal trash bin about 30 pixels LEFT (at the input's 1672 px width), so its position relative to the right panel's left edge exactly matches the bin's position relative to the left panel's left edge. Move the entire right bin including lid and pedal without changing its shape, size, orientation, contents, lighting, or gray color. Keep the tissue inside it. Restore the vacated area to flat pure green #00FF00. Do not move the girl, her arm, feet, hair, pajamas or any other object. Preserve both equal-width panels and the empty center gutter. Do not add divider or arrow. Keep background pure solid green, not transparent or checkerboard.
 
 Make one precise change to Image 1, keep all else exactly unchanged. Canvas 1672x941, two 836px wide panels. The silver trash bin in LEFT panel begins at x≈474 and ends x≈712. The same silver trash bin in RIGHT panel currently begins at global x≈1340 (local x≈504). Move the ENTIRE RIGHT trash bin including its lid, pedal, and tissue 30 px LEFT, so it begins at global x≈1310 (local x≈474), matching the LEFT bin exactly in within-panel position. Fill its vacated old region with pure flat #00FF00. Do not change either girl, the left bin, or any other visible pixel. Preserve pure green background; no transparency or checkerboard. No divider or arrow.
+```
+
+
+## 2026-09-26 — `action-get-girl-v4-candidate`（所有者承認・公開へ反映）
+
+- 用途：Action Match の女の子版 `get` を「棚からタオルを取る」に変更した。所有者承認後、候補を公開用 `action-get-girl-v4.png.webp` に複写して `index.html` を切り替え、旧v3 WebPは `source-images/legacy/` に移した。公開用と候補のSHA-256は一致し、`data-panels="2"` を確認済み。
+- 添付基準画像：`docs/characters/word-target-girl-v2.png.webp`、`docs/characters/breakfast-stage-v7.jpg.webp`。その他の参考画像：`action-get-girl-v3.png.webp`、`bathroom-item-towel-v4.png.webp`、`word-target-bookshelf-v1.png.webp`。本棚は形の参考だけとし、本は描いていない。既存素材は貼り付けていない。
+- 初稿は青いタオルになったため、画像生成ツールで**タオルの色だけ**既存素材のピンクに修正した。青い原稿は `source-images/generation-inputs/action-get-girl-v4-green.png` に残るが、候補ではない。最終緑背景原稿：`source-images/generation-inputs/action-get-girl-v4-green-final.png`（1672×941px、1,699,564 bytes）。洗面所の公開素材 `bathroom-item-towel-v4.png.webp` もピンクで、最終候補と同色。タオルを水色とした前回の報告・初稿表示が紛らわしかったため、ファイルを直接再確認した。
+- 2026-09-26の縁取り修正：`scripts/chroma-key-green.py --green-cutoff 175 --edge-shrink 2` で緑背景を透過し、髪の領域に限って残留した緑色480画素を `private-prototypes/despill-get-girl-hair.py` で透明化した。通常の透過処理の既定値は変えていない。WebP quality 84、最終候補 `private-prototypes/action-get-girl-v4-candidate.png.webp` は800×450px、64,222 bytes（緑背景原稿比約96.2%削減）。旧公開v3は64,154 bytes。修正前候補は `private-prototypes/action-get-girl-v4-before-defringe.png.webp`（68,846 bytes）に保管。
+- 透過検査：公開55枚と修正後候補1枚すべてPASS、候補の四隅アルファ0/0/0/0。明色・濃色の背景に重ねた拡大図 `private-prototypes/action-get-girl-v4-edge-check.png` と髪の4倍拡大比較 `private-prototypes/action-get-girl-v4-hair-closeup.png` を目視し、黄緑の縁は修正後に見えなくなった。細い毛束の一部は縮んでいるため、所有者に確認を求める。
+- 人物基準と公開旧版との比較：`private-prototypes/action-get-girl-v4-comparison.png`。カード表示の**オフライン合成**：`private-prototypes/action-get-girl-v4-card-preview.png`。実ブラウザのスクリーンショットではない。
+
+### 初稿に使ったプロンプト全文
+
+```text
+Use case: illustration-story
+Asset type: one Action Match "get" game-card illustration candidate, a SINGLE horizontal image containing exactly two equal-width sequential panels.
+Input image roles: Image 1 docs/characters/word-target-girl-v2.png.webp is the authoritative full-body GIRL reference. Image 2 docs/characters/breakfast-stage-v7.jpg.webp is her authoritative face, dark-brown high bun and BLUE scrunchie reference. Image 3 action-get-girl-v3.png.webp is the current approved Action Match girl, rendering style, girl proportions, two-panel pacing, and near-shelf action reference (replace the book with a towel, do not retain books). Image 4 bathroom-item-towel-v4.png.webp is the existing towel shape/color reference only, redraw rather than paste it. Image 5 word-target-bookshelf-v1.png.webp is a shelf shape reference only: make it a simple warm wooden towel shelf, NOT a bookcase; no books.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors.
+
+[SCENE]
+Who: The same GIRL alone, one full-body appearance in each panel, wearing approved pink pajamas with white stars, high dark-brown bun with clearly BLUE scrunchie, barefoot.
+Action: LEFT PANEL: the GIRL stands RIGHT BESIDE a small wooden shelf and reaches one hand toward ONE neatly folded light-blue towel resting on the shelf; the towel is still on the shelf, not yet in her hand. RIGHT PANEL: the same GIRL is STILL RIGHT BESIDE THE SAME SHELF and now holds that same light-blue towel in her hands; its previous spot on the shelf is empty. This is GET: reaching for and taking the towel, not walking away, giving, or putting.
+Expression: Cheerful, focused, same face and hairstyle across panels.
+Objects: One simple warm wooden towel shelf, identical in position, size, shape, orientation and all remaining contents in both panels. The single light-blue towel is the ONLY object that moves, from its shelf spot to the girl's hands. Keep all other shelf compartments unchanged and simple; no books, extra towels, extra characters, text or room background.
+Composition: Exactly TWO EQUAL-WIDTH panels side by side, read left to right. In EACH half, the shelf stays at the LEFT in the same local coordinates and GIRL stays at the RIGHT immediately beside it, same scale. Do not move the girl away from the shelf. All hair, hands, feet, shelf and towel must fit inside their own panels and essential action must be in the upper 80% of the image. The app overlays a white-outlined red double-arrow group about 40x22 CSS px at card center on the 50% panel boundary, vertically centered; leave a completely empty PURE-GREEN vertical gutter x=45%-55% of full canvas, clear of faces, hands, towel and shelf. Equal panel widths, no drawn divider or arrow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Critical: Same shelf and its fixed contents across both panels. Towel alone changes position. Girl remains at shelf. No books. No split line, no arrow, no inset card/UI, no paper-white background, no checkerboard. Green #00FF00 solid backdrop for later chroma-key.
+```
+
+### タオル色の修正に使ったプロンプト全文
+
+```text
+Use case: precise-object-edit. Image 1 is the edit target: an existing two-panel Action Match children's illustration on flat pure #00FF00 green. Image 2 is the existing pink folded towel color/shape reference. Change ONLY the SINGLE towel in BOTH panels from blue to the SAME soft pink as Image 2, preserving its exact shape, folds, texture, position and size in each panel. In left panel it remains on the shelf; in right panel it remains in the girl's hands. Keep every other pixel and object as close to the input as possible: both identical wooden shelves, plants, baskets, girl identity, high bun, BLUE scrunchie, pink star pajamas, bare feet, expressions, poses, pure-green background, blank central gutter, panel widths. Do not recolor the blue scrunchie. Do not add divider, arrow, words, extra towel, extra objects, or checkerboard. Keep exactly two equal-width panels and 16:9 landscape composition.
+```
+
+
+## 2026-09-26 — `action-bring-girl-v4`（承認・公開用へ反映）
+
+- 用途：Action Match の女の子版 `bring` を「青い雲柄のブランケットを離れた棚からパパへ持っていく」に変更。所有者が棚の左右のずれを許容して v4 候補を承認。公開用 `action-bring-girl-v4.png.webp` へ複写し、`index.html` を切り替えた。旧 v3 は `source-images/legacy/action-bring-girl-v3.png.webp` に移動。`data-panels="2"` を維持。承認候補と公開用の SHA-256 一致を確認した。
+- 使用した組み込み画像生成ツールへの添付：`action-bring-girl-v3.png.webp`（編集対象・構図基準）、`docs/characters/word-target-girl-v2.png.webp`（女の子）、`docs/characters/word-target-dad-v1.png.webp` および `docs/characters/bedroom-stage-v2.png.webp`（パパ）、`living-item-blanket-v1.png.webp`（青い雲柄）。5枚上限のため朝ごはん背景は添付せず、女の子の全身基準を優先した。
+- 初稿では右の棚に余計な本があり、家具の位置にもずれがあったため、同じ画像生成ツールで右コマの棚上段を空にし、棚・パパの位置を調整した。両コマで家具の大きさ・構成はほぼ揃ったが、棚の左右位置にはわずかな差が残る。候補であることを区別し、所有者の目視確認を求める。
+- 最終緑背景原稿：`source-images/generation-inputs/action-bring-girl-v4-green.png`（1672×941px、1,495,423 bytes）。`scripts/chroma-key-green.py --green-cutoff 175 --edge-shrink 1` で透過、WebP quality 84で `private-prototypes/action-bring-girl-v4-candidate.png.webp`（800×450px、51,664 bytes、原稿比約96.5%削減）。旧公開v3は52,470 bytes。
+- 透過チェック：公開55枚と候補1枚PASS。候補の四隅アルファ0/0/0/0。淡色・濃色に重ねた拡大図 `private-prototypes/action-bring-girl-v4-edge-check.png` とさらに拡大した `private-prototypes/action-bring-girl-v4-edge-closeup.png` を目視し、目立つ緑の縁は見えなかった。比較：`private-prototypes/action-bring-girl-v4-comparison.png`。カード寸法の**オフライン合成**：`private-prototypes/action-bring-girl-v4-card-preview.png`。実ブラウザのスクリーンショットではない。
+
+### 初稿に使ったプロンプト全文
+
+```text
+Use case: precise-object-edit
+Asset type: Action Match "bring the blanket to Dad" two-panel GIRL illustration candidate, not a UI screen.
+Input image roles: Image 1 action-bring-girl-v3.png.webp is the EDIT TARGET and approved two-panel composition/style to preserve. Image 2 docs/characters/word-target-girl-v2.png.webp is authoritative full-body GIRL identity, face, high bun, blue scrunchie. Image 3 docs/characters/word-target-dad-v1.png.webp is authoritative seated DAD face, near-black side-parted hair, clean shaven and light-blue collared pajamas; Image 4 docs/characters/bedroom-stage-v2.png.webp supports DAD's established identity and pajamas. Image 5 living-item-blanket-v1.png.webp is the folded LIGHT-BLUE BLANKET with WHITE CLOUDS; redraw this exact color and cloud pattern, do not paste the source.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors.
+DAD: man around his 30s, calm face, light skin, short near-black dark-brown hair parted to the side, clean-shaven. Current standard outfit for both day and night: light-blue collared pajamas.
+
+[SCENE]
+Who: One canonical GIRL and one canonical DAD in EACH of two panels. Girl wears her pink white-star pajamas, BLUE scrunchie, barefoot. Dad wears light-blue collared pajamas, has short near-black SIDE-PARTED hair and NO beard or stubble; he sits in the same cream armchair.
+Action: Keep the edit target's established journey from distant shelf to Dad, but replace its red book with ONLY ONE folded light-blue cloud-patterned blanket from Image 5. LEFT PANEL: the folded cloud blanket rests on a shelf at the FAR LEFT, the girl stands beside the shelf REACHING FOR IT, and Dad sits at the FAR RIGHT in his armchair watching from a clear distance. RIGHT PANEL: the same girl has traveled to Dad and now holds out that same folded cloud blanket to him; Dad accepts it while seated. The blanket is no longer on the shelf. This is BRING from a distant place, not merely give while already standing beside Dad.
+Expression: Girl attentive and happy; Dad calmly encouraging, identical faces in both panels.
+Objects: SAME bookshelf and SAME cream armchair as Image 1; same shape, exact within-panel position, size, perspective and contents in BOTH panels. Only girl's position and the single blanket's position change. No red book in her hands, no extra blankets or props.
+Composition: ONE 16:9 image with exactly TWO EQUAL-WIDTH panels side by side. Preserve current Action Match scale and spatial structure. In both panels, bookshelf stays at local far LEFT and Dad in his armchair stays at local far RIGHT; do not move or resize either furniture or Dad between panels. In left, girl close to the distant shelf; in right, girl by Dad. Leave clean pure-green space around the 50% panel boundary, especially its vertical center: the app overlays a white-outlined red double-arrow group about 40x22 CSS px at card center. Keep faces, hands, and blanket away from this boundary. Important action and objects in upper 80% of image; both characters fully in their respective panel. No in-image divider, arrows, text or card UI.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Critical: Dad must be identical in both panels, seated in identical chair position. No brown-haired/bearded Dad, green sweater, jeans, shoes on girl, pink hair tie, extra person, third panel, divider, arrow, letters. Blanket must be clearly LIGHT BLUE with WHITE CLOUDS in both panels, and ONLY the blanket and girl move. Replace the image's transparent backdrop with PURE SOLID #00FF00 for the approved chroma-key workflow, not checkerboard.
+```
+
+### 継続性の修正に使ったプロンプト全文
+
+```text
+Use case: precise-object-edit. Image 1 is the EDIT TARGET, a two-panel bright children's illustration on pure #00FF00 background. Preserve the girl, Dad, their faces/identities/pajamas, the blue cloud-pattern blanket and its movement, bare feet, the exactly TWO equal-width panels, all colors, clear center gutter, pure green background, and the scene's vivid cel-shaded style.
+
+Make ONLY these continuity corrections in the RIGHT panel:
+1) REMOVE the small upright turquoise-blue BOOK from the TOP shelf. The left panel's only top-shelf object was the cloud blanket, so after she takes it, the top shelf on the right must be EMPTY. Keep the two lower shelves' books exactly as they are and matching the left panel.
+2) The wooden bookshelf in right panel is about 45 pixels too far RIGHT compared with the left panel when measured within its half of this 1672-pixel canvas. Shift the entire right bookshelf approximately 45 pixels LEFT without changing its size/view; fill the vacated region with pure solid #00FF00. It should have the exact same within-panel x/y coordinates as the shelf in the left panel.
+3) The seated Dad and cream armchair in right panel are about 35 pixels too far RIGHT relative to their positions in left panel. Shift Dad plus chair together approximately 35 pixels LEFT without changing their size, face, clothing, pose or how he holds the blanket. Maintain the girl's blanket handoff, adjusting only the connecting hands if needed.
+Do NOT move the GIRL or blanket. Do not add any other object, person, book, divider, arrow or text. No checkerboard. Preserve flat pure #00FF00 backdrop. The only movable story elements between panels remain the girl and blue cloud blanket; Dad and furniture align.
+```
+
+## 2026-09-26 — `action-throw-girl-v5`（承認・公開用へ反映）
+
+- 用途：Action Match の女の子版 `throw away` を、ティッシュから空のお菓子の包み紙へ変更。所有者が候補を承認したため、`action-throw-girl-v5.png.webp` へ複写して `index.html` の参照を切り替えた。旧v4は `source-images/legacy/action-throw-girl-v4.png.webp` へ移動。候補と公開画像のSHA-256は一致し、`data-panels="2"` を確認済み。
+- 生成時の添付：`action-throw-girl-v4.png.webp`（編集対象と2コマ構図）、`docs/characters/word-target-girl-v2.png.webp`（女の子全身の基準）、`docs/characters/breakfast-stage-v7.jpg.webp`（女の子の顔・髪）、`action-throw-boy-v3.png.webp`（銀色のゴミ箱）、`living-item-cookie-wrapper-v3.png.webp`（青い包み紙。絵に含まれる食べられるクッキーは候補から除外）。
+- 緑背景原稿：`source-images/generation-inputs/action-throw-girl-v5-green.png`（1672×940px）。`scripts/chroma-key-green.py --green-cutoff 125 --edge-shrink 2` で透過後、髪周辺だけに残った緑優勢の輪郭画素を `private-prototypes/despill-throw-girl-v5-hair.py` で除去。WebP quality 84、800×450px の候補：`private-prototypes/action-throw-girl-v5-candidate.png.webp`。顔や服を消さないよう輪郭近傍だけを処理した。
+- 透過検査：公開55枚と候補1枚がPASS。候補の四隅のアルファは0/0/0/0。`private-prototypes/action-throw-girl-v5-hair-closeup.png` と `private-prototypes/action-throw-girl-v5-edge-check.png` で濃色・淡色背景上に拡大して確認。カード寸法の**オフライン合成**は `private-prototypes/action-throw-girl-v5-card-preview.png`。基準・現行・候補の比較は `private-prototypes/action-throw-girl-v5-comparison.png`。
+
+### 使用した画像生成プロンプト全文
+
+```text
+EDIT Image 1 as the base, preserving its exact two-panel composition, equal panel widths, unchanged girl positions, same silver foot-pedal trash bin position and dimensions across both panels, same cheerful faces and pink star pajamas. Replace only the white tissue prop with an EMPTY blue candy/cookie WRAPPER matching the blue torn package with colorful circles shown in Image 5. LEFT PANEL: the girl visibly holds the EMPTY flattened blue wrapper in her raised hand; the bin is empty. RIGHT PANEL: that SAME empty wrapper is visibly inside the silver trash bin, which is unchanged in position and size; the girl has finished throwing it away. No edible cookie and no food anywhere. Use Images 2 and 3 as authoritative girl identity; Image 4 as authoritative silver bin. Keep the center boundary clear for the app's overlay red double arrow. No painted divider, arrow, text or labels. Replace transparent/checkerboard background with a flat solid pure #00FF00 green backdrop so it can be chroma-keyed later; do not draw a checkerboard.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors.
+
+[SCENE]
+Who: GIRL in her default pink star-patterned pajamas, barefoot indoors.
+Action: Equal-width left panel shows GIRL holding an empty torn blue candy wrapper before discarding it, with a clearly empty silver bin at her right. Equal-width right panel shows her having discarded the same wrapper: the empty wrapper is visibly inside the silver bin, and her hand is no longer holding it.
+Expression: Happy and calm in both panels.
+Objects: The silver foot-pedal trash bin from Image 4, fixed in exactly the same position and size in both panels. The EMPTY blue wrapper shape and colorful dots from Image 5, but exclude its edible chocolate chip cookie entirely; use the wrapper only.
+Composition: Two equal-width panels, left to right, each with the same girl and bin placement. Keep the girl’s face, hands, the wrapper, and the bin away from the vertical midpoint x=50%, where the app overlays a red double arrow about 31 CSS px across at vertical center. All important actions and objects in the upper 80% of the overall image. No divider line.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
 ```

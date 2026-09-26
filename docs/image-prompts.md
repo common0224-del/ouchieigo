@@ -22,7 +22,7 @@ Objects: (objects in the scene; also attach the existing item image when there i
 Composition: (position, size, and facing direction of each character; for Action Match, arrange panels from left to right at equal widths, and keep faces, hands, and important action objects clear of every panel boundary; state the position and display size of any app-rendered overlays before generation)
 
 [TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
-Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. No text, no watermark.
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
 
 [TECHNICAL B — room background: Listen & Do, etc.]
 Portrait composition for a 900x1200 image. Leave enough empty floor and table space for items to be placed. No text, no watermark.
@@ -51,7 +51,7 @@ Do not change any character's hairstyle, hair color, face, or selected approved 
 1. 画像の用途・人物・小道具を決め、登場人物の基準画像を `docs/characters/` から**必ず添付**する。男の子は `bathroom-stage-v5.jpg.webp` と `word-target-boy-v1.png.webp`、女の子は `breakfast-stage-v7.jpg.webp` と正面全身の `word-target-girl-v2.png.webp`、ママは `living-stage-v2.png.webp`（`word-target-mom-v1.png.webp` は補助資料）、パパは `bedroom-stage-v2.png.webp` と `word-target-dad-v1.png.webp`。小道具に既存のアイテム画像があれば、それも添付する。
 2. `[STYLE]`、該当する `[CHARACTERS]`、具体化した `[SCENE]`、用途に合う `[TECHNICAL]`、`[DO NOT]` の順に一つのプロンプトを組み立てる。完成した**実際のプロンプト全文**と、添付した基準画像のファイル名を、採用した画像ごとに `docs/image-log.md` に残す。画像を生成しただけで未採用の候補は、その旨を区別して記録する。
 3. 生成結果を基準画像と並べた比較画像を作る。髪型・髪色・顔立ち・年齢感・服・柄・絵のタッチを拡大確認し、比較画像を報告に含める。実際のカードや場面で表示した画像も報告する。Action Match では重要な手・物・動作を画像の上側80%に収める。
-4. A の画像は生成した緑背景を `scripts/chroma-key-green.py` で透過し、輪郭の緑の縁を拡大確認する。`scripts/optimize-images.sh` で WebP に変換し、`tests/check-image-alpha.mjs` で透過を確認する。WebP quality 84、既存カテゴリの上限（背景900×1200、アイテム・届け先長辺512、Action Match長辺800）に従う。Think & Say など**新しい種類**の画像の上限は決め打ちせず、制作前に所有者に確認する。
+4. A の画像は生成した緑背景を `scripts/chroma-key-green.py` で透過し、輪郭の緑の縁を拡大確認する。`scripts/optimize-images.sh` で WebP に変換し、`tests/check-image-alpha.mjs` で透過を確認する。WebP quality 84、既存カテゴリの上限（背景900×1200、アイテム・届け先長辺512、Action Match長辺800）に従う。Action Match は書き出し後に **800×450px（16:9）** であることも検査し、縦横比が違う原稿は絵を引き伸ばさず透明余白で調整する。Think & Say など**新しい種類**の画像の上限は決め打ちせず、制作前に所有者に確認する。
 5. 髪・服・タッチなどに繰り返しずれが出たら、具体的な再発防止文を `[DO NOT]` に追加する案を提案する。承認されるまで固定ブロックを変えない。
 
 ## 基準画像の構図上の不足

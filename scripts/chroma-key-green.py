@@ -8,7 +8,7 @@ Requires Pillow: python3 -m pip install Pillow
 import argparse
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 BACKGROUND = (6, 248, 11)  # measured from the generated solid-green image
@@ -16,7 +16,8 @@ GREEN_CUTOFF = 205
 GREEN_RANGE = 220
 
 
-def remove_green(source: Path, destination: Path, green_cutoff: int = GREEN_CUTOFF) -> None:
+def remove_green(source: Path, destination: Path, green_cutoff: int = GREEN_CUTOFF,
+                 edge_shrink: int = 0) -> None:
     image = Image.open(source).convert("RGB")
     output = Image.new("RGBA", image.size)
     result = []
@@ -39,6 +40,12 @@ def remove_green(source: Path, destination: Path, green_cutoff: int = GREEN_CUTO
             color = (red, green, blue)
         result.append((*color, round(alpha * 255)))
     output.putdata(result)
+    if edge_shrink:
+        # Generated hair can contain green-contaminated edge pixels even after
+        # chroma de-spill. Trim only the alpha silhouette, leaving RGB artwork
+        # and the script's default behavior unchanged.
+        alpha = output.getchannel("A").filter(ImageFilter.MinFilter(edge_shrink * 2 + 1))
+        output.putalpha(alpha)
     destination.parent.mkdir(parents=True, exist_ok=True)
     output.save(destination)
 
@@ -49,5 +56,8 @@ if __name__ == "__main__":
     parser.add_argument("destination", type=Path, help="RGBA PNG for WebP conversion")
     parser.add_argument("--green-cutoff", type=int, default=GREEN_CUTOFF,
                         help="Green dominance to clear; lower for less saturated generated backdrops")
+    parser.add_argument("--edge-shrink", type=int, choices=(0, 1, 2), default=0,
+                        help="Trim a 1- or 2-pixel green-contaminated alpha fringe; default leaves edges unchanged")
     arguments = parser.parse_args()
-    remove_green(arguments.source, arguments.destination, arguments.green_cutoff)
+    remove_green(arguments.source, arguments.destination, arguments.green_cutoff,
+                 arguments.edge_shrink)
