@@ -129,6 +129,64 @@ Plain solid pure green (#00FF00) background with no gradient, no shadow on the b
 Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
 ```
 
+## 2026-09-27 — 男の子の昼服 `boy-daywear-v2.png.webp`（承認済み・基準画像に採用）
+
+- 採用した候補：`private-prototypes/boy-daywear-v2.png.webp`。同一ファイルを `docs/characters/boy-daywear-v2.png.webp` に配置。512×512px、WebP quality 84、透過。候補と採用画像の SHA-256 は一致する。
+- 添付した基準画像：`docs/characters/word-target-boy-v1.png.webp`（顔・髪・年齢感・絵のタッチ）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の顔）。
+- 緑背景で生成後、`scripts/chroma-key-green.py --edge-shrink 1` で透過。髪の縁を拡大確認し、`tests/check-image-alpha.mjs` で四隅の透過を確認。比較画像は `private-prototypes/` に保管。
+
+### 実際に使ったプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy only, daytime indoors, wearing the approved daytime outfit and barefoot. Reference image 1 is the same boy in pajamas and fixes his face, hairstyle, hair color, age, proportions, and illustration style. Reference image 2 fixes the cat face used for the tiny chest emblem.
+Action: Standing naturally, facing almost straight forward, both hands visible and relaxed; no other action.
+Expression: Cheerful, friendly open smile like the reference boy, with the same large brown eyes and rosy cheeks.
+Objects: Only a tiny, simplified black-and-white face of the reference cat as a flat emblem on the T-shirt chest. Keep it simple at this scale; no separate cat, star, or other object.
+Composition: Single full-body standing character, centered and large but fully inside the square frame, head, both hands, and bare feet visible with clear margins. No app-rendered overlays will cover this reference image. Keep the background uniformly pure #00FF00, not transparent; leave clean separation at every hair edge for chroma key.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+## 2026-09-27 — 女の子の昼服 `girl-daywear-v1.png.webp`（承認済み・基準画像に採用）
+
+- 採用した候補：`private-prototypes/girl-daywear-v1.png.webp`。同一ファイルを `docs/characters/girl-daywear-v1.png.webp` に配置。512×512px、WebP quality 84、透過。候補と採用画像の SHA-256 は一致する。
+- 添付した基準画像：`docs/characters/word-target-girl-v2.png.webp`（顔・髪・年齢感・絵のタッチ）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の顔）、`docs/characters/boy-daywear-v2.png.webp`（昼服の布の質感と猫のワンポイントの大きさ・位置のみ）。
+- 緑背景で生成後、`scripts/chroma-key-green.py --edge-shrink 2` で透過。お団子・シュシュ・髪の縁を拡大確認し、`tests/check-image-alpha.mjs` で四隅の透過を確認。比較画像は `private-prototypes/` に保管。
+
+### 実際に使ったプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One GIRL only, daytime indoors, wearing the approved plain pink short-sleeved dress and barefoot. Reference image 1 (word-target-girl-v2.png.webp) is authoritative for her face, high dark-brown bun, blue scrunchie, age, proportions, and illustration style. Reference image 2 (cat-mascot-v2-small.png.webp) is authoritative for the black-and-white cat face on the chest. Reference image 3 (boy-daywear-v2.png.webp) is for the daytime clothing illustration treatment, fabric texture, and size and position of the tiny cat-face chest emblem ONLY. Do not copy the boy's face, hairstyle, hair color, body, gender, or clothing shape.
+Action: Standing naturally, facing almost straight forward, both hands visible and relaxed; no other action.
+Expression: Cheerful, friendly open smile like the reference girl, with the same large brown eyes and rosy cheeks.
+Objects: Only a tiny, simplified black-and-white face of the reference cat as a flat emblem on the upper chest of the dress. Keep it simple at this scale; no separate cat, star, or other object.
+Composition: Single full-body standing GIRL, centered and large but fully inside a square frame, with high bun, blue scrunchie, head, both hands, the whole plain pink dress, legs, and bare feet visible with clear margins. The dress is plain without pajama stars or a pajama collar. No app-rendered overlays will cover this reference image. Final asset will be 512x512 pixels without stretching. Keep the generation background uniformly pure #00FF00, not transparent; leave clean separation at every hair and scrunchie edge for chroma key.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-09-23 — `action-put-girl-v4-candidate`（承認済み・公開用へ反映）
 
 - 用途：Action Match の `put`、女の子版。所有者の承認後、公開用 `action-put-girl-v4.png.webp` と `index.html` の参照を切り替えた。旧v3のPNGとWebPは `source-images/legacy/` に保管。候補は `private-prototypes/action-put-girl-v4-candidate.png.webp` にも保存。
