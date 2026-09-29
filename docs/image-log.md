@@ -604,3 +604,94 @@ Plain solid pure green (#00FF00) background with no gradient, no shadow on the b
 [DO NOT]
 Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
 ```
+
+## 2026-09-28 — `think-say-wanting-boy-v3.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の吹き出し左半分に使う、対象物を持たない「欲しがる／ちょうだい」の汎用身ぶり。所有者がv3を承認。画像は当面 `private-prototypes/think-say-wanting-boy-v3.png.webp` に置き、本体には未組み込み。
+- 添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪型）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪型・絵のタッチ）。v1・v2の候補画像は生成時に添付していない。
+- 不採用の候補：`private-prototypes/think-say-wanting-boy-v1.png.webp` は両手を大きく開いた笑顔が「じゃーん」「おいで」に見えるため不採用。`private-prototypes/think-say-wanting-boy-v2.png.webp` はつかもうとする手が「つかまえる」「待って」に見えるため不採用。どちらも公開用には採用しない。
+- 生成は純緑背景（#00FF00）で新規に行い、`scripts/chroma-key-green.py` で透過。完成候補は512×512px、WebP quality 84、36,338 bytes。`tests/check-image-alpha.mjs` で四隅のアルファ0/0/0/0を確認し、髪と指の輪郭に目立つ緑の縁がないことを拡大・画素確認した。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, daytime indoors, wearing his approved plain blue short-sleeved T-shirt with the tiny simplified usual cat-face emblem. Reference image 1 (boy-daywear-v2.png.webp) fixes his approved daytime clothing, hair, face, age and art style. Reference image 2 (word-target-boy-v1.png.webp) further fixes his face, hairstyle and illustration style; do not copy its pajamas. Create a NEW illustration from these two references, not an edit or continuation of any previous “wanting” gesture candidate.
+Action: A familiar Japanese child's “ちょうだい / please give me” gesture. His torso and face point straight toward the viewer. In front of the center of his chest, bring BOTH hands TOGETHER side by side, touching at the inner edges, then extend them a little toward the viewer. BOTH PALMS FACE THE CEILING and are gently cupped together to make one small empty receiving bowl. Show both broad upward-facing palm surfaces and each individual finger clearly; fingers are slightly curved upward around the empty bowl, not flat and splayed. Make the paired hands visually large and central, readable in a 147 CSS px square display. The hands are EMPTY: he is asking to receive something, not holding, presenting, catching or clapping anything. No prayer hands, folded hands, fists, reaching to the right, open-armed hug or ta-da pose.
+Expression: Tilt his head slightly to one side. Give him a small, sweet, coaxing smile and gentle pleading eyes directed toward the viewer, as if softly asking “ちょうだい.” Not a wide open-mouthed grin, surprise, triumph or excitement.
+Objects: Nothing in or above the hands. No object, toy, food, furniture, text, letters, icon, speech bubble, extra character or background scene. Retain only the tiny simplified usual cat-face emblem on the approved blue T-shirt.
+Composition: Square 512×512 asset; front-facing waist-up or mid-chest-up framing, with face and both cupped hands large in the center. Keep the full hair, both elbows, both palms and every fingertip inside the frame. Leave clear margins above the hair and around the sides; keep important details out of the rounded square's four corners. The hands should sit below the face rather than blocking it. The app displays this artwork at roughly 147–183 CSS px and adds no overlay on top of the illustration; the card slot is below it. Generate against a perfectly uniform pure #00FF00 solid green background, not transparency or a checkerboard, for later chroma key. Do not stretch the figure to make the final square.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+## 2026-09-30 — `think-say-want-to-boy-v2.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の I want to に対応する「やりたい／はーい！」の汎用身ぶり。所有者がv2を承認。画像は `private-prototypes/think-say-want-to-boy-v2.png.webp` に置き、本体には未組み込み。
+- 添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪型）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪型・絵のタッチ）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の印）、`private-prototypes/think-say-wanting-boy-v3.png.webp`（顔の大きさと位置の参考のみ。ポーズ・表情は写さない）。
+- 不採用：`private-prototypes/think-say-want-to-boy-v1.png.webp`。腕を斜めに上げて指を広げた形が手を振る動作に見え、全身構図で顔が小さかった。
+- 512×512px、WebP quality 84。純緑背景（#00FF00）から `scripts/chroma-key-green.py` で透過し、髪・指先の輪郭の緑の縁と四隅のアルファを確認。`tests/check-image-alpha.mjs` の透過チェックに合格。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, daytime indoors, in his approved plain blue short-sleeved T-shirt with tiny simplified cat-face emblem. Reference image 1 (boy-daywear-v2.png.webp) defines approved daytime clothing, hair and face. Reference image 2 (word-target-boy-v1.png.webp) reinforces face, hair, age and art style; do NOT copy its pajamas, waving pose or spread fingers. Reference image 3 (cat-mascot-v2-small.png.webp) defines only the tiny simplified cat-face shirt emblem. Reference image 4 (think-say-wanting-boy-v3.png.webp) is a COMPOSITION REFERENCE ONLY for close-up face size, head position and centered figure scale. Do NOT copy its cupped hands, 'please give me' pose, or pleading expression.
+Action: The boy volunteers with an unmistakable Japanese preschool 'はーい！ぼくがやりたい！' raised-hand gesture. He faces the viewer straight on, torso upright and stretching upward energetically. Raise ONE arm vertically STRAIGHT UP right next to his ear: upper arm and forearm form one near-vertical line, not an arm angled outward to the side. The raised hand is aligned directly above its shoulder and ear. Keep all five fingers CLOSE TOGETHER, straight and extended upward as one compact vertical shape, not splayed apart; the palm is mostly seen edge-on or slightly forward. The other arm rests naturally low, not held out. This is NOT a hello wave, goodbye wave, greeting, self-pointing, or reaching for an object.
+Expression: Same boy's face as the two identity references; bright sparkling eyes, open happy eager smile, excited and ready to DO something. Face toward viewer. No pleading, surprise, or shy look.
+Objects: None. No item in the hands, no prop, furniture, symbol, question mark, letter, text or speech bubble. Only the tiny approved cat-face emblem on his shirt.
+Composition: A single square illustration intended to finish at 512×512px and appear at about 147×147 CSS px inside a rounded Think & Say picture frame. Crop at the waist or just below it, NOT full body: show the upper body, big face and all of the raised arm with its fingertips safely inside the image. Match the face WIDTH and head POSITION closely to reference image 4, so the two gestures look like the same-sized child side-by-side; make the face and raised hand large and readable at 147px. Use the narrow strip beside the head and the top margin for the vertical arm and fingertips, rather than lowering or shrinking the head excessively. Keep hair and fingertips clear of rounded frame corners. No app-rendered overlay covers this image; the card slot is below. Generate on solid pure #00FF00 green for later chroma-key cutout, NOT on checkerboard or transparent background.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+## 2026-09-30 — `think-say-reading-boy-v3.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の「read the book」を示す右側の絵。吹き出しの中で、男の子が思い浮かべた「本を開いて読んでいる自分」を表す。所有者がv3を採用。画像は `private-prototypes/think-say-reading-boy-v3.png.webp` に置き、本体には未組み込み。
+- 添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪型）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪型・絵のタッチ）。不採用の読書候補v1・v2は添付していない。
+- 不採用：`private-prototypes/think-say-want-to-read-boy-v1.png.webp`（閉じた本を持つだけでは「読みたい」が伝わらない）、`private-prototypes/think-say-reading-boy-v2.png.webp`（小さな表示では青い表紙の外側だけが見え、閉じた本や箱に見えた）。
+- 512×512px、WebP quality 84。純緑背景（#00FF00）から `scripts/chroma-key-green.py` で透過し、輪郭の緑の縁と四隅のアルファを確認。`tests/check-image-alpha.mjs` の透過チェックに合格。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, daytime indoors and barefoot, wearing his approved plain blue short-sleeved T-shirt with the tiny simplified usual cat-face emblem and navy knee-length shorts. Reference image 1 (boy-daywear-v2.png.webp) fixes his approved daytime clothing, hair, face, age, and art style. Reference image 2 (word-target-boy-v1.png.webp) reinforces his face, hairstyle, and illustration style, but do not copy its pajamas. Generate a NEW illustration from these two references only.
+Action: He sits cross-legged on the floor, quietly READING an already WIDE-OPEN picture book held in BOTH hands just above his lap. The INNER PAGE SURFACES face UP and INWARD TOWARD THE BOY'S FACE, so HE can see and read them. The viewer sees the book from a three-quarter SIDE angle: its clear V-shaped open silhouette, central spine, layered page edges, and a foreshortened glimpse of simple pictures on the inner pages, but NOT a full flat spread facing the viewer. The boy is reading for himself, NOT showing the book to an audience and NOT reading aloud to anyone. Both hands hold the outer edges naturally.
+Expression: His head tilts down toward the open pages; his pupils visibly focus on the pages. He has an absorbed, delighted small smile and sparkling eyes, as if engrossed in the story. His face remains visible to the viewer in three-quarter view.
+Objects: Exactly ONE open picture book. The inside pictures are simple shapes with no text or letters. No other person, toy, furniture, prop, detailed floor, or background scene.
+Composition: Square image to finish at 512×512 pixels. Angle the boy's torso and head about 35 degrees sideways to the viewer, facing toward screen RIGHT, and place the camera a little above and in front of his LEFT side. This oblique view must show BOTH his face and that the page surfaces are oriented TOWARD HIM, not toward the viewer. Place the open book diagonally on his lap, rather than upright like a presentation. Make the boy and open book LARGE and centered, readable in a 147×147 CSS-pixel rounded illustration slot. Keep all hair, hands, book corners, and bare feet inside the square with margins at the rounded corners. The app overlays nothing on the image; the card slot is below it. No panels, divider, arrow, speech bubble, label, or writing. Generate against a perfectly uniform pure #00FF00 green background for later chroma key, not transparency or checkerboard. Use only a minimal soft contact shadow beneath him.
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
