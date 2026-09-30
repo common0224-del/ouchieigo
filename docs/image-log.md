@@ -727,3 +727,35 @@ Plain solid pure green (#00FF00) background with no gradient, no shadow on the b
 [DO NOT]
 Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
 ```
+
+## 2026-09-30 — `think-say-please-boy-v1.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の Can you／Can I に対応する「頼む／おねがい」の汎用身ぶり。所有者が候補を承認。画像は `private-prototypes/think-say-please-boy-v1.png.webp` に置き、本体には未組み込み。
+- 添付した画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪型）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪型・絵のタッチ）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の印）、`private-prototypes/think-say-me-boy-v2.png.webp`（顔の大きさと頭の位置の参考のみ。指さしのポーズと表情は写さない）。
+- 不採用：`private-prototypes/think-say-please-boy-open-mouth-rejected.png`（最初の生成結果）。手を合わせて大きく口を開けて笑う姿が、大喜びしているように見え、「いただきます」に近かった。
+- 採用候補は 512×512px、WebP quality 84、35,086 bytes。純緑背景（#00FF00）から `scripts/chroma-key-green.py`（輪郭を 1px 縮小）で透過し、髪・指先の縁を淡色と青色の背景で拡大確認。緑が目立つ縁の画素は 0 件で、`tests/check-image-alpha.mjs` の透過チェックに合格。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+Use case: illustration-story. Generate a NEW single-character illustration from the four attached reference images. Do not edit or copy any reference pose. The output will later be cut out by chroma key.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, in a daytime indoor scene, wearing his approved plain blue short-sleeved T-shirt with the tiny simplified cat-face emblem; the waist-up crop does not show footwear. Attached image 1, boy-daywear-v2.png.webp, fixes his face, hair, age, blue daywear and overall style. Attached image 2, word-target-boy-v1.png.webp, reinforces facial identity and style; do not copy its pajamas. Attached image 3, cat-mascot-v2-small.png.webp, defines only the tiny simplified cat-face emblem on his shirt. Attached image 4, think-say-me-boy-v2.png.webp, is a COMPOSITION REFERENCE ONLY for face size and head position; do not copy its self-pointing hand or expression.
+Action: A familiar Japanese child's "おねがい / please" begging gesture. Body and face straight toward the viewer. Press both OPEN palms FLAT TOGETHER, palm against palm, with fingers together and pointing upward, directly in front of his LOWER FACE. The JOINED FINGERTIPS reach up to the height of the BOTTOM OF HIS NOSE, with the hands kept in front of his face rather than down at his chest. His touching palms form a narrow vertical prayer-like silhouette, not two separate cupped hands. Position the joined fingertips close to his nose and at least partially overlapping the lower mouth area, while the eyes, eyebrows, cheeks and most of the facial expression remain fully visible. His thumbs meet under the chin; the gesture is conspicuously HIGH, not a low mealtime prayer. Tilt his head slightly to one side. His eyes stay WIDE OPEN and look up toward the viewer with an upward pleading gaze. This is asking a person for help or permission, NOT "いただきます" or "ごちそうさま": do not place clasped hands down at chest height, do not bow, and do not close the eyes.
+Expression: Cute, gentle, earnest "お願い" expression. A tiny closed-mouth pleading smile with raised inner eyebrows and big open upward-looking eyes. If the mouth opens at all, it opens only a LITTLE, as if quietly saying "おねがい"; no visible big red oval mouth, teeth or loud joyful laugh. Not a broad ecstatic grin, not a neutral mealtime expression, not eyes closed.
+Objects: None. Empty hands. No food, dishes, toys, props, furniture, symbol, writing, speech bubble, or extra person. Retain only the tiny cat-face emblem on the approved T-shirt.
+Composition: Final 512×512 square illustration. Waist-up framing matching the approximate face width and head position of attached image 4 and the other approved Think & Say gesture images, so four gestures look like the same-sized child in a row. Center the boy; keep the top of the hair, both arms, and joined fingertips fully inside the square, with clear margins around them and at all four corners of a rounded-square display slot. At 147 CSS px, the two touching palms, open eyes and pleading expression must remain readable. Keep the eyes above and unobstructed by the hands. The app displays this picture in a rounded 147–183 CSS px illustration frame; it overlays nothing on the artwork (the card slot is below). Generate against a perfectly UNIFORM SOLID PURE GREEN #00FF00 background, not transparency, checkerboard or gradient, for later chroma-key removal.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
