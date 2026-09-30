@@ -695,3 +695,35 @@ Plain solid pure green (#00FF00) background with no gradient, no shadow on the b
 [DO NOT]
 Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
 ```
+
+## 2026-09-30 — `think-say-me-boy-v2.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の I'm／It's に対応する「ぼくね」の汎用身ぶり。所有者が v2 を承認。画像は `private-prototypes/think-say-me-boy-v2.png.webp` に置き、本体には未組み込み。
+- 添付した画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪型）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪型・絵のタッチ）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の印）、生成時の `private-prototypes/think-say-me-boy-v2-green-original.png`（直前の v2 下書き。現在は `private-prototypes/think-say-me-boy-v2-pre-feedback-green-original.png` に保存）、`private-prototypes/think-say-me-boy-v1.png.webp`（顔と表情の参考のみ。鼻を指す手は写さない）。
+- 不採用：`private-prototypes/think-say-me-boy-v1.png.webp`。自分の鼻を指す形が、鼻をほじっているように見えた。
+- 完成候補は 512×512px、WebP quality 84。純緑背景（#00FF00）から `scripts/chroma-key-green.py` で透過し、髪・指先の緑の縁を拡大して確認。`tests/check-image-alpha.mjs` の透過チェックに合格。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+Use case: illustration-story. Generate a NEW image from the attached visual references. The previous v2 image's nearly horizontal pointing arm and wide smile must NOT be copied.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, daytime indoors, in his approved plain blue short-sleeved T-shirt and navy shorts. Image 1 (boy-daywear-v2.png.webp) defines his clothes and identity, Image 2 (word-target-boy-v1.png.webp) reinforces his face and hair, Image 3 (cat-mascot-v2-small.png.webp) defines only the tiny T-shirt emblem. Image 4 (the current v2 green original) defines ONLY the front-facing waist-up scale, face size and head position. Image 5 (think-say-me-boy-v1.png.webp) further confirms face and hair only. Do NOT copy the hand pose or mouth shape from Images 4 or 5.
+Action: A clear Japanese child's “ぼく / わたし” gesture, pointing to HIMSELF. His torso and face remain straight toward the viewer. On the viewer's LEFT side, bend ONE elbow and place the hand LOWER on the torso, around the lower chest. The knuckles should be at approximately x=35%, y=73% of the square, well below the chin. From those low knuckles, extend the index finger on a STEEP DIAGONAL UPWARD AND INWARD, at roughly 45 degrees, to its fingertip at x=50%, y=59%: the exact midline of the UPPER CHEST, immediately below the collar center. The finger's direction leads back into his own sternum. Leave a small visible air gap between finger tip and shirt. The shirt's small cat emblem is farther toward the viewer's RIGHT at about x=58%, y=69%; there must be ample separation so the finger is not pointing at the cat. Keep fingers natural, the other fingers curled, and the free arm hanging down. No hand or finger anywhere near nose, mouth, chin or face. The pose must read “me,” not “look at my cat.”
+Expression: Warm and gently sociable, speaking calmly as if saying “ぼくね.” Show a VERY SMALL relaxed talking smile: mouth corners only slightly upturned, lips modestly parted in a NARROW short curved opening, less than half as wide as the previous image's open mouth. No visible teeth, no big open grin, no laughing or delighted face. Maintain neutral eyebrows and bright but calm eyes so the picture can also accompany “I'm hungry” and “I'm sleepy.”
+Objects: No objects, furniture, food, toy, background scene, text, letters or symbols. Only the tiny simplified cat-face emblem on the approved shirt.
+Composition: Final 512×512 square, front-facing waist-up, face size and vertical head position matched to Image 4 and to the approved “ちょうだい” and “やりたい” pictures. Leave modest margins, no important details in the rounded-square corners. At a 147 CSS px display, the down-low fist and diagonal index finger aimed into the chest's exact midline must still read as self-reference. No app-rendered element overlaps the illustration; its card slot sits below it. Generate on an opaque perfectly flat pure #00FF00 green background for later chroma key. Do not produce transparency, checkerboard or background shadow. Do not stretch the figure.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
