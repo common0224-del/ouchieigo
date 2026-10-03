@@ -2,6 +2,38 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-03 — `think-say-get-towel-dad-v1.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の右の絵「get the towel」。パパが棚からピンクのタオルを取り出す。所有者が候補を承認し、`private-prototypes/think-and-say-proto.html` の3問目で使用する。本体には未組み込み。
+- 添付した画像：`docs/characters/word-target-dad-v1.png.webp`（パパの正式な人物基準）、`bathroom-item-towel-v4.png.webp`（既存のピンクのタオルの色・畳み方・質感の参考。貼り付けはしない）。
+- 元の緑背景：`private-prototypes/think-say-get-towel-dad-v1-green-original.png`。`scripts/chroma-key-green.py --edge-shrink 2` で透過し、512×512px の透明余白を加えて WebP quality 84 で保存した。元画像 2,057,978 bytes → 候補 WebP 43,176 bytes（97.9%削減）。
+- 確認：髪・手・棚の輪郭を淡い青背景で2倍に拡大し、緑優勢の縁は0件。`tests/check-image-alpha.mjs` の透過チェックは PASS（四隅0/0/0/0）。基準画像との比較 `private-prototypes/think-say-get-towel-dad-v1-comparison.png` と、147px相当の合成プレビュー `private-prototypes/think-say-get-towel-dad-v1-question3-147px.png` を作成した。合成プレビューは実ブラウザ表示の検証ではない。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+Use case: illustration-story. Generate a NEW square Think & Say right-side illustration. Image 1 is the authoritative Dad identity, hairstyle, face, pajamas, and picture-book style reference. Image 2 is the existing pink bath-towel item reference for the towel's color, folded shape, and fabric texture; do not paste it into the art.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+DAD: man around his 30s, calm face, light skin, short dark-brown softly wavy hair with a loose fringe falling onto his forehead, clean-shaven. Approved morning/night outfit: light-blue collared pajamas with white piping along the collar and cuffs. Daytime outfit is undecided; ask the owner before depicting Dad in a daytime scene.
+
+[SCENE]
+Who: Dad alone, indoors just after bath time (night), in his approved light-blue collared pajamas with white piping. No boy and no other person.
+Action: Dad reaches toward a SIMPLE OPEN WOODEN SHELF and is JUST TAKING one neatly folded pink towel from the stack on a shelf. One hand supports and pulls the pink towel halfway out toward himself; the towel still visibly overlaps the remaining stack. His extended arm, hand, towel, and shelf must form an obvious continuous action of GETTING A TOWEL FROM THE SHELF, not holding up a towel after walking away.
+Expression: Dad has a calm, kind, gentle face and looks at the towel he is taking.
+Objects: One simple wooden open shelf with a few folded towels stacked on it, plus the one towel being removed. The removed towel is a single clear pink color matching the attached bathroom-item-towel-v4 reference. Other stacked towels may be muted pale blue or cream to separate them from the pink towel in motion. No doors, cabinets, books, cups, toys, windows, shoes, coats, food, writing or logos.
+Composition: Final 512x512 square illustration. Dad shown waist-up to above the knees, on the RIGHT; simple shelf on the LEFT, close enough that his extended hand is visibly pulling the pink towel directly from it. Dad's face, reaching arm, towel, and shelf should all be large and readable within a 147 CSS-pixel rounded-square illustration slot. Keep the hand touching the pulled towel, and keep part of the pulled towel still on the stack so the action is unambiguous. No important detail at rounded corners. The app displays no triangle, button, label, or other overlay on top of this image; the card slot is beneath it. Use the specified uniform green background for later chroma key.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-10-03 — `think-say-open-milk-dad-v1`〜`v4`（すべて不採用）
 
 - 用途：Think & Say の右の絵「open the milk」。候補は `private-prototypes/think-say-open-milk-dad-v1.png.webp`、`private-prototypes/think-say-open-milk-dad-v2.png.webp`、`private-prototypes/think-say-open-milk-dad-v3.png.webp`、`private-prototypes/think-say-open-milk-dad-v4.png.webp` として非公開保管し、本体には組み込まない。
