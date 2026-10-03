@@ -81,7 +81,7 @@ I can't（→action、困っている絵） / Look! I can（→action、得意�
 - 除外：I need, Do you want（親のセリフ）, Thank you for, Where is, What is, Please, I have
 - That's は It's に一本化する案
 
-## 右カード（約63種）
+## 右カード候補（67種。最初のリリースに含める語は後述）
 
 state：hungry, thirsty, sleepy, tired, full, sick, cold, hot, happy, sad, scared,
 excited, angry, done, ready, okay, yummy, big, small, pretty, fun, hard
@@ -95,15 +95,17 @@ play with the blocks, play with the toy car, draw a picture, build a tower,
 get the towel, get the book, bring the blanket, put it away, clean up,
 throw it away, wear my pajamas, put on my socks, brush my teeth, wash my hands,
 take a bath, go outside, go to bed, sit down, help me, reach the book,
-open the milk, find my socks
+open the milk, find my socks, carry me
 
 ## イラストの方針
 
 - 以前 Codex が作った「本に手を伸ばす男の子」など、特定の物に依存した絵は
   汎用性がないため不採用
 - 吹き出し左の絵は、日本の子どもが日常で使う決まった身ぶりを使い、対象物を描かない。「欲しがる」のv1・v2では、物を持たないだけのポーズは別の意味に見えやすかった
-- 身ぶりの絵は昼服で描く。右の絵は場面に合わせ、朝ならパジャマ、昼なら昼服で描き、その盤面の右カードの中から1枚に決まるようにする
-- 吹き出しは男の子が思い浮かべている姿なので、右側の動作の絵は「その動作をしている自分」を描く（例：本を開いて読んでいる姿）。I want／I want to の選び分けでは、物だけなら I want、動作をしている姿なら I want to と読み取れるようにする
+- 身ぶりの絵は昼服で描く。右の絵は時間帯が決まらない場合は昼服を基本とし、パジャマは sleepy や brush my teeth のように時間帯が内容と結びつく絵だけにする。どの場合も、その盤面の右カードの中から1枚に決まるように描く
+- 吹き出しは男の子が思い浮かべている姿なので、I want to／Can I の右側の動作の絵には「その動作をしている自分」を描く（例：本を開いて読んでいる姿）。Can you では、頼まれた大人が動作をしている姿を描く。I want／I want to の選び分けでは、物だけなら I want、動作をしている姿なら I want to と読み取れるようにする
+- 右側の状態の絵（hungry など）は、表情やポーズだけでは別の状態に見えやすい。必要に応じて、状態の原因や気持ちの向かう先を頭の上の小さな考え雲で示してよい。採用済みの hungry の絵 `private-prototypes/think-say-hungry-boy-v2.png.webp` は、おなかを押さえ、少しよだれを垂らし、考え雲の中におにぎりを思い浮かべる
+- 考え雲に描く物は、その盤面の右カードのどの語にも当たらない物にする。たとえば `a banana` が盤面にあるときはバナナを描かず、絵から別のカードを選べてしまう取り違えを防ぐ
 - I want の「ちょうだい」は物をもらう場面を連想させ、動作と組むと不自然だった。日本語の「ほしい」と「したい」の区別に合わせ、I want to には別の「やりたい！」の身ぶりを使う
 - 身ぶり10種の具体的な構図は下記「左の絵を身ぶり10種に集約する」に記録する
 - 人物の基準は確定済み（docs/characters.md）。プロンプトのテンプレートも整備済み
@@ -122,11 +124,14 @@ open the milk, find my socks
 | Look at | the cat, the book, the blocks |
 | I want to | go outside, read the book, play with the blocks |
 | Look! I can | build a tower, put on my socks, brush my teeth |
-| Can you | help me, open the milk, get the towel（絵には大人を描く） |
+| Can you | get the towel（おふろ上がりにパパが棚から取る）, read the book（寝る前にパパが読み聞かせる）, carry me（疲れた男の子をパパが抱き上げる） |
 | Can I | go outside, play with the blocks, read the book |
 | Let's | clean up, go outside, play with the blocks |
 
-- 右の絵は重複を除いて22枚の見込み
+- Can you の選定基準は、子どもが大人によくする具体的なお願いで、大人が動作する姿を絵にできること。同じ組に、get／bring のように動詞を入れ替えても成り立つ語を重ねない
+- `read the book` は Can you と Can I の両方に含む。パパが男の子に読み聞かせる絵なら Can you、男の子が自分で読む絵なら Can I と、動作する人を描き分ける。同じ語でも誰がするかで文が変わることを体験させる
+- 初回から外した `help me` は、何を手伝うか具体化すると別の動作の絵になるため。`open the milk` は日本の紙パックの開け口を画像生成で正確に描けず、描き方が見つかるまで保留する。上記の右カード候補一覧には将来用の語として残すが、最初のリリースには含めない
+- 右の語は重複を除いて21種、右の絵は22枚の見込み。`read the book` は男の子が読む絵とパパが読み聞かせる絵の2枚を数える
 - 語の多様性は将来 Word Match に預けることも検討する
 
 ## 未決定事項

@@ -11,7 +11,7 @@ Children's picture-book illustration for a kids' English learning app. Bright, s
 [CHARACTERS]
 BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
 GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
-DAD: man around his 30s, calm face, light skin, short near-black dark-brown hair parted to the side, clean-shaven. Approved night outfit: light-blue collared pajamas. Daytime outfit is undecided; ask the owner before depicting Dad in a daytime scene.
+DAD: man around his 30s, calm face, light skin, short dark-brown softly wavy hair with a loose fringe falling onto his forehead, clean-shaven. Approved morning/night outfit: light-blue collared pajamas with white piping along the collar and cuffs. Daytime outfit is undecided; ask the owner before depicting Dad in a daytime scene.
 MOM: woman around her 30s, gentle face, light skin, dark-brown hair gathered and tied low at the back. Default outfit: cream top and long green skirt. Approved variation: a yellow cardigan over the cream top.
 
 [SCENE]
@@ -48,7 +48,7 @@ Do not change any character's hairstyle, hair color, face, or selected approved 
 
 ## 作業・記録の手順
 
-1. 画像の用途・人物・小道具を決め、登場人物の基準画像を `docs/characters/` から**必ず添付**する。男の子は `bathroom-stage-v5.jpg.webp` と `word-target-boy-v1.png.webp`、女の子は `breakfast-stage-v7.jpg.webp` と正面全身の `word-target-girl-v2.png.webp`、ママは `living-stage-v2.png.webp`（`word-target-mom-v1.png.webp` は補助資料）、パパは `bedroom-stage-v2.png.webp` と `word-target-dad-v1.png.webp`。子どもの昼の服を生成するときは、人物の基準画像に加えて `docs/characters/cat-mascot-v2-small.png.webp` も必ず添付する。小道具に既存のアイテム画像があれば、それも添付する。
+1. 画像の用途・人物・小道具を決め、登場人物の基準画像を `docs/characters/` から**必ず添付**する。男の子は `bathroom-stage-v5.jpg.webp` と `word-target-boy-v1.png.webp`、女の子は `breakfast-stage-v7.jpg.webp` と正面全身の `word-target-girl-v2.png.webp`、ママは `living-stage-v2.png.webp`（`word-target-mom-v1.png.webp` は補助資料）、パパは正式な人物基準 `word-target-dad-v1.png.webp`。`bedroom-stage-v2.png.webp` は背景画像として維持するが、今後のパパの人物生成では基準にしない。子どもの昼の服を生成するときは、人物の基準画像に加えて `docs/characters/cat-mascot-v2-small.png.webp` も必ず添付する。小道具に既存のアイテム画像があれば、それも添付する。
 2. `[STYLE]`、該当する `[CHARACTERS]`、具体化した `[SCENE]`、用途に合う `[TECHNICAL]`、`[DO NOT]` の順に一つのプロンプトを組み立てる。完成した**実際のプロンプト全文**と、添付した基準画像のファイル名を、採用した画像ごとに `docs/image-log.md` に残す。画像を生成しただけで未採用の候補は、その旨を区別して記録する。
 3. 生成結果を基準画像と並べた比較画像を作る。髪型・髪色・顔立ち・年齢感・服・柄・絵のタッチを拡大確認し、比較画像を報告に含める。実際のカードや場面で表示した画像も報告する。Action Match では重要な手・物・動作を画像の上側80%に収める。
 4. A の画像は生成した緑背景を `scripts/chroma-key-green.py` で透過し、輪郭の緑の縁を拡大確認する。`scripts/optimize-images.sh` で WebP に変換し、`tests/check-image-alpha.mjs` で透過を確認する。WebP quality 84、既存カテゴリの上限（背景900×1200、アイテム・届け先長辺512、Action Match長辺800）に従う。Action Match は書き出し後に **800×450px（16:9）** であることも検査し、縦横比が違う原稿は絵を引き伸ばさず透明余白で調整する。Think & Say のイラストは決定済みの **512×512px** とする。それ以外の新しい種類の画像は上限を決め打ちせず、制作前に所有者に確認する。
@@ -56,4 +56,4 @@ Do not change any character's hairstyle, hair color, face, or selected approved 
 
 ## 基準画像の構図上の不足
 
-`docs/characters/` を目視確認した結果、男の子は `word-target-boy-v1.png.webp` に正面に近い立ち姿の全身が見える。女の子は承認済みの `word-target-girl-v2.png.webp` が正面全身の基準である。ママの `living-stage-v2.png.webp` は座り姿、`word-target-mom-v1.png.webp` も座り姿で、立った正面全身の基準がない。パパの `bedroom-stage-v2.png.webp` と `word-target-dad-v1.png.webp` はどちらも座り姿で、立った正面全身の基準がない。ママ・パパの立ち姿の基準を新たに作るかは所有者が判断する。
+`docs/characters/` を目視確認した結果、男の子は `word-target-boy-v1.png.webp` に正面に近い立ち姿の全身が見える。女の子は承認済みの `word-target-girl-v2.png.webp` が正面全身の基準である。ママの `living-stage-v2.png.webp` は座り姿、`word-target-mom-v1.png.webp` も座り姿で、立った正面全身の基準がない。パパの正式な人物基準 `word-target-dad-v1.png.webp` は座り姿で、立った正面全身の基準がない。ママ・パパの立ち姿の基準を新たに作るかは所有者が判断する。

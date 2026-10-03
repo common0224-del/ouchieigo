@@ -2,6 +2,12 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-03 — `think-say-open-milk-dad-v1`〜`v4`（すべて不採用）
+
+- 用途：Think & Say の右の絵「open the milk」。候補は `private-prototypes/think-say-open-milk-dad-v1.png.webp`、`private-prototypes/think-say-open-milk-dad-v2.png.webp`、`private-prototypes/think-say-open-milk-dad-v3.png.webp`、`private-prototypes/think-say-open-milk-dad-v4.png.webp` として非公開保管し、本体には組み込まない。
+- 不採用の理由：日本の一般的な紙パックの開け口を何度修正しても正確な形で描けず、屋根の稜線、片端だけを引き出す注ぎ口、閉じた反対側の関係が崩れた。小さな表示でも開ける動作を確実に伝えられる候補には至らなかった。
+- `open the milk` は描き方が見つかるまで最初のリリースから保留し、操作確認用プロトタイプの3問目も `Can you get the towel?` に変更した。過去の確認用ファイルは採用画像・公開画像と区別して残す。
+
 ## 2026-09-22 — `word-target-girl-v2-candidate`（承認済み・公開用へ反映）
 
 - 用途：Item Match の女の子。承認後、公開用 `word-target-girl-v2.png.webp` と全身基準画像 `docs/characters/word-target-girl-v2.png.webp` に採用。旧v1は `source-images/legacy/` に保管。
@@ -752,6 +758,36 @@ Action: A familiar Japanese child's "おねがい / please" begging gesture. Bod
 Expression: Cute, gentle, earnest "お願い" expression. A tiny closed-mouth pleading smile with raised inner eyebrows and big open upward-looking eyes. If the mouth opens at all, it opens only a LITTLE, as if quietly saying "おねがい"; no visible big red oval mouth, teeth or loud joyful laugh. Not a broad ecstatic grin, not a neutral mealtime expression, not eyes closed.
 Objects: None. Empty hands. No food, dishes, toys, props, furniture, symbol, writing, speech bubble, or extra person. Retain only the tiny cat-face emblem on the approved T-shirt.
 Composition: Final 512×512 square illustration. Waist-up framing matching the approximate face width and head position of attached image 4 and the other approved Think & Say gesture images, so four gestures look like the same-sized child in a row. Center the boy; keep the top of the hair, both arms, and joined fingertips fully inside the square, with clear margins around them and at all four corners of a rounded-square display slot. At 147 CSS px, the two touching palms, open eyes and pleading expression must remain readable. Keep the eyes above and unobstructed by the hands. The app displays this picture in a rounded 147–183 CSS px illustration frame; it overlays nothing on the artwork (the card slot is below). Generate against a perfectly UNIFORM SOLID PURE GREEN #00FF00 background, not transparency, checkerboard or gradient, for later chroma-key removal.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+## 2026-10-02 — `think-say-hungry-boy-v2.png.webp`（採用、プロトタイプ用）
+
+- 用途：Think & Say の右の絵「hungry」。所有者が v2 を承認。画像は `private-prototypes/think-say-hungry-boy-v2.png.webp` に置き、プロトタイプの1問目で使用する。本体には未組み込み。
+- 添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪型）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪型・絵のタッチ）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の印）、`private-prototypes/think-say-me-boy-v2.png.webp`（顔の大きさと位置の参考のみ）。v1 は生成時に添付していない。
+- 不採用：`private-prototypes/think-say-hungry-boy-v1.png.webp`。おなかを押さえた力のない顔だけでは、空腹ではなく腹痛や体調不良に見えた。
+- 採用画像は純緑背景から `scripts/chroma-key-green.py --edge-shrink 1` で透過。縦横比を保って512×512pxに仕上げ、WebP quality 84で書き出した。拡大した輪郭に緑優勢の画素はなく、`tests/check-image-alpha.mjs` の透過チェックに合格。
+
+### 採用画像に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The BOY in his approved daytime outfit, indoors, alone.
+Action: He gently rests BOTH hands on his belly because he is hungry. A SMALL fluffy thought cloud floats diagonally above and to the right of his head, connected to his head by exactly two or three small round thought dots. Inside the cloud is exactly ONE clearly recognizable Japanese onigiri: a triangular mound of WHITE rice with a tiny black nori patch. The onigiri is imagined food, not held by the boy.
+Expression: His eyes look upward toward the onigiri in the cloud. A dreamy "I want to eat" expression, pleasantly longing, softened brows, slightly open smiling mouth, with just ONE subtle drop of drool at the corner of his mouth. No pain, nausea, sadness, sweat, tears, or tightly furrowed brows.
+Objects: Only the single onigiri inside the thought cloud. Absolutely no banana, apple, toast, cereal, milk, plate, furniture, letters or symbols.
+Composition: Square 512x512 asset. Waist-up boy facing mostly forward. Keep his face about the same scale and vertical position as the attached self-pointing boy reference; adjust only enough to fit the thought cloud in clear upper-right space. The boy's face, both belly-resting hands, thought dots, entire cloud and triangular rice ball must be legible at 147 CSS pixels. Keep all important content away from rounded square corners. Leave visible separation between cloud and hair/face. No cropping or stretching. The attached self-pointing boy is ONLY a size and placement reference, not a pose or expression reference.
 
 [TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
 Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
