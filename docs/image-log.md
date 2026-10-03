@@ -2,6 +2,35 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-03 — パパの昼服 `dad-daywear-v1.png.webp`（承認済み・基準画像に採用）
+
+- 採用した候補：`private-prototypes/dad-daywear-v1.png.webp`。同一ファイルを `docs/characters/dad-daywear-v1.png.webp` に配置。パパにとって初めての正面全身の立ち姿基準。512×512px、WebP quality 84、透過。候補と採用画像の SHA-256 は一致する。
+- 添付した基準画像：`docs/characters/word-target-dad-v1.png.webp`（顔・髪型・髪色・年齢感・絵のタッチの正式基準）、`docs/characters/boy-daywear-v2.png.webp`（昼服の描き方と正面全身の立ち姿の構図のみ。男の子の顔・髪・体型・服の色や形は写さない）。
+- 緑背景（#00FF00）で生成し、`scripts/chroma-key-green.py --edge-shrink 1` で透過。人物を切らず引き伸ばさずに透明余白で512×512pxに収めた。元画像 1,085,069 bytes → 候補 WebP 23,120 bytes（97.9%削減）。淡色・青色の背景上で輪郭を拡大確認し、目立つ緑の縁は見られなかった。`tests/check-image-alpha.mjs` は PASS（四隅0/0/0/0）。比較画像は `private-prototypes/dad-daywear-v1-vs-reference.png` と `private-prototypes/dad-daywear-v1-vs-boy.png` に保管。
+
+### 実際に使ったプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+DAD: man around his 30s, calm face, light skin, short dark-brown softly wavy hair with a loose fringe falling onto his forehead, clean-shaven. Approved morning/night outfit: light-blue collared pajamas with white piping along the collar and cuffs. Approved daytime outfit: plain navy long-sleeved crew-neck T-shirt without a collar or cat emblem, beige trousers; barefoot indoors, brown sneakers outdoors. Keep the daytime outfit visibly distinct from the light-blue collared pajamas by color and shape.
+
+[SCENE]
+Who: Dad alone, in a daytime indoor scene, wearing his approved navy long-sleeved crew-neck T-shirt and beige full-length trousers, barefoot. Reference image 1 (word-target-dad-v1.png.webp) is the authoritative reference for his face, hair, hair color, age, and illustration style. Reference image 2 (boy-daywear-v2.png.webp) is ONLY a reference for the clean rendering of daytime clothes and near-frontal full-body standing composition; do not copy the boy's face, hair, youthful body proportions, short sleeves, shorts, colors, or cat emblem.
+Action: Dad stands naturally and calmly, facing nearly straight toward the viewer. This is a full-body standing character reference, with natural adult body proportions, relaxed arms, both bare feet visible, and no action or props.
+Expression: Same gentle, calm, friendly expression and mature 30-something face as reference image 1.
+Objects: None. No furniture, no item, no cat emblem, no shadows or scenery.
+Composition: One adult man centered in a square frame, head to toes fully inside with comfortable margins. Make the full figure as large and legible as possible without cropping. No app-rendered overlays will be placed on this reference image; keep the entire figure unobstructed. Preserve an adult height-to-head ratio and mature facial structure even though reference image 2 depicts a child. The composition should be nearly frontal, not seated.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-10-03 — `think-say-get-towel-dad-v1.png.webp`（採用、プロトタイプ用）
 
 - 用途：Think & Say の右の絵「get the towel」。パパが棚からピンクのタオルを取り出す。所有者が候補を承認し、`private-prototypes/think-and-say-proto.html` の3問目で使用する。本体には未組み込み。
