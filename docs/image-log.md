@@ -2,6 +2,93 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-04 — Think & Say の `some milk` `think-say-milk-v2.png.webp`（承認済み・採用）
+
+- 用途：Think & Say の右の絵「some milk」。所有者が `private-prototypes/think-say-milk-v2.png.webp` を承認した。透明なガラスのコップの側面から、7〜8分目まで入った白い牛乳が見える。本体には未組み込み。
+- 添付した画像：`breakfast-item-plate-v1.png.webp`（絵のタッチのみの参考。皿は描かない）。不採用の v1 は添付していない。
+- 不採用：`private-prototypes/think-say-milk-v1.png.webp`。青いマグカップでは中身が上からしか見えず、147pxの表示では「牛乳」よりマグカップや単なる飲み物に見えたため。
+- v2 は純緑背景（#00FF00）で新規生成し、`scripts/chroma-key-green.py` で透過した。縦横比を変えずに512×512pxの透明な正方形の中央へ配置し、WebP quality 84で保存（35,400 bytes）。明るい背景と青い背景でガラス上部を拡大確認し、コップの縁・牛乳の輪郭に欠けはなく、強い緑優勢画素は検出されなかった。`tests/check-image-alpha.mjs` はPASS（四隅0/0/0/0）。
+- 確認画像：`private-prototypes/think-say-milk-v2-glass-closeup.png`、6枚の比較 `private-prototypes/think-say-objects-compare-milk-v2.png`、147px相当の比較 `private-prototypes/think-say-objects-compare-milk-v2-147.png`。比較はオフライン合成で、実ブラウザのスクリーンショットではない。
+
+### `think-say-milk-v2.png.webp` に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+No human or animal characters appear.
+
+[SCENE]
+Who: No characters. One plain transparent drinking glass of milk for the Think & Say right illustration “some milk”.
+Action: The glass stands upright, filled with opaque WHITE MILK to roughly 75–80% of its height. Show the milk as a large, solid white area clearly visible THROUGH THE SIDE of the glass, not only as a white oval seen from above. A crisp horizontal milk level separates the white milk from the empty clear top quarter.
+Expression: Not applicable.
+Objects: Exactly one simple colorless glass tumbler, without a handle, pattern, logo, words, straw, paper carton, saucer, steam or other food. The attached breakfast-item-plate-v1.png.webp is a STYLE reference only for clean outlines, soft highlights, and the app's picture-book rendering; do not draw the plate.
+Composition: Center the entire glass large in a square 512x512 final canvas. Show it from slightly above the rim but mostly front-on, so the broad white milk-filled side dominates. Use a distinct pale blue-gray outline and subtle white highlights to define the rim and glass walls. Keep the EMPTY upper part genuinely transparent, with no green-tinted glass or green reflections; chroma-key removal must leave the rim and walls intact. At 147 CSS px, the image must immediately read as a GLASS FULL OF MILK, not a mug or bowl of soup. The app overlays nothing on this image; keep the rim and base away from the rounded frame corners.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+## 2026-10-04 — Think & Say の物だけの絵5枚（承認済み・採用）
+
+- `private-prototypes/think-say-banana-v1.png.webp`：`breakfast-items-v2.png.webp` のバナナ1本を切り出し、縦横比を保って512×512pxの透明な正方形の中央に配置。生成は行っていない。
+- `private-prototypes/think-say-teddy-bear-v1.png.webp`：`living-item-doll-and-teddy-v2.png.webp` からくまのぬいぐるみ1体だけを切り出し、縦横比を保って512×512pxの透明な正方形の中央に配置。生成は行っていない。
+- `private-prototypes/think-say-book-v1.png.webp`：閉じた絵本の `living-item-book-v1.png.webp` を、縦横比を保って512×512pxの透明な正方形の中央に配置。生成は行っていない。
+- `private-prototypes/think-say-cat-v1.png.webp`：全身の黒白猫を新規生成。添付した基準画像は `docs/characters/cat-mascot-v2-small.png.webp`。顔の模様、目、鼻、画風を合わせた。下記にプロンプト全文を記録する。
+- `private-prototypes/think-say-blocks-v2.png.webp`：積み上げていない積み木を新規生成。添付した画風・小道具の参考画像は `living-item-blocks-v1.png.webp`。下記にプロンプト全文を記録する。
+- `private-prototypes/think-say-blocks-v1.png.webp` は不採用。緑の積み木が `scripts/chroma-key-green.py` による透過処理で灰色に変色したため、緑色を含まない配色で v2 を新たに生成した。
+- 5枚とも512×512px、WebP quality 84、透明な四隅と十分な透明領域を `tests/check-image-alpha.mjs` で確認した。`cat-v1` と `blocks-v2` は純緑背景（#00FF00）から `scripts/chroma-key-green.py` で透過し、明るい背景に重ねて輪郭を拡大確認した。承認済み6枚を並べた比較画像は `private-prototypes/think-say-objects-compare-milk-v2.png`、147px相当は `private-prototypes/think-say-objects-compare-milk-v2-147.png`。これらはオフライン合成で、実ブラウザのスクリーンショットではない。本体には未組み込み。
+
+### `think-say-cat-v1.png.webp` に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+No human characters appear. The only animal is the approved black-and-white cat mascot in the attached reference image.
+
+[SCENE]
+Who: The app's usual black-and-white cat mascot, recognizable as the same individual as the attached cat-mascot-v2-small.png.webp: matching black mask and ears, white muzzle and chest, pink nose, large yellow-green eyes, friendly face.
+Action: Show one cat standing naturally, full body including all four paws and the tail. No other animals or people.
+Expression: Bright and friendly, matching the mascot reference.
+Objects: None. Do not copy the yellow star decoration from the head-only mascot reference.
+Composition: One full cat centered and large within a square 512x512 final canvas, with a clear silhouette at 147 CSS px. Do not crop paws, ears, whiskers or tail. The app adds no overlay over this illustration; keep all essential parts clear of the rounded frame corners.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### `think-say-blocks-v2.png.webp` に使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+No human or animal characters appear.
+
+[SCENE]
+Who: No characters. A small group of colorful wooden toy blocks for the Think & Say right illustration, “the blocks”.
+Action: Five or six separate blocks casually placed next to one another, not stacked; no block rests on another, and there is no tower.
+Expression: Not applicable.
+Objects: Only colorful wooden toy blocks, using the attached living-item-blocks-v1.png.webp as a reference for rounded wood texture and simple embossed motifs. Use yellow, red, blue, orange, and purple blocks. Do not paint any block or motif green, because the pure-green background will be chroma-keyed to transparency. No box, furniture, floor illustration, or other toy.
+Composition: Center the group large within a square 512x512 final canvas. Keep small gaps between blocks so they read as several individual pieces at 147 CSS px. The app adds no overlay over the image; avoid all rounded frame corners. Strongly avoid any vertical tower silhouette, to distinguish “the blocks” from “build a tower”.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-10-04 — 身ぶり「誘う」 `think-say-lets-boy-v2.png.webp`（承認済み・採用）
 
 - 用途：Think & Say の左の絵、Let's 用の「いこうよ！」。採用候補は `private-prototypes/think-say-lets-boy-v2.png.webp` に保管し、所有者が承認した。本体には未組み込み。
