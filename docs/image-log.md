@@ -2,6 +2,114 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-04 — Think & Say 右の絵：外へ出る・ジャングルジム・ねむい（承認済み・採用）
+
+- 所有者が `private-prototypes/think-say-go-outside-boy-v4.png.webp`、`private-prototypes/think-say-climb-boy-v1.png.webp`、`private-prototypes/think-say-sleepy-boy-v1.png.webp` を承認した。3枚とも 512×512px の透過 WebP（quality 84）。本体には未組み込み。
+- 3枚とも緑背景（#00FF00）で生成し、`scripts/chroma-key-green.py --edge-shrink 1` で透過した。`tests/check-image-alpha.mjs` は3枚とも PASS（四隅0/0/0/0）。髪の輪郭と、外の木・ジャングルジムの草を拡大確認し、緑の縁や欠けは見つからなかった。
+- 不採用 `think-say-go-outside-boy-v1.png.webp`：ドアと枠が宙に浮き、壁と床がなかったため、家の中から外へ出る場面だと伝わらなかった。
+- 不採用 `think-say-go-outside-boy-v2.png.webp`：壁と床を追加した版だが、男の子の上半身は室内側を向いてドアノブを握り、下半身は外へ歩いていて、向きが逆になった。壁なしの初稿を直す途中の候補として不採用。
+- 不採用 `think-say-go-outside-boy-v3.png.webp`：体は外へ向いたが、ほぼ背中を見せたまま顔だけ正面へ大きく振り返り、首が回りすぎて不自然だった。v2 で指摘された上半身・下半身の向きの不一致を解消するための修正版だったが、採用しない。
+- 採用 v4：体・顔ともに外へ進む横向きの歩き姿。胸の猫の印は横向きのため見えなくてもよい。ドアノブは握らず、壁・床・ドア・外の景色は維持した。
+
+### `think-say-go-outside-boy-v4.png.webp`（採用）
+
+添付した画像：初回の壁・床つき生成では `docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`、ユーザー提供の `スクリーンショット 2026-10-04 19.08.59.png`（構図の参考のみ）。ドア修正では初回生成の緑背景画像（保存ファイル名なし）、v3への姿勢修正では `private-prototypes/think-say-go-outside-boy-v2-green-original.png`、v4への修正では `private-prototypes/think-say-go-outside-boy-v3-green-original.png` を編集対象として添付した。
+
+#### 壁・床つきの初回生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, daytime, viewed from INSIDE the home at the front entrance. He wears his approved plain blue short-sleeved T-shirt with a tiny simplified usual cat-face emblem, navy knee-length shorts and WHITE SNEAKERS. Reference image 1 boy-daywear-v2.png.webp fixes the boy's identity, face, swept brown hair and daytime outfit; change only bare feet to white sneakers. Reference image 2 word-target-boy-v1.png.webp reinforces the same face and picture-book style, NOT pajamas. Reference image 3 cat-mascot-v2-small.png.webp is only for the tiny chest emblem. Reference image 4 (the user-supplied doorway screenshot) is ONLY a composition reference for a wall-attached open door and someone stepping through it. Do NOT copy its girl, ponytail, yellow shirt, window, furniture, or whole-room background.
+Action: The boy is mid-step THROUGH an OPEN front door, leaving the house. His torso, hips and leading white sneaker move toward the bright outdoors, while his head turns slightly back toward the viewer with a happy excited smile. One hand may touch the open door or frame; his hands hold nothing. Make the travel direction unmistakably from inside to outside, not entering the home.
+Expression: Excited and eager to go out, face partly visible as he looks back.
+Objects: A SIMPLE LIGHT-COLORED interior wall SECTION with a visible edge, and a SMALL connected indoor floor SECTION. The open front door is physically HINGED TO THAT WALL, set in a doorframe and threshold; it must NOT be a freestanding floating door or detached frame. Beyond the doorway show bright blue sky, white cloud, a simple path leading away, and one tree. No window, cabinet, table, shoes rack, furniture, toy, held object, text or logo. Outside foliage and any tiny grass are deep muted dark green/teal (#245E46), never near pure chroma #00FF00.
+Composition: TRUE SQUARE 1:1 canvas for final 512x512px Think & Say right-side illustration. Make a compact CUTOUT STAGE: only a partial light wall panel with the attached door and a small floor piece, with pure green #00FF00 CHROMA BACKDROP VISIBLE ALL AROUND its outer silhouette. Do not fill the square with a complete room or a large rectangular background. The boy, doorway and outdoor view must all read clearly at 147 CSS px. Show the boy's full body including both white sneakers, no cropping or stretching. Keep head, feet and action away from the rounded square frame corners. The app places no overlay over the artwork; its card slot is separate below.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+#### ガラス窓を木製板へ変更した追加指示全文
+
+```text
+Use case: precise-object-edit. Edit only the FIRST attached green-background illustration. Keep the EXACT same boy (face, hair, blue short-sleeved cat-emblem shirt, navy shorts, white sneakers, expression and walking-out pose), exact wall, floor, door position and opening, outdoor sky, cloud, path, tree, framing, drawing style, and PURE FLAT #00FF00 chroma-green outside the cutout. Change ONLY the open door's upper blue glass pane into a plain solid WOOD panel in the same warm wood color and shading as the rest of the door. There must be NO glass window and NO window anywhere. Keep door handle, hinges and all other parts unchanged. No new objects, text, furniture or people.
+```
+
+#### v3 に向けた体の向きの追加指示全文
+
+```text
+Use case: precise-object-edit. Edit the FIRST attached green-background illustration. Preserve the same approved boy identity (brown swept hair, face, age), blue short-sleeved T-shirt with tiny cat-face emblem, navy shorts, WHITE SNEAKERS, art style, pure flat #00FF00 green outer background, partial light interior wall and short floor, fully open solid-wood door attached to the wall, bright sky/cloud/path/dark-green tree outside, and square framing. Change ONLY the boy's BODY POSE and head orientation. The door is already wide open and he does NOT touch or grip the door knob, door, or frame; BOTH HANDS are visibly away from the handle. Show him walking OUT through the doorway in a consistent SIDE VIEW or slightly rear three-quarter view: shoulders, CHEST, waist, hips, knees and BOTH FEET all face the SAME outward direction toward the path beyond the door, with one white sneaker stepping across the threshold. His arms swing naturally with the walking motion, one a little forward and one a little back. ONLY HIS HEAD turns slightly back OVER HIS SHOULDER toward the viewer, showing a cheerful, excited partial face. Do not rotate his chest or shirt front toward the viewer; no twisted torso and no forward-facing upper body attached to outward-facing legs. Keep the door panel opaque wood, with NO glass window, and add no furniture, other people, text or objects. This is a precise pose correction, not a new scene.
+```
+
+#### 採用 v4 に向けた横向き姿勢の追加指示全文
+
+```text
+Use case: precise-object-edit. Edit the attached green-background illustration as the TARGET. Keep the exact same bright children's picture-book art style and the SAME partial pale indoor wall and wood floor cutout, door frame and threshold, fully open solid wooden door with no window, blue sky, clouds, path and tree outside, pure flat #00FF00 green around the cutout, square composition. Keep the same small brown-haired boy in a plain blue short-sleeved daytime shirt and navy shorts with WHITE SNEAKERS. Change ONLY the boy's pose and orientation. He is walking OUT to the right through the doorway. Depict his WHOLE BODY IN A TRUE SIDE PROFILE, seen from his left side: shoulders, chest, pelvis, legs, both sneakers and nose ALL point toward the outdoor path on image-right. His near shoulder and near side of the shirt face the viewer; avoid a rear/back view. Let his head stay in the same profile direction as his chest, with at most a subtle 30–45 degree glance toward the viewer, NOT looking backward over a shoulder. Show a cheerful expression with a small open smile and lively visible eye in profile. Both arms swing naturally while walking and are far away from the doorknob and door; he does not hold anything. Chest cat emblem may be hidden by the side view. Anatomical priority: the neck connects naturally to shoulders; face and body orientations match; no head twisted 180 degrees and no face looking directly at viewer while back is visible. Keep the boy full-body and large enough to read at 147px. No new objects, no text.
+```
+
+### `think-say-climb-boy-v1.png.webp`（採用）
+
+添付した画像：`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`。
+
+#### 使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, daytime outdoor play, in his approved blue short-sleeved shirt with tiny simplified cat-face emblem, navy knee-length shorts, and WHITE SNEAKERS. Reference image 1 (boy-daywear-v2.png.webp) defines his exact identity, face, hair and daytime clothing; replace only bare feet with white sneakers. Reference image 2 (word-target-boy-v1.png.webp) reinforces face, hair and art style, not pajamas. Reference image 3 (cat-mascot-v2-small.png.webp) defines only the tiny chest emblem.
+Action: He is actively CLIMBING a simple three-dimensional jungle gym of horizontal and vertical metal bars, near its top, both hands tightly gripping separate upper bars and both white-sneakered feet supported on lower rungs. His body is above the middle of the structure, with several visible tiers of bars extending below him, unmistakably showing height. Do not make it a ladder, swing, slide, or plain railing.
+Expression: Happy and quietly proud of climbing high, looking outward with a delighted confident face.
+Objects: Exactly one colorful children's jungle gym made of red, blue, yellow and orange painted metal bars. Simple open cubic grid with visible crossbars and vertical tiers, large enough to recognize at 147 CSS px. No other people or objects. No sky or scenic background. At most a tiny patch of dark muted teal-green grass (#245E46) directly at the base, far from chroma green #00FF00; do not use bright green or lime on the bars or any object.
+Composition: A true square Think & Say right-side illustration for final 512x512px. Make the boy large and clearly near the TOP of the jungle gym, while enough of the structure's lower grid remains visible to show he climbed high. Keep the full boy, both hands and white shoes within the square, not cropped or stretched. The app places no overlay over this artwork; only its separate frame has rounded corners, so avoid important parts in the corners. Background outside the depicted equipment is pure flat #00FF00 green for chroma removal; minimal ground shadow only.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### `think-say-sleepy-boy-v1.png.webp`（採用）
+
+添付した画像：`docs/characters/word-target-boy-v1.png.webp`。
+
+#### 使用したプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, a sleepy evening or bedtime indoor moment. He wears his approved blue COLLARED long-sleeved pajamas with white star pattern and white piping on the collar and cuffs, barefoot. The attached word-target-boy-v1.png.webp is the authoritative reference for the boy's exact face, swept brown hair, pajamas, age and picture-book art style. Do not copy its waving pose.
+Action: He rubs ONE EYE with one hand while giving a large, unmistakable yawn. His other arm hangs relaxed. His shoulders droop slightly with drowsiness, but he remains upright. He holds nothing.
+Expression: Half-closed droopy sleepy eyes, mouth wide open in a clear yawn, heavy eyelids. Not laughing, not crying, not ill or in pain.
+Objects: None. No pillow, teddy bear, bed, furniture, food, symbols or text.
+Composition: Square Think & Say right-side illustration for final 512x512px. Show the boy from waist up, large and centered, with the rubbing hand, sleepy half-closed eyes and open yawning mouth clearly readable at 147 CSS px. Keep the whole head and hand inside the frame with safe margins at rounded corners. No app-rendered overlay covers the illustration; the card slot is below, separate. Background is flat pure #00FF00 green for later transparency. No floor shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-10-04 — Think & Say 室内・昼服の男の子の右の絵5枚（承認済み・採用）
 
 - 所有者が `think-say-happy-boy-v1`（笑い目への編集後）、`think-say-play-blocks-boy-v1`、`think-say-build-tower-boy-v1`、`think-say-clean-up-boy-v1`、`think-say-socks-boy-v1` を承認した。候補はすべて `private-prototypes/` にあり、512×512px。本体には未組み込み。
