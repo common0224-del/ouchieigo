@@ -46,7 +46,7 @@
 ## 正解時のカード演出（決定済み）
 
 - スロットに入った2枚のカードが中央へ寄り、文字を大きくしながら隙間のない1枚のカードにくっつく
-- 左側は青系、右側はオレンジ系のまま残し、文末に問題データで指定した記号（`.` や `?`）を付ける
+- 左側は青系、右側はオレンジ系のまま残し、正解の文に含まれる文末記号（`.` や `?`）を付ける
 - くっついたカードは次の問題に切り替わるまで表示する。星は表示しない
 
 ## 問題と盤面のルール（決定済み）
@@ -54,16 +54,23 @@
 - 1問につき正解の組み合わせは1組だけ
 - 同じ絵を別の問題で再利用してよい。盤面のカードが変われば正解も変わる
   （例：空腹の絵で、ある問題は I'm hungry、別の問題は I want an apple）
-- 盤面のカードは問題ごとに明示して定義する（自動生成しない）
-- 盤面に、正解以外に成立する組み合わせが出ないようにする
-- 左カードに同じものを並べない
-- 右カードは state／noun／action を混ぜる（1分類に偏らせない）
-- ダミーは右カードで場面に合わないものを混ぜるのが作りやすい
+- 問題には正解の文だけを定義する。左右のダミーカードは、カードに付けた印と下記のルールを使って毎回ランダムに選ぶ
+- 左右それぞれ正解1枚＋ダミー2枚とし、同じカードを1つの盤面に重ねて出さない。盤面に正解以外の組み合わせが成立しないようにする
+- 右のダミー2枚は、正解の右カードと同じ印を1つも持たないカードからランダムに選ぶ。表示する右カード3枚には、状態・物・動作のうち2種類以上を含める
+- 左のダミー2枚は、正解の左カードと同じ身ぶりのカードを除いてランダムに選ぶ。Can you の問題に Can I を、Can I の問題に Can you をダミーとして入れない。I want と I want to は身ぶりが別なので同じ盤面に並べてよい
+- 左右3枚ずつの並び順も問題ごとにランダムにする。シャッフルは Fisher–Yates 方式を使う。テストでは `Math.random` を固定値に差し替えて並びを再現し、無作為の2回が必ず異なることは合格条件にしない（Action Match の教訓）
 - 右の絵は、その盤面の右カードの中から1枚に決まるように描く
-- 出題前に、左カードを**1枚ずつ**見て、左の絵で除外できないカードが正解以外にないか確認する。右カードも**1枚ずつ**見て、右の絵で除外できないカードが正解以外にないか確認する
+- 抽選した盤面を確認するときは、左カードを**1枚ずつ**見て左の絵で除外できないカードが正解以外にないか、右カードも**1枚ずつ**見て右の絵で除外できないカードが正解以外にないか確認する
 - Can you の動作の絵には動作をする大人を描き、Can I の動作の絵には子ども自身を描く
 - Can you は自分にしかできない動作（brush my teeth, wash my hands,
   wear my pajamas, put on my socks 等）と組み合わせない。カードに属性を持たせて制御する
+
+## 1ゲームの出題ルール（決定済み）
+
+- 1ゲームは5問。最初のリリースの24問から5問をランダムに選び、順番もランダムにする
+- 同じ正解の文を1ゲームで2回出さない
+- 5問の正解の左カードはすべて別のカードにする（最初のリリースの8枚から5枚を使う）
+- 問題の選択と順番のシャッフルにも Fisher–Yates 方式を使う
 
 ## 左カード 14種（発達順の優先度つき）
 
@@ -81,7 +88,7 @@ I can't（→action、困っている絵） / Look! I can（→action、得意�
 - 除外：I need, Do you want（親のセリフ）, Thank you for, Where is, What is, Please, I have
 - That's は It's に一本化する案
 
-## 右カード候補（67種。最初のリリースに含める語は後述）
+## 右カード候補（68種。最初のリリースに含める語は後述）
 
 state：hungry, thirsty, sleepy, tired, full, sick, cold, hot, happy, sad, scared,
 excited, angry, done, ready, okay, yummy, big, small, pretty, fun, hard
@@ -92,6 +99,7 @@ the towel, the blanket, the cat, the remote, the cup
 
 action：eat the apple, drink the milk, eat breakfast, read the book,
 play with the blocks, play with the toy car, draw a picture, build a tower,
+climb the jungle gym,
 get the towel, get the book, bring the blanket, put it away, clean up,
 throw it away, wear my pajamas, put on my socks, brush my teeth, wash my hands,
 take a bath, go outside, go to bed, sit down, help me, reach the book,
@@ -103,7 +111,7 @@ open the milk, find my socks, carry me
   汎用性がないため不採用
 - 吹き出し左の絵は、日本の子どもが日常で使う決まった身ぶりを使い、対象物を描かない。「欲しがる」のv1・v2では、物を持たないだけのポーズは別の意味に見えやすかった
 - 身ぶりの絵は昼服で描く。右の絵は時間帯が決まらない場合は昼服を基本とし、パジャマは sleepy や brush my teeth のように時間帯が内容と結びつく絵だけにする。どの場合も、その盤面の右カードの中から1枚に決まるように描く
-- 吹き出しは男の子が思い浮かべている姿なので、I want to／Can I の右側の動作の絵には「その動作をしている自分」を描く（例：本を開いて読んでいる姿）。Can you では、頼まれた大人が動作をしている姿を描く。I want／I want to の選び分けでは、物だけなら I want、動作をしている姿なら I want to と読み取れるようにする
+- 吹き出しは男の子が思い浮かべている姿なので、I want to／Can I の右側の動作の絵には「その動作をしている自分」を描く（例：本を開いて読んでいる姿）。Can you では、頼まれた大人が動作をしている姿を描く。I want の右の絵は物、I want to の右の絵は動作として描き分ける。同じ題材で取り違えやすい物カードと動作カードを同じ盤面に並べるのではなく、共通の印でダミーから除く
 - 右側の状態の絵（hungry など）は、表情やポーズだけでは別の状態に見えやすい。必要に応じて、状態の原因や気持ちの向かう先を頭の上の小さな考え雲で示してよい。採用済みの hungry の絵 `private-prototypes/think-say-hungry-boy-v2.png.webp` は、おなかを押さえ、少しよだれを垂らし、考え雲の中におにぎりを思い浮かべる
 - 考え雲に描く物は、その盤面の右カードのどの語にも当たらない物にする。たとえば `a banana` が盤面にあるときはバナナを描かず、絵から別のカードを選べてしまう取り違えを防ぐ
 - I want の「ちょうだい」は物をもらう場面を連想させ、動作と組むと不自然だった。日本語の「ほしい」と「したい」の区別に合わせ、I want to には別の「やりたい！」の身ぶりを使う
@@ -113,31 +121,57 @@ open the milk, find my socks, carry me
 
 ## 最初のリリースの範囲（決定済み）
 
-- 左カードは I'm, It's, I want, Look at, I want to, Look! I can, Can you, Can I, Let's の9枚
-- 左カード1枚につき右の語は3つまで（暫定）
+- 左カードは I'm, I want, I want to, Look at, Look! I can, Can you, Can I, Let's の8枚。It's は保留する
+- 問題データに定義する正解の文は次の24問。左カード1枚につき3問ずつとする
 
-| 左カード | 右の語 |
+| 左カード | 正解の文 |
 | --- | --- |
-| I'm | hungry, sleepy, happy |
-| It's | yummy, fun, pretty |
-| I want | a banana, some milk, the teddy bear |
-| Look at | the cat, the book, the blocks |
-| I want to | go outside, read the book, play with the blocks |
-| Look! I can | build a tower, put on my socks, brush my teeth |
-| Can you | get the towel（おふろ上がりにパパが棚から取る）, read the book（寝る前にパパが読み聞かせる）, carry me（疲れた男の子をパパが抱き上げる） |
-| Can I | go outside, play with the blocks, read the book |
-| Let's | clean up, go outside, play with the blocks |
+| I'm | I'm hungry. ／ I'm sleepy. ／ I'm happy. |
+| I want | I want a banana. ／ I want some milk. ／ I want the teddy bear. |
+| I want to | I want to go outside. ／ I want to read the book. ／ I want to play with the blocks. |
+| Look at | Look at the cat. ／ Look at the book. ／ Look at the blocks. |
+| Look! I can | Look! I can build a tower. ／ Look! I can put on my socks. ／ Look! I can climb the jungle gym. |
+| Can you | Can you get the towel? ／ Can you read the book?（右の絵はパパの読み聞かせ） ／ Can you carry me? |
+| Can I | Can I go outside? ／ Can I play with the blocks? ／ Can I read the book?（右の絵は男の子が自分で読む） |
+| Let's | Let's clean up. ／ Let's go outside. ／ Let's play with the blocks. |
 
 - Can you の選定基準は、子どもが大人によくする具体的なお願いで、大人が動作する姿を絵にできること。同じ組に、get／bring のように動詞を入れ替えても成り立つ語を重ねない
-- `read the book` は Can you と Can I の両方に含む。パパが男の子に読み聞かせる絵なら Can you、男の子が自分で読む絵なら Can I と、動作する人を描き分ける。同じ語でも誰がするかで文が変わることを体験させる
+- `read the book` は Can you と Can I の両方の正解文に含むが、両者をダミーとして同じ盤面には並べない。パパが男の子に読み聞かせる絵なら Can you、男の子が自分で読む絵なら Can I と、問題ごとに動作する人を描き分ける
 - 初回から外した `help me` は、何を手伝うか具体化すると別の動作の絵になるため。`open the milk` は日本の紙パックの開け口を画像生成で正確に描けず、描き方が見つかるまで保留する。上記の右カード候補一覧には将来用の語として残すが、最初のリリースには含めない
-- 右の語は重複を除いて21種、右の絵は22枚の見込み。`read the book` は男の子が読む絵とパパが読み聞かせる絵の2枚を数える
+- `Look! I can` の `brush my teeth` を `climb the jungle gym`（ジャングルジムに登る）に変更した。「見て！」と大人を呼びたくなる場面として歯みがきより自然なため。右の絵は昼の外遊びとし、男の子は昼服と白いスニーカーで描く
+- 右の語は重複を除いて18種、右の絵は19枚の見込み。`read the book` は男の子が読む絵とパパが読み聞かせる絵の2枚を数える
 - 語の多様性は将来 Word Match に預けることも検討する
+
+### 最初のリリースの右カードの種類と印
+
+| 右カード | 種類 | 印 |
+| --- | --- | --- |
+| hungry | 状態 | 食べ物 |
+| sleepy | 状態 | 眠り |
+| happy | 状態 | ダミーに使わない |
+| a banana | 物 | 食べ物 |
+| some milk | 物 | 食べ物 |
+| the teddy bear | 物 | おもちゃ |
+| the cat | 物 | 猫 |
+| the book | 物 | 本 |
+| the blocks | 物 | 積み木、おもちゃ |
+| go outside | 動作 | 外 |
+| read the book | 動作 | 本 |
+| play with the blocks | 動作 | 積み木、おもちゃ |
+| build a tower | 動作 | 積み木、おもちゃ |
+| put on my socks | 動作 | 着替え |
+| climb the jungle gym | 動作 | 外 |
+| get the towel | 動作 | タオル |
+| carry me | 動作 | 抱っこ |
+| clean up | 動作 | おもちゃ |
+
+- `happy` は正解には使うが、ダミーには使わない。右の絵の多くが笑顔の男の子で、どの絵にも当てはまってしまうため
+- 印は、同じ名詞を含むカードだけでなく、絵を見て取り違えやすいものにも共通して付ける。例：積み木の塔と積み木、空腹の絵と食べ物、片付けの絵とおもちゃ。新しい右カードを追加するときは必ず印を決める
 
 ## 未決定事項
 
 1. 身ぶりの絵で「困る」「好き」「いや」の案を採用するか、および10種が子どもに区別できるか
-2. I'm／It's の state 分類を将来の出題にどう適用するか。最初のリリースでは「両方可」の語を使わない
+2. 保留した It's を将来追加するとき、I'm／It's の state 分類を出題にどう適用するか。最初のリリースでは It's と「両方可」の語を使わない
    - I'm だけ：hungry, thirsty, sleepy, tired, sick, happy, sad, scared, excited, angry
    - It's だけ：yummy, pretty, fun, hard
    - 両方可：cold, hot, okay, done, ready, full, big, small
@@ -165,22 +199,25 @@ open the milk, find my socks, carry me
 - 訴える（I'm／It's）：人さし指で自分の胸の真ん中を指して「ぼくね」（採用済み：`think-say-me-boy-v2.png.webp`）
 - ちょうだい（I want）：両手をお皿の形にする（採用済み：`think-say-wanting-boy-v3.png.webp`）
 - やりたい（I want to）：腕を耳の横でまっすぐ上に伸ばし、指をそろえて「はーい！」（採用済み：`think-say-want-to-boy-v2.png.webp`）
-- 指さす（Look at）：腕を伸ばして指さし「あ、見て！」
-- 得意げ（Look! I can）：腰に手を当てて胸を張る「えっへん」
+- 指さす（Look at）：腕を伸ばして指さし「あ、見て！」（採用済み：`think-say-look-boy-v1.png.webp`）
+- 得意げ（Look! I can）：腰に手を当てて胸を張る「えっへん」（採用済み：`think-say-proud-boy-v1.png.webp`）
 - 頼む（Can you／Can I）：顔の前で手を合わせて「おねがい」（採用済み：`think-say-please-boy-v1.png.webp`）
-- 誘う（Let's）：手招きして「おいで、いっしょにやろう」
+- 誘う（Let's）：片腕を斜め前上に挙げて人さし指で行き先を指し、もう片方の手は腰の横でこぶし。顔は見る人に向けて「いこうよ！」（採用済み：`think-say-lets-boy-v2.png.webp`）
 - 困る（I can't）：眉を下げて首をかしげる「こまったなあ」（案）
 - 好き（I like）：胸の前で両手を握ってうっとりする（案）
 - いや（I don't like／I don't want／I don't want to）：腕で ✕ を作る「だめ・いや」（案）
 
 「訴える」の初稿で自分の鼻を指す形は、絵にすると鼻をほじっているように見えたため不採用。胸を指す形に変更した。hungry、sleepy などさまざまな状態と組み合わせるため、表情は穏やかに話しかける笑顔とし、無表情にも大笑いにもしない。
 
-「訴える」と「指さす」はどちらも人さし指を使うため、指の向き（自分の胸／外）で区別する。子どもの試用で迷わないか確認する。
+「訴える」と「指さす」はどちらも人さし指を使うため、指の向き（自分の胸／外）で区別する。「指さす」は腕を体から離して画面の右へ伸ばし、吹き出しの右の絵を指しているように見せる。子どもの試用で迷わないか確認する。
+
+「得意げ」の表情は、口を閉じて目を細めた「えっへん」の顔にする。口を開けた笑顔だけでは「やりたい」と近くなる。「誘う」は手招きにしない。日本の手招きは止まった絵では「バイバイ」「しっしっ」と同じ形に見える。片手を横向きに差し出した初稿も握手に見えたため不採用にした。「指さす」は腕が水平で顔も指す方向、「やりたい」は腕が真上で指をそろえる、「誘う」は腕が斜め上で顔は見る人の方に向けて描き分ける。
+
+最初のリリースで使う身ぶりの絵7枚（訴える、ちょうだい、やりたい、指さす、得意げ、頼む、誘う）はすべて採用済み。最初のリリースの左カードは8枚で、Can you／Can I は同じ「頼む」の絵を使うが、ダミーとして同じ盤面には並べない。It's は保留する。
 
 「頼む」で手を合わせる身ぶりは「いただきます」に見えやすい。手は胸の前ではなく顔の高さで合わせ、目を開けて見る人を見る。「困る」は「頼む」と同じ眉が下がった表情になる可能性があるため、制作時は手を合わせない形で区別する。
 
-同じ身ぶりのカードを同じ盤面に並べない盤面は易しい問題、並べる盤面は
-組み合わせを考える問題として、難しさの調整に使う。
+最初のリリースでは、正解の左カードと同じ身ぶりのカードをダミーに選ばない。I want と I want to は別の身ぶりなので同じ盤面に並べてよい。
 
 ### 【提案2：表情の基準画像を先に作る（未決定）】
 
@@ -192,7 +229,7 @@ Think & Say では同じ人物の表情を何種類も描くことになる（�
 
 1. 残る身ぶりの絵を1種ずつ制作し、子どもの試用で意味を区別できるか確認する
 2. 表情の基準画像を作るか決める（提案2への判断）
-3. 操作確認用プロトタイプを踏まえ、本番用の最初の数問の盤面を決める
+3. 操作確認用プロトタイプを踏まえ、24問の正解文から印に基づいてダミーを抽選する盤面を検証する
 4. 本番用の絵と画面を作り、ドラッグから読み上げ・カード結合・次問まで通して確認する
 5. 子どもに触ってもらい、絵から正解を推測できるか確認
 6. 問題数と種類を増やす

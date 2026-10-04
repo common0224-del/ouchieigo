@@ -2,6 +2,110 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-04 — 身ぶり「誘う」 `think-say-lets-boy-v2.png.webp`（承認済み・採用）
+
+- 用途：Think & Say の左の絵、Let's 用の「いこうよ！」。採用候補は `private-prototypes/think-say-lets-boy-v2.png.webp` に保管し、所有者が承認した。本体には未組み込み。
+- `think-say-lets-boy-v1.png.webp` は不採用。片手を横向きに差し出した形が、「いっしょにいこう」ではなく握手を求めているように見えたため。v2はv1を添付・編集せず、新しく生成した。
+- v2に添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪・年齢感・画風）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪・画風の補強。パジャマや挙手は写さない）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の小さな猫の顔のみ）、`private-prototypes/think-say-me-boy-v2.png.webp`（顔の大きさ・頭の位置・腰から上の構図のみ。ポーズと表情は写さない）。
+- 緑背景原稿：`private-prototypes/think-say-lets-boy-v2-green-original.png`。`scripts/chroma-key-green.py --edge-shrink 2` で透過し、正方形のまま比率を変えず512×512pxへ縮小、WebP quality 84で保存した。原稿1,456,865 bytes → WebP 37,800 bytes（97.4%削減）。髪と輪郭を淡色・青色背景で拡大確認し、半透明輪郭の緑優勢画素は0件。`tests/check-image-alpha.mjs` はPASS（四隅0/0/0/0）。
+- 比較画像：`private-prototypes/think-say-lets-boy-v2-three-gestures.png`、`private-prototypes/think-say-lets-boy-v2-three-gestures-147px.png`、`private-prototypes/think-say-lets-boy-v2-seven-gestures.png`。147px相当でも「指さす」の水平・右向きの視線、「やりたい」の真上・そろえた指と、v2の斜め上・人さし指・見る人への視線を区別できることを確認。比較画像はオフライン合成で、実ブラウザのスクリーンショットではない。
+
+### 実際に使ったプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, in a daytime indoor scene, wearing his approved plain blue short-sleeved T-shirt with the tiny simplified cat-face emblem. Reference image 1 (boy-daywear-v2.png.webp) defines the approved daytime clothing, hair, face, age and art style. Reference image 2 (word-target-boy-v1.png.webp) reinforces his face, hair and illustration style; do not copy its pajamas or raised arm. Reference image 3 (cat-mascot-v2-small.png.webp) defines only the tiny simplified cat-face emblem on his shirt. Reference image 4 (think-say-me-boy-v2.png.webp) is ONLY a reference for face size, head height and waist-up framing; do not copy its self-pointing pose or expression. The previous Let's candidate is NOT a reference and must not influence the pose.
+Action: A spirited Japanese child's "Shuppaatsu! Let's go over there!" invitation. His torso leans and steps toward the VIEWER'S RIGHT, as if just starting to go there. ONE ARM is raised DIAGONALLY FORWARD AND UP toward the UPPER RIGHT of the square (roughly a 45-degree diagonal), with the INDEX FINGER pointing toward that upper-right destination; the other fingers are curled. The raised arm is neither horizontal nor straight vertically above his ear. The other hand makes a small, relaxed fist beside his waist. His FACE and EYES turn back toward the VIEWER, the friend he is inviting, while his raised index finger points away toward their destination. This is a lively moving-together invitation, not merely noticing an object.
+Expression: Bright energetic open-mouth smile, looking at the viewer as if calling "Let's go!" He is cheerful and inviting.
+Objects: No held objects, other people, background scenery, signs, letters or symbols. Only the tiny cat emblem from reference image 3.
+Composition: Create an ACTUAL SQUARE 1:1 canvas for a final 512x512 asset. Waist-up portrait with the entire head, raised diagonal arm, upward-right pointing index fingertip, and other fist fully inside the square. Keep his face approximately the same large size and vertical position as reference image 4. Leave room in the square's upper-right quadrant for the diagonal arm and pointing fingertip, but do not make the face too small. The difference from Look at must be clear at 147 CSS px: Look at points horizontally right while facing that direction; this boy points diagonally UP-RIGHT while looking back at the viewer. The difference from I want to must be clear: I want to raises an arm vertically beside the ear with all fingers together; this boy raises his arm diagonally and extends only his index finger. No app-rendered overlay covers the image; its separate frame merely has rounded corners. Keep face, fingertip, elbow and fist away from the rounded corners. Preserve proportions, no stretching.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+## 2026-10-04 — 身ぶり「得意げ」 `think-say-proud-boy-v1.png.webp`（承認済み・採用）
+
+- 用途：Think & Say の左の絵、Look! I can 用の「えっへん」。最終候補は `private-prototypes/think-say-proud-boy-v1.png.webp` に保管し、所有者が承認した。本体には未組み込み。
+- 初稿は口を大きく開けた笑顔で、ただうれしそうに見え、「やりたい」の表情に近かった。そのため表情のみ2回編集し、閉じた口の控えめな笑み、満足げに細めた目、少し上げたあごにした。両手を腰に当てるポーズ、人物、昼服は維持した。
+- 初回生成で添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪・画風）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪・画風）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の小さな猫の顔）、`private-prototypes/think-say-me-boy-v2.png.webp`（顔の大きさ・頭の高さ・腰から上の構図のみ。ポーズと表情は写さない）。1回目の表情編集には初稿の緑背景画像、`boy-daywear-v2.png.webp`、`word-target-boy-v1.png.webp` を添付。2回目には1回目の編集結果を添付した。
+- 最終緑背景原稿：`private-prototypes/think-say-proud-boy-v1-green-original.png`。生成された1672×941pxの中央941×941pxに人物・両ひじ・両手が収まっていたため、`scripts/chroma-key-green.py --edge-shrink 2` で透過後、中央を正方形に切り出し、比率を変えず512×512pxへ縮小してWebP quality 84で保存した。髪と輪郭を淡色・青色背景で拡大確認し、半透明輪郭の緑優勢画素は0件。`tests/check-image-alpha.mjs` はPASS（四隅0/0/0/0）。最終WebPは38,248 bytes。
+- 比較画像：`private-prototypes/think-say-proud-boy-v1-six-gestures.png`、`private-prototypes/think-say-proud-boy-v1-six-gestures-147px.png`。147px相当でも両手が腰にあり、既存の5身ぶりと区別できることを確認。比較画像はオフライン合成で、実ブラウザのスクリーンショットではない。
+
+### 初回生成で使ったプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, in a daytime indoor scene, wearing his approved plain blue short-sleeved T-shirt with the tiny simplified usual cat-face emblem. Reference image 1 (boy-daywear-v2.png.webp) defines his daytime clothing, face, hair, age and art style. Reference image 2 (word-target-boy-v1.png.webp) reinforces his face, hair and illustration style; do not copy its pajamas, raised arm or wave. Reference image 3 (cat-mascot-v2-small.png.webp) defines only the tiny simplified cat-face emblem on his shirt. Reference image 4 (think-say-me-boy-v2.png.webp) is ONLY for his face size, head height and waist-up framing; do not copy its self-pointing pose or calm expression.
+Action: The boy stands proudly with BOTH HANDS planted clearly on his WAIST/HIPS, one on each side, elbows jutting outward left and right, chest pushed forward and shoulders back, like a Japanese child saying "Ehem! Look, I did it!" His body and face are squarely front-facing. His chin may lift slightly. Both hands are visibly touching the sides of his waist, not raised, not pointing, not in pockets, and not folded across his chest.
+Expression: A confident, delighted BIG smile, eyes wide open looking directly at the viewer, eyebrows lively; he is pleased with something he has just managed to do.
+Objects: No finished craft or achievement object, no held item, no background furniture, no symbol or text. Only the tiny shirt emblem from reference image 3.
+Composition: ACTUAL SQUARE 1:1 canvas for a final 512x512 asset. Waist-up portrait with the whole head, both hands on hips and both outward elbows fully inside the square. Keep his face approximately the same large size and vertical position as reference image 4, but include enough torso below the face so both hands at the waist are unmistakable. Do not shrink the face excessively to fit the elbows. Show the hip gesture clearly at 147 CSS px display size. Keep head, elbows and hands away from the rounded frame's four corners. No app-rendered overlay will be placed over this image; the separate display frame merely has rounded corners. No crop or stretching in the final asset.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### 1回目の表情編集で使った追加指示全文
+
+```text
+Edit the FIRST attached green-background illustration of the boy. Keep the same exact boy, same blue short-sleeve shirt with tiny cat face, same hairstyle, same waist-up scale and position, and the exact BOTH-HANDS-ON-HIPS pose with elbows out. Change ONLY the facial expression and slight head/chin angle: a distinctive self-satisfied Japanese child's 'えっへん' expression after succeeding, with a CLOSED mouth, only the corners slightly lifted in a restrained smug smile, eyes gently narrowed in satisfaction (not wide-open, not asleep), and chin lifted just a little. He must look proud and pleased, not excited or surprised. No open mouth, no teeth, no tongue. Preserve the picture-book style and facial identity from reference images 2 and 3. No new objects, props, symbols, text, rays, or sparkles. The backdrop MUST be uniformly pure solid #00FF00 green for later chroma key, with no shadows or gradient. Keep all head, hands, and elbows fully inside a central square area.
+```
+
+### 2回目の表情編集で使った追加指示全文
+
+```text
+Edit ONLY the eye expression on this exact illustration. Preserve the character identity, hair, clothes, composition, both hands on hips, closed-mouth small smug smile, slight raised chin, pure flat #00FF00 background, everything else. The boy's eyes should be visibly but gently narrowed into a satisfied, self-proud, playful 'えっへん' gaze, with upper lids lowered about one third, NOT wide round surprised eyes, NOT closed eyes, and not angry. Preserve warm friendly expression. No open mouth, no teeth. Do not change anything else.
+```
+
+## 2026-10-04 — 身ぶり「指さす」 `think-say-look-boy-v1.png.webp`（承認済み・採用）
+
+- 用途：Think & Say の左の絵、Look at 用の「あ、見て！」。候補は `private-prototypes/think-say-look-boy-v1.png.webp` に保管し、所有者が承認した。本体には未組み込み。
+- 添付した基準画像：`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪・年齢感・画風）、`docs/characters/word-target-boy-v1.png.webp`（顔・髪・画風の補強。パジャマと挙手は写さない）、`docs/characters/cat-mascot-v2-small.png.webp`（Tシャツの小さな猫の顔のみ）、`private-prototypes/think-say-me-boy-v2.png.webp`（顔の大きさ・頭の位置・腰から上の構図のみ。自分を指すポーズと表情は写さない）。
+- 緑背景原稿：`private-prototypes/think-say-look-boy-v1-green-original.png`。正方形原稿を `scripts/chroma-key-green.py --edge-shrink 1` で透過し、比率を変えず512×512pxのWebP quality 84で書き出した。原稿1,454,956 bytes → WebP 37,022 bytes（97.5%削減）。淡色・青色背景で拡大確認し、半透明輪郭の緑優勢画素は0件。`tests/check-image-alpha.mjs` は PASS（四隅0/0/0/0）。
+- 比較画像：`private-prototypes/think-say-look-boy-v1-vs-me.png`、`private-prototypes/think-say-look-boy-v1-five-gestures.png`、`private-prototypes/think-say-look-boy-v1-five-gestures-147px.png`。147px相当でも右向きの指さしが読み取れることを確認。比較画像はオフライン合成で、実ブラウザのスクリーンショットではない。
+
+### 実際に使ったプロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One BOY only, in a daytime indoor scene, wearing his approved plain blue short-sleeved T-shirt with the tiny simplified usual cat-face emblem; the waist-up crop does not show his shorts or bare feet. Reference image 1 (boy-daywear-v2.png.webp) defines his approved daytime clothing, hair, face, age and art style. Reference image 2 (word-target-boy-v1.png.webp) reinforces his face, hair and illustration style, but do not copy its pajamas or raised waving hand. Reference image 3 (cat-mascot-v2-small.png.webp) defines only the tiny, simplified cat-face emblem on the shirt. Reference image 4 (think-say-me-boy-v2.png.webp) is ONLY a reference for face size, head height and general waist-up scale; do not copy its self-pointing hand pose or calm expression.
+Action: The boy has just spotted something offscreen. He extends ONE arm straight outward toward the VIEWER'S RIGHT, away from his chest and body, and points with only his INDEX FINGER to the empty space on the right. The finger clearly points to the right, not upward, toward his chest, or toward the viewer. His other arm rests naturally. His face, eyes and slightly right-turned torso all follow the same rightward direction. This is the familiar Japanese child's "Ah, look!" pointing gesture, not a wave and not self-pointing.
+Expression: Delighted discovery and mild surprise, eyes opened wide and looking toward the viewer's right, mouth open in a small "Ah!" shape.
+Objects: No held object, no object at the fingertip, no scenery, no symbols or text. Only the tiny shirt emblem from reference image 3.
+Composition: An ACTUAL SQUARE 1:1 canvas, not a wide canvas. Draw the boy from the waist up as in reference image 4; his hair begins near the top edge and his shirt continues to the bottom edge, so there is no visible flat cut-off above the bottom of the square. Keep his face approximately the same large size and vertical position as reference image 4. Shift his torso LEFT of center; the straight extended arm points to the RIGHT and stays inside the square with the whole pointing hand, individual index finger and tip visible with a clear margin from the right edge. Do not shrink the face to fit the arm. At a 147 CSS px display size, the outward rightward point must remain readable and clearly distinct from reference image 4's finger pointing toward his own chest. No app-rendered overlay is placed over this image; its separate display frame has rounded corners, so keep face, hand and fingertip out of all four corners. Final asset will be 512x512 pixels without cropping or stretching.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-10-03 — パパの昼服 `dad-daywear-v1.png.webp`（承認済み・基準画像に採用）
 
 - 採用した候補：`private-prototypes/dad-daywear-v1.png.webp`。同一ファイルを `docs/characters/dad-daywear-v1.png.webp` に配置。パパにとって初めての正面全身の立ち姿基準。512×512px、WebP quality 84、透過。候補と採用画像の SHA-256 は一致する。
