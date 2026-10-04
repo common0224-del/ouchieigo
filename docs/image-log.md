@@ -2,6 +2,153 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-04 — Think & Say 室内・昼服の男の子の右の絵5枚（承認済み・採用）
+
+- 所有者が `think-say-happy-boy-v1`（笑い目への編集後）、`think-say-play-blocks-boy-v1`、`think-say-build-tower-boy-v1`、`think-say-clean-up-boy-v1`、`think-say-socks-boy-v1` を承認した。候補はすべて `private-prototypes/` にあり、512×512px。本体には未組み込み。
+- `put on my socks` の確認事項：くつしたのつま先が画像の左下の角で切れている。アプリの角の丸い枠でさらに隠れて気になる場合は、引きの構図で描き直す。
+
+### `think-say-happy-boy-v1.png.webp`（採用）
+
+- 採用画像：`private-prototypes/think-say-happy-boy-v1.png.webp`。初稿の目を開けた笑顔は、ほかの身ぶり（やりたい・指さす・誘う）と同じ顔に見え、「うれしい」が特別に伝わらなかったため、ポーズ・服・髪型を保ったまま弓なりの笑い目へ編集した。
+
+添付した画像：`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`。表情編集時は初稿の生成画像（保存ファイル名なし）、`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`。
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy, daytime indoors, wearing the approved blue short-sleeved cat-emblem T-shirt and navy shorts, barefoot. Use boy-daywear-v2 for his exact face, hair and clothing; word-target-boy-v1 only for consistent face and art style, not its pajamas; cat-mascot-v2-small only for the tiny chest emblem.
+Action: He springs upward in a joyful little jump, both arms raised high above his head. Both bare feet are just off the ground. He holds nothing.
+Expression: Unmistakable delighted "yay!" happiness, a broad genuine smile; eyes may narrow with joy.
+Objects: None. No toys, props, lettering, or symbols.
+Composition: One large centered full-body boy in a square 512x512 asset, head, raised hands and bare feet fully within frame; energetic silhouette and facial expression read clearly at 147 CSS px. The app displays this in a rounded square illustration frame, with no overlay over the artwork; leave safe corner margins. Background must be flat pure green for later chroma removal, with almost no floor shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+表情のみの追加編集指示全文（初稿の生成画像、boy-daywear-v2、cat-mascot-v2-small を添付）:
+
+```text
+Edit the FIRST attached image only. Keep the exact same illustrated boy, same airborne jumping pose, both arms and hands raised, same limb positions, blue short-sleeved cat-emblem T-shirt, navy shorts, bare feet, hair, framing, pure green #00FF00 backdrop, and art style. Change ONLY his facial expression: both eyes closed as clear upward-arching cheerful smiling eye curves, like the Japanese picture-book "^^" happy expression; mouth wide open in a big delighted full smile. This should read as uniquely joyful, not the open-eyed excited expression of the current image. Keep the face shape and head angle identical. Do not add or remove any other object. The other attached images are identity/emblem references only.
+```
+
+### `think-say-play-blocks-boy-v1.png.webp`（採用）
+
+- 採用画像：`private-prototypes/think-say-play-blocks-boy-v1.png.webp`。
+
+添付した画像：`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`、`private-prototypes/think-say-blocks-v2.png.webp`。
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy, daytime indoors, wearing the approved blue short-sleeved cat-emblem T-shirt and navy shorts, barefoot. Use boy-daywear-v2 for his exact face, hair and clothing; word-target-boy-v1 for face and art style, not pajamas; cat-mascot-v2-small only for the tiny chest emblem. The attached think-say-blocks-v2 defines the blocks' exact colors and simple motifs, not the composition.
+Action: Seated on the floor, smiling and playing with scattered toy blocks. He holds exactly one loose block in both hands in front of him, examining and moving it. Several other loose blocks rest separately on the floor near him. No stacked blocks, no tower.
+Expression: Happy, absorbed in play, eyes looking at the block he holds.
+Objects: A few easy-to-read toy blocks in red, yellow, blue, orange and purple with small heart, sun, star, flower and moon motifs as in the attached block reference. Absolutely no green blocks. No box, furniture, lettering or symbols beyond the approved block motifs.
+Composition: Single square 512x512 illustration; seated boy large and central, his hands and the one held block especially legible at 147 CSS px; the loose blocks visibly scattered, not forming any stack. Full boy and blocks within frame with empty safe corners. App displays this image in a rounded illustration frame and overlays nothing on the artwork. Flat pure green background for chroma removal; minimal floor shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### `think-say-build-tower-boy-v1.png.webp`（採用）
+
+- 採用画像：`private-prototypes/think-say-build-tower-boy-v1.png.webp`。
+
+添付した画像：`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`、`private-prototypes/think-say-blocks-v2.png.webp`。
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy, daytime indoors, in the approved blue short-sleeved cat-emblem T-shirt and navy shorts, barefoot. boy-daywear-v2 is his exact appearance; word-target-boy-v1 is face/art-style reference but not outfit; cat-mascot-v2-small is only for the small chest emblem. The attached think-say-blocks-v2 is the block design reference only.
+Action: He kneels beside a clearly tall, straight, already-built toy-block tower roughly as high as his own seated/kneeling body. He is carefully placing one final block on the very top with one hand. The vertical stack must remain upright, stable, and obvious; this is building a tower, not playing with scattered blocks. Do not show a collapsed tower.
+Expression: Concentrated and quietly proud, eyes watching the top block.
+Objects: A single high stacked tower using block colors and motifs from think-say-blocks-v2: red heart, yellow sun, blue star, orange flower, purple moon. No green blocks. The last block is visibly held above and nearly touching the top. No other toys, furniture, words, or symbols.
+Composition: Square 512x512 illustration with kneeling boy on the left and tall tower on the right, both large and fully inside the frame, top block and hand visually prominent at 147 CSS px. Do not crop head, hand, tower base, or bare feet. The app overlays nothing on this rounded-square illustration; leave corner margins. Flat pure green background for later chroma removal; minimal floor shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### `think-say-clean-up-boy-v1.png.webp`（採用）
+
+- 採用画像：`private-prototypes/think-say-clean-up-boy-v1.png.webp`。
+
+添付した画像：`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`、`private-prototypes/think-say-blocks-v2.png.webp`。
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy, daytime indoors, wearing approved blue short-sleeved cat-emblem T-shirt, navy shorts, bare feet. boy-daywear-v2 is exact face/hair/outfit reference; word-target-boy-v1 is face/art-style reference, not pajama reference; cat-mascot-v2-small is only chest emblem; think-say-blocks-v2 is block designs only.
+Action: He is actively tidying up toys: seated or kneeling at a simple open wooden toy box, carrying one loose block with his hand into the box opening. The block is halfway into the box, so the action of putting away is clear. A few blocks are already visibly inside the box, with only two or three left scattered on the floor. He is cleaning up, not playing or building.
+Expression: Gentle focused and satisfied, looking at the block being placed into the box.
+Objects: Simple plain wooden open-top toy box or basket. Red/yellow/blue/orange/purple blocks with small heart/sun/star/flower/moon motifs matching the attached block reference. No green blocks, no tower. No other toys, furniture, words, or symbols.
+Composition: Square 512x512, boy on one side and open box on the other, large visible opening and hand-to-box motion readable at 147 CSS px. Full body/limbs, box and remaining blocks inside frame. Rounded illustration frame has no app overlay on the image; leave corner margins. Pure flat green chroma background, minimal floor shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### `think-say-socks-boy-v1.png.webp`（採用）
+
+- 採用画像：`private-prototypes/think-say-socks-boy-v1.png.webp`。
+
+添付した画像：`docs/characters/boy-daywear-v2.png.webp`、`docs/characters/word-target-boy-v1.png.webp`、`docs/characters/cat-mascot-v2-small.png.webp`。
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy, daytime indoors, in the approved blue short-sleeved T-shirt with tiny cat-face emblem and navy knee-length shorts. He is normally barefoot indoors but is now visibly putting on a sock. boy-daywear-v2 is his exact appearance/outfit reference; word-target-boy-v1 is face/art-style reference, not its pajamas; cat-mascot-v2-small is only the tiny chest emblem.
+Action: Seated on the floor with one knee bent and the foot drawn near his body. Using both hands, he grips the cuff of one plain bright yellow sock and actively pulls it over one foot. The sock is partially on the foot, its cuff stretched between both hands; the dressing action is unmistakable. His other foot may remain bare. Do not show him merely holding up a sock.
+Expression: A determined, trying-hard but gentle face, looking down at the sock and his foot.
+Objects: One plain solid-color yellow sock being put on, with no pattern, logo, writing, shoes, or other objects.
+Composition: Square 512x512 illustration. Large boy centered, foot, sock cuff, and both hands clear and enlarged enough to identify the action at 147 CSS px. No cropped head, fingers, feet or legs. No background furniture. App has no overlay on this rounded-square artwork; leave clear margins at corners. Flat pure green background for chroma removal and minimal floor shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+
 ## 2026-10-04 — Think & Say の `some milk` `think-say-milk-v2.png.webp`（承認済み・採用）
 
 - 用途：Think & Say の右の絵「some milk」。所有者が `private-prototypes/think-say-milk-v2.png.webp` を承認した。透明なガラスのコップの側面から、7〜8分目まで入った白い牛乳が見える。本体には未組み込み。
