@@ -4,6 +4,7 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {checkIndexSyntax} from './check-index-syntax.mjs';
+import {installSilentAudio,assertSilentAudio} from './silent-audio.mjs';
 
 const root=path.resolve('.');
 checkIndexSyntax(path.join(root,'index.html'));
@@ -19,7 +20,7 @@ const actionFixtures=[
 ];
 const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene']];
 const engines=[
-  ['chromium',chromium,process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}],
+  ['chromium',chromium,{...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}),args:['--mute-audio']}],
   ['webkit',webkit,{}],
 ];
 let failures=0;
@@ -202,6 +203,7 @@ for(const [engineName,engine,launchOptions] of engines) {
   try {
     for(const [width,height] of sizes) {
       const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
+      await installSilentAudio(page);
       await page.addInitScript(()=>{
         const originalRandom=Math.random;
         window.__setActionTestRandom=draws=>{ let index=0; Math.random=()=>draws[index++%draws.length]; };
@@ -210,6 +212,7 @@ for(const [engineName,engine,launchOptions] of engines) {
       let current='startup';
       try {
         await page.goto(url,{waitUntil:'load'});
+        await assertSilentAudio(page);
         const capture=async(id,kind)=>{ current=`${engineName} ${width}×${height} ${id}`; if(kind==='scene') await page.waitForFunction(screenId=>!document.querySelector(`#${screenId} section`)?.classList.contains('scene-loading'),id,{timeout:12000}); await inspect(page,id,kind,width,height); await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-${id}.png`)}); };
         await capture('home-screen','home');
         await page.locator('#open-word').click(); await capture('match-mode-screen','mode');

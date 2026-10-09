@@ -4,6 +4,7 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {checkIndexSyntax} from './check-index-syntax.mjs';
+import {installSilentAudio,assertSilentAudio} from './silent-audio.mjs';
 
 const syntax=checkIndexSyntax(path.resolve('index.html'));
 console.log(`構文チェック PASS: index.html のスクリプト ${syntax.scripts}件、関数 ${syntax.functions}件、.speech-debug 系 CSS ${syntax.debugSelectors}件。重複なし。`);
@@ -11,7 +12,7 @@ const require=createRequire(import.meta.url);
 const {chromium,webkit}=require('playwright');
 const appUrl=`${pathToFileURL(path.resolve('index.html')).href}?debug=1&automation=1`;
 const sceneNames=['bathroom','breakfast','living','bedroom'];
-const engines=process.env.RUN_WEBKIT==='1' ? [['webkit',webkit,{}]] : [['chromium',chromium,process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}]];
+const engines=process.env.RUN_WEBKIT==='1' ? [['webkit',webkit,{}]] : [['chromium',chromium,{...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}),args:['--mute-audio']}]];
 const artifactDirectory=path.resolve('tests','artifacts');
 const delay=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
 let currentOperation={scene:'startup',round:0,action:'open browser'}, currentViewport='';
@@ -214,11 +215,13 @@ for(const [engineName,engine,launchOptions] of engines) {
     for(const [width,height] of [[375,667],[390,844],[430,932]]) {
       currentViewport=`${width}×${height}`;
       const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
+      await installSilentAudio(page);
       const consoleEntries=[];
       page.on('console',message=>consoleEntries.push(`[${message.type()}] ${message.text()}`));
       page.on('pageerror',error=>consoleEntries.push(`[pageerror] ${error.stack || error}`));
       try {
         await page.goto(appUrl,{waitUntil:'load'});
+        await assertSilentAudio(page);
         // Include the 2.5-second recovery watchdog window while still on Home.
         await delay(3000);
         const startup=await events(page);

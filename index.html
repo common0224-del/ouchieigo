@@ -237,6 +237,85 @@
       .place-list { gap:11px; padding-bottom:0; }
       .place-card, .place-copy { min-height:118px; }
     }
+#think-screen { position:relative; --ink:#493c32; --orange:#ef9b40; --blue:#5e9ed3; background:#fff4df; }
+#think-screen .screen-header .controls { display:flex; align-items:center; gap:var(--header-gap); flex:none; }
+#think-screen .screen-header .stage-back { font-size:25px; font-weight:900; }
+#think-screen .screen-header .think-home-button { background:linear-gradient(145deg,#fff5a3,#ffc95b); font-size:19px; }
+#think-screen .screen-header .hint { background:linear-gradient(145deg,#ffe9b6,#ffb966); font-size:20px; }
+    #think-screen .header-center { display:flex; align-items:center; justify-content:center; gap:5px; flex:1; min-width:0; }
+    #think-screen .header-center h1 { margin:0; font-size:18px; line-height:1; white-space:nowrap; }
+    #think-screen .count { flex:none; font-size:12px; font-weight:900; white-space:nowrap; padding:5px 6px; border-radius:10px; background:#ffffff30; }
+    #think-screen .think-body { position:relative; flex:1; min-height:0; display:flex; flex-direction:column; padding:7px 9px max(9px,env(safe-area-inset-bottom)); gap:5px; color:var(--ink); font-family:system-ui,-apple-system,sans-serif; }
+    #think-screen .thought { position:relative; z-index:3; flex:none; min-height:222px; padding:19px 13px 14px; border:4px solid #fff; border-radius:41% 40% 24% 24% / 25% 25% 19% 19%; background:#fffdfa; box-shadow:0 5px 0 #dcb58d; }
+    #think-screen .thought::before, #think-screen .thought::after, #think-screen .tail-dot { content:""; position:absolute; z-index:1; background:#fffdfa; border:3px solid white; border-radius:50%; pointer-events:none; }
+    #think-screen .thought::before { width:27px; height:23px; left:calc(50% - 25px); bottom:-18px; }
+    #think-screen .thought::after { width:18px; height:16px; left:calc(50% + 2px); bottom:-30px; }
+    #think-screen .tail-dot { width:10px; height:10px; left:calc(50% + 19px); bottom:-41px; border-width:2px; }
+    #think-screen .visuals, #think-screen .slots { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
+    #think-screen .visuals { align-items:start; }
+    #think-screen .visual { width:100%; min-width:0; aspect-ratio:1 / 1; display:grid; place-items:center; overflow:hidden; text-align:center; font-size:clamp(2.6rem,8vw,3.25rem); line-height:1.05; border-radius:28px; }
+    #think-screen .visual img { display:block; width:100%; height:100%; object-fit:contain; }
+    #think-screen .visual.left { background:#e8f5ff; }
+    #think-screen .visual.right { background:#fff0d7; font-size:clamp(2.4rem,7.5vw,2.9rem); }
+    #think-screen .slots { position:relative; margin-top:10px; }
+    #think-screen .slot { position:relative; height:62px; min-width:0; display:flex; align-items:stretch; justify-content:center; padding:3px; border:3px dashed; border-radius:17px; transition:background .15s, transform .15s; }
+    #think-screen .slot.left { border-color:var(--blue); background:#f1f9ff; }
+    #think-screen .slot.right { border-color:var(--orange); background:#fff5e6; }
+    #think-screen .slot.active { transform:scale(1.04); background:#fff1af; }
+    #think-screen .slot .card { width:100%; height:100%; min-height:0; box-shadow:none; }
+    #think-screen .slot-speaker { position:absolute; z-index:2; left:50%; top:50%; width:48px; height:48px; padding:0; display:grid; place-items:center; transform:translate(-50%,-50%); border:3px solid #fff; border-radius:50%; box-shadow:0 3px 0 #a79a8c; font-size:24px; line-height:1; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    #think-screen .slot-speaker.left { background:#cfeaff; color:#235b8e; }
+    #think-screen .slot-speaker.right { background:#ffe1b6; color:#9b5218; }
+    #think-screen .slot-speaker[hidden] { display:none; }
+    #think-screen .slot-speaker.pop { animation:think-speaker-pop .34s ease-out 1; }
+    @keyframes think-speaker-pop { 0% { transform:translate(-50%,-50%) scale(.7); } 65% { transform:translate(-50%,-50%) scale(1.12); } 100% { transform:translate(-50%,-50%) scale(1); } }
+    #think-screen .slots.merging .slot .card { visibility:hidden; }
+    #think-screen .joined-card { position:absolute; z-index:5; inset:0; border-radius:17px; pointer-events:none; }
+    #think-screen .joined-half { position:absolute; top:6px; bottom:6px; width:calc(50% - 18px); display:grid; place-items:center; min-width:0; padding:4px 5px; border:3px solid #fff; border-radius:16px; font-size:clamp(.78rem,3.3vw,1rem); font-weight:900; line-height:1.12; text-align:center; text-wrap:balance; overflow-wrap:break-word; box-shadow:0 5px 0 #b7a89b; transition:left .5s ease,right .5s ease,top .5s ease,bottom .5s ease,width .5s ease,border-radius .5s ease,font-size .5s ease; }
+    #think-screen .joined-half.left { left:6px; background:#cfeaff; }
+    #think-screen .joined-half.right { right:6px; background:#ffe1b6; }
+    #think-screen .joined-card.together { box-shadow:0 5px 0 #b7a89b; }
+    #think-screen .joined-card.together .joined-half { top:0; bottom:0; width:50%; font-size:clamp(1rem,4vw,1.18rem); box-shadow:none; }
+    #think-screen .joined-card.together .joined-half.left { left:0; border-right-width:1px; border-radius:17px 0 0 17px; }
+    #think-screen .joined-card.together .joined-half.right { right:0; border-left-width:1px; border-radius:0 17px 17px 0; }
+    #think-screen .feedback-space { position:relative; z-index:4; flex:none; height:40px; }
+    #think-screen .feedback { position:relative; height:40px; padding:0 8px; display:flex; flex-direction:column; justify-content:center; gap:1px; text-align:center; }
+    #think-screen .jp { height:18px; color:#79523a; font-size:.78rem; font-weight:800; line-height:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #think-screen .show-correct-copy .feedback { position:absolute; top:0; left:-9px; width:calc(100% + 18px); height:74px; padding-inline:max(12px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-right)); gap:2px; border-radius:12px; background:#fffdf4f2; box-shadow:0 2px 7px #79523a20; pointer-events:none; }
+    #think-screen .show-correct-copy .jp { height:auto; font-size:clamp(13px,3.5vw,15px); font-weight:900; line-height:1.2; }
+    #think-screen .show-correct-copy .status { display:-webkit-box; height:auto; max-height:2.2em; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; white-space:normal; text-overflow:clip; text-wrap:balance; font-size:clamp(20px,5.5vw,24px); font-weight:900; line-height:1.1; color:#26364a; }
+    #think-screen .show-correct-copy .thought::before, #think-screen .show-correct-copy .thought::after, #think-screen .show-correct-copy .tail-dot { opacity:0; }
+    #think-screen .show-correct-copy .bank::before { opacity:0; }
+    #think-screen .playfield { position:relative; flex:1; min-height:250px; }
+    #think-screen .bank { position:absolute; z-index:2; bottom:0; width:calc(50% - 4px); display:flex; flex-direction:column; justify-content:flex-end; gap:8px; min-width:0; }
+    #think-screen #think-left-bank { left:0; } #think-screen #think-right-bank { right:0; }
+    #think-screen .bank::before { content:"↑"; position:absolute; left:50%; bottom:calc(100% + 3px); transform:translateX(-50%); font-size:31px; font-weight:1000; line-height:1; pointer-events:none; text-shadow:0 2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff; }
+    #think-screen #think-left-bank::before { color:var(--blue); } #think-screen #think-right-bank::before { color:var(--orange); }
+    #think-screen .think-home { flex:none; min-height:58px; width:100%; display:grid; place-items:center; border-radius:15px; }
+    #think-screen .think-home.empty { border:2px dotted #cfc3ae; pointer-events:none; }
+    #think-screen .card { width:100%; min-height:58px; padding:5px 7px; display:grid; place-items:center; text-align:center; background:#fff; border:3px solid white; border-radius:16px; font-size:clamp(.78rem,3.3vw,1rem); font-weight:900; line-height:1.1; box-shadow:0 5px 0 #b7a89b; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+    #think-screen .card-copy { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; width:100%; min-width:0; }
+    #think-screen .card-en { display:block; max-width:100%; }
+    #think-screen .card-ja { display:block; max-width:100%; color:#654d3c; font-size:clamp(9px,2.4vw,10.5px); font-weight:800; line-height:1.1; white-space:nowrap; }
+    #think-screen .card-ja[hidden] { display:none; }
+    #think-screen .hints-visible .card { padding:2px 5px; }
+    #think-screen .card.left { background:#cfeaff; outline:2px solid var(--blue); }
+    #think-screen .card.right { background:#ffe1b6; outline:2px solid var(--orange); }
+    #think-screen .card.dragging { z-index:50; cursor:grabbing; transform:scale(1.08); box-shadow:0 12px 19px #372f2f55; pointer-events:none; }
+    #think-screen .card.reject { animation:think-shake .3s; }
+    @keyframes think-shake { 25% { transform:translateX(-8px); } 75% { transform:translateX(8px); } }
+    #think-screen .boy-area { position:absolute; z-index:1; inset:0; overflow:hidden; pointer-events:none; }
+    #think-screen .boy-area img { position:absolute; bottom:0; left:50%; height:100%; width:auto; max-width:none; max-height:none; transform:translateX(-50%); }
+    #think-screen .boy-area .fallback { font-size:6rem; }
+    #think-screen .toast { position:absolute; z-index:30; left:50%; top:clamp(365px,calc(59dvh - 70px),480px); display:flex; align-items:center; justify-content:center; gap:8px; transform:translate(-50%,-50%) scale(.9); width:75%; min-height:64px; padding:9px 13px; border:3px solid #fff; border-radius:18px; text-align:center; font-weight:900; color:#fff; background:#2f8e6a; box-shadow:0 4px 0 #1f6e51; opacity:0; pointer-events:none; transition:.18s; }
+    #think-screen .toast::before { content:""; flex:0 0 46px; width:46px; height:46px; background:url('cat-mascot-v2-small.png.webp') 50% 38% / 118% auto no-repeat; }
+    #think-screen .toast.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+    #think-screen .status { height:18px; font-size:.78rem; font-weight:800; line-height:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #think-screen #think-restart { min-height:48px; }
+    #think-screen .start-screen { position:absolute; inset:calc(var(--header-height) + env(safe-area-inset-top)) 0 0; z-index:60; display:grid; place-items:center; background:#fff4df; }
+    #think-screen .start-screen[hidden] { display:none; }
+    #think-screen .start-button { min-width:180px; min-height:72px; padding:12px 28px; border:4px solid #fff; border-radius:24px; background:#f9ac8c; color:var(--ink); box-shadow:0 6px 0 #c4755d; font-size:1.5rem; font-weight:900; cursor:pointer; }
+    @media (max-height:700px) { #think-screen .thought { min-height:0; padding-top:12px; } #think-screen .visuals, #think-screen .slots { width:min(100%, calc(40svh + 12px)); margin-inline:auto; } #think-screen .playfield { min-height:215px; } #think-screen .think-home, #think-screen .card { min-height:54px; } }
   </style>
 </head>
 <body>
@@ -247,7 +326,7 @@
       <div class="game-select">
         <button class="game-card mode-word" id="open-word" type="button"><span class="mode-icon">🔎</span><span class="mode-copy"><strong>Word Match</strong><small>ことばを みつけよう</small></span><span class="mode-arrow">▶</span></button>
         <button class="game-card mode-listen" id="open-listen" type="button"><span class="mode-icon">👂</span><span class="mode-copy"><strong>Listen &amp; Do</strong><small>きいて、うごいてみよう</small></span><span class="mode-arrow">▶</span></button>
-        <button class="game-card mode-think" type="button" disabled><span class="mode-icon">💭</span><span class="mode-copy"><strong>Think &amp; Say</strong><small>えいごを つくってみよう</small></span><span class="mode-status">じゅんび中</span></button>
+        <button class="game-card mode-think" id="open-think" type="button"><span class="mode-icon">💭</span><span class="mode-copy"><strong>Think &amp; Say</strong><small>えいごを つくってみよう</small></span><span class="mode-arrow">▶</span></button>
       </div>
       <button class="game-card mode-my" type="button" disabled aria-label="マイミーとマイルーム、準備中"><span class="mode-icon cat-mode-icon"><img src="cat-mascot-v2-small.png.webp" alt=""></span><span class="mode-copy"><strong>マイミー ＆ マイルーム</strong><small>ねこと おへやを かざろう</small></span><span class="mode-status">じゅんび中</span></button>
       <div class="home-progress"><span>🌱</span><span>きょうの おうちえいご</span><b>0 / 1</b></div>
@@ -342,6 +421,25 @@
       <div class="finish" id="finish-panel" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>You moved every item. Great listening!</p><button class="round" id="play-again" type="button">Play again</button></div></div>
     </section>
   </main>
+<main class="app" id="think-screen" hidden aria-label="Think & Say のゲーム画面">
+  <header class="screen-header"><button class="stage-back" id="think-proto-back" type="button" aria-label="ホームへ戻る">‹</button><div class="header-center"><h1>Think &amp; Say</h1><span class="count" id="think-count" aria-live="polite"></span></div><div class="controls"><button class="round think-home-button" id="think-proto-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round hint" id="think-hint" type="button" aria-label="日本語のヒント">💡</button></div></header>
+  <section class="think-body">
+    <section class="thought" aria-label="考えの吹き出し">
+      <div class="visuals"><div class="visual left" id="think-left-visual"></div><div class="visual right" id="think-right-visual"></div></div>
+      <div class="slots"><div class="slot left" id="think-left-slot" data-side="left" aria-label="左の青い枠"></div><div class="slot right" id="think-right-slot" data-side="right" aria-label="右のオレンジの枠"></div></div>
+      <span class="tail-dot" aria-hidden="true"></span>
+    </section>
+    <div class="feedback-space"><div class="feedback"><div class="jp" id="think-jp" aria-live="polite"></div><div class="status" id="think-status" aria-live="polite"></div></div></div>
+    <section class="playfield" aria-label="カードをドラッグして吹き出しへ入れる">
+      <div class="bank" id="think-left-bank"></div>
+      <div class="boy-area"><img id="think-boy" src="boy-daywear-v2.png.webp" alt="男の子"></div>
+      <div class="bank" id="think-right-bank"></div>
+    </section>
+    <div class="toast" id="think-toast" aria-live="polite">できたね！</div>
+    <div class="finish" id="think-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt=""><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great sentences!</p><button class="round" id="think-restart" type="button">Play again</button></div></div>
+  </section>
+<div class="start-screen" id="think-start-screen"><button class="start-button" id="think-start" type="button">はじめる</button></div>
+</main>
   <script>
     (() => {
       const tasks = [
@@ -591,6 +689,19 @@
         activeUtterance=u;
         if(speechStartTimer) clearTimeout(speechStartTimer);
         if(speechWatchTimer) clearTimeout(speechWatchTimer);
+        // Think & Say serializes requests and supplies a short timeout per utterance.
+        if(u._thinkSequential) {
+          const fire=()=>{
+            if(activeUtterance!==u) return;
+            if(engine.pending || engine.speaking) { speechStartTimer=setTimeout(fire,100); return; }
+            if(IS_SAFARI || /iPhone|iPad|iPod/i.test(navigator.userAgent)) engine.resume();
+            speechEvents.push({scene:'think',text:u.text,visible:true});
+            engine.speak(u);
+            logSpeech('speak() called',{scene:'think',text:u.text});
+          };
+          fire();
+          return;
+        }
         // The browser's pending/speaking flags can lag behind its internal queue.
         // Cancel unconditionally and coalesce rapid requests into only the newest utterance.
         engine.cancel();
@@ -676,7 +787,7 @@
       function speak(repeat=false) { speakListenScene(listenScenes.bathroom,repeat); }
       function finishGame() { if(finishPanel.classList.contains('show')) return; current=null; stopSpeech(); finishPanel.classList.add('show'); prompt.textContent='You finished every item!'; finishSound(); }
       function next() { selectTask(); if (!current) { finishGame(); return; } setTimeout(speak, 260); }
-      function celebrate(msg, state='right') { toast.textContent=msg; toast.classList.toggle('wrong',state==='wrong'); toast.classList.add('show'); setTimeout(()=>{toast.classList.remove('show','wrong');},1150); }
+      function celebrate(msg, state='right', target=toast) { target.textContent=msg; target.classList.toggle('wrong',state==='wrong'); target.classList.add('show'); setTimeout(()=>{target.classList.remove('show','wrong');},1150); }
       const listenInteractionControllers={};
       function resetGame(shouldSpeak=true) { stopSpeech(); listenInteractionControllers.bathroom?.cancelActive('reset'); clearRecentTasks('bathroom'); finishPanel.classList.remove('show'); document.querySelectorAll('.item').forEach(el=>{ el.classList.remove('done','drag'); el.style.left=''; el.style.top=''; el.dataset.listenState='tray'; }); selectTask(); listenStarted.bathroom=true; prompt.textContent='New game — listen carefully!'; if (shouldSpeak && voicesReady) setTimeout(speak, 120); }
       const shuffle = list => { const result=[...list]; for(let index=result.length-1;index>0;index--) { const swapIndex=Math.floor(Math.random()*(index+1)); [result[index],result[swapIndex]]=[result[swapIndex],result[index]]; } return result; };
@@ -881,7 +992,7 @@
       function openLiving() { prepareSceneImage(livingScene); placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving(),'living'); }
       function openBedroom() { prepareSceneImage(bedroomScene); placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom(),'bedroom'); }
       function backToPlaces() { stopSpeech(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
-      function returnHome() { stopSpeech(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
+      function returnHome() { stopSpeech(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
       document.querySelector('#open-word').addEventListener('click', openWord);
       document.querySelector('#open-listen').addEventListener('click', openPlaces);
       document.querySelector('#back-games').addEventListener('click', backToGames);
@@ -933,6 +1044,603 @@
       initSpeechDebug();
       function toScenePoint(e) { return toSvgPoint(scene,e); }
       function inside(p, z) { return p[0]>=z[0] && p[0]<=z[2] && p[1]>=z[1] && p[1]<=z[3]; }
+      const thinkSay = (() => {
+  const leftCards = [
+    {word:"I'm",ja:'ぼく',gesture:'me'}, {word:'I want',ja:'ほしい',gesture:'want'},
+    {word:'I want to',ja:'したい',gesture:'want-to'}, {word:'Look at',ja:'みて',gesture:'look'},
+    {word:'Look! I can',ja:'みて！できるよ',gesture:'proud'}, {word:'Can you',ja:'してくれる？',gesture:'please'},
+    {word:'Can I',ja:'してもいい？',gesture:'please'}, {word:"Let's",ja:'しよう',gesture:'lets'}
+  ];
+  const rightCards = [
+    {word:'hungry',ja:'おなかがすいた',kind:'状態',marks:['食べ物']},
+    {word:'sleepy',ja:'ねむい',kind:'状態',marks:['眠り']},
+    {word:'happy',ja:'うれしい',kind:'状態',marks:[],noDummy:true},
+    {word:'a banana',ja:'バナナ',kind:'物',marks:['食べ物']},
+    {word:'some milk',ja:'ぎゅうにゅう',kind:'物',marks:['食べ物']},
+    {word:'the teddy bear',ja:'くまのぬいぐるみ',kind:'物',marks:['おもちゃ']},
+    {word:'the cat',ja:'ねこ',kind:'物',marks:['猫']},
+    {word:'the book',ja:'ほん',kind:'物',marks:['本']},
+    {word:'the blocks',ja:'ブロック',kind:'物',marks:['積み木','おもちゃ']},
+    {word:'go outside',ja:'おそとにいく',kind:'動作',marks:['外']},
+    {word:'read the book',ja:'ほんをよむ',kind:'動作',marks:['本']},
+    {word:'play with the blocks',ja:'ブロックであそぶ',kind:'動作',marks:['積み木','おもちゃ']},
+    {word:'build a tower',ja:'タワーをつくる',kind:'動作',marks:['積み木','おもちゃ']},
+    {word:'put on my socks',ja:'くつしたをはく',kind:'動作',marks:['着替え']},
+    {word:'climb the jungle gym',ja:'ジャングルジムにのぼる',kind:'動作',marks:['外']},
+    {word:'get the towel',ja:'タオルをとる',kind:'動作',marks:['タオル']},
+    {word:'carry me',ja:'だっこする',kind:'動作',marks:['抱っこ']},
+    {word:'clean up',ja:'おかたづけ',kind:'動作',marks:['おもちゃ']}
+  ];
+  const questions = [
+    {leftAnswer:"I'm",rightAnswer:'hungry',sentence:"I'm hungry.",jp:'ぼく、おなかすいた',leftImage:'think-say-me-boy-v2.png.webp',rightImage:'think-say-hungry-boy-v2.png.webp'},
+    {leftAnswer:"I'm",rightAnswer:'sleepy',sentence:"I'm sleepy.",jp:'ぼく、ねむい',leftImage:'think-say-me-boy-v2.png.webp',rightImage:'think-say-sleepy-boy-v1.png.webp'},
+    {leftAnswer:"I'm",rightAnswer:'happy',sentence:"I'm happy.",jp:'ぼく、うれしい',leftImage:'think-say-me-boy-v2.png.webp',rightImage:'think-say-happy-boy-v1.png.webp'},
+    {leftAnswer:'I want',rightAnswer:'a banana',sentence:'I want a banana.',jp:'バナナがほしい',leftImage:'think-say-wanting-boy-v3.png.webp',rightImage:'think-say-banana-v1.png.webp'},
+    {leftAnswer:'I want',rightAnswer:'some milk',sentence:'I want some milk.',jp:'ぎゅうにゅうがほしい',leftImage:'think-say-wanting-boy-v3.png.webp',rightImage:'think-say-milk-v2.png.webp'},
+    {leftAnswer:'I want',rightAnswer:'the teddy bear',sentence:'I want the teddy bear.',jp:'くまのぬいぐるみがほしい',leftImage:'think-say-wanting-boy-v3.png.webp',rightImage:'think-say-teddy-bear-v1.png.webp'},
+    {leftAnswer:'I want to',rightAnswer:'read the book',sentence:'I want to read the book.',jp:'ほんをよみたい',leftImage:'think-say-want-to-boy-v2.png.webp',rightImage:'think-say-reading-boy-v3.png.webp'},
+    {leftAnswer:'I want to',rightAnswer:'go outside',sentence:'I want to go outside.',jp:'おそとにいきたい',leftImage:'think-say-want-to-boy-v2.png.webp',rightImage:'think-say-go-outside-boy-v4.png.webp'},
+    {leftAnswer:'I want to',rightAnswer:'play with the blocks',sentence:'I want to play with the blocks.',jp:'ブロックであそびたい',leftImage:'think-say-want-to-boy-v2.png.webp',rightImage:'think-say-play-blocks-boy-v1.png.webp'},
+    {leftAnswer:'Look at',rightAnswer:'the cat',sentence:'Look at the cat.',jp:'ねこをみて',leftImage:'think-say-look-boy-v1.png.webp',rightImage:'think-say-cat-v1.png.webp'},
+    {leftAnswer:'Look at',rightAnswer:'the book',sentence:'Look at the book.',jp:'ほんをみて',leftImage:'think-say-look-boy-v1.png.webp',rightImage:'think-say-book-v1.png.webp'},
+    {leftAnswer:'Look at',rightAnswer:'the blocks',sentence:'Look at the blocks.',jp:'ブロックをみて',leftImage:'think-say-look-boy-v1.png.webp',rightImage:'think-say-blocks-v2.png.webp'},
+    {leftAnswer:'Can you',rightAnswer:'get the towel',sentence:'Can you get the towel?',jp:'タオルをとってくれる？',leftImage:'think-say-please-boy-v1.png.webp',rightImage:'think-say-get-towel-dad-v1.png.webp'},
+    {leftAnswer:'Can you',rightAnswer:'read the book',sentence:'Can you read the book?',jp:'ほんをよんでくれる？',leftImage:'think-say-please-boy-v1.png.webp',rightImage:'think-say-dad-read-v1c.png.webp'},
+    {leftAnswer:'Can you',rightAnswer:'carry me',sentence:'Can you carry me?',jp:'だっこしてくれる？',leftImage:'think-say-please-boy-v1.png.webp',rightImage:'think-say-dad-carry-v1b.png.webp'},
+    {leftAnswer:'Can I',rightAnswer:'play with the blocks',sentence:'Can I play with the blocks?',jp:'ブロックであそんでもいい？',leftImage:'think-say-please-boy-v1.png.webp',rightImage:'think-say-play-blocks-boy-v1.png.webp'},
+    {leftAnswer:'Can I',rightAnswer:'go outside',sentence:'Can I go outside?',jp:'おそとにいってもいい？',leftImage:'think-say-please-boy-v1.png.webp',rightImage:'think-say-go-outside-boy-v4.png.webp'},
+    {leftAnswer:'Can I',rightAnswer:'read the book',sentence:'Can I read the book?',jp:'ほんをよんでもいい？',leftImage:'think-say-please-boy-v1.png.webp',rightImage:'think-say-reading-boy-v3.png.webp'},
+    {leftAnswer:"Let's",rightAnswer:'play with the blocks',sentence:"Let's play with the blocks.",jp:'いっしょにブロックであそぼう',leftImage:'think-say-lets-boy-v2.png.webp',rightImage:'think-say-play-blocks-boy-v1.png.webp'},
+    {leftAnswer:"Let's",rightAnswer:'go outside',sentence:"Let's go outside.",jp:'いっしょにおそとにいこう',leftImage:'think-say-lets-boy-v2.png.webp',rightImage:'think-say-go-outside-boy-v4.png.webp'},
+    {leftAnswer:'Look! I can',rightAnswer:'build a tower',sentence:'Look! I can build a tower.',jp:'みて！タワーをつくれるよ',leftImage:'think-say-proud-boy-v1.png.webp',rightImage:'think-say-build-tower-boy-v1.png.webp'},
+    {leftAnswer:'Look! I can',rightAnswer:'climb the jungle gym',sentence:'Look! I can climb the jungle gym.',jp:'みて！ジャングルジムにのぼれるよ',leftImage:'think-say-proud-boy-v1.png.webp',rightImage:'think-say-climb-boy-v1.png.webp'},
+    {leftAnswer:"Let's",rightAnswer:'clean up',sentence:"Let's clean up.",jp:'いっしょにおかたづけしよう',leftImage:'think-say-lets-boy-v2.png.webp',rightImage:'think-say-clean-up-boy-v3b.png.webp'},
+    {leftAnswer:'Look! I can',rightAnswer:'put on my socks',sentence:'Look! I can put on my socks.',jp:'みて！くつしたをはけるよ',leftImage:'think-say-proud-boy-v1.png.webp',rightImage:'think-say-socks-boy-v1.png.webp'}
+  ];
+  const imageAlts = {
+    'think-say-me-boy-v2.png.webp':'男の子が自分の胸を指して話しかけている',
+    'think-say-hungry-boy-v2.png.webp':'男の子がおなかに両手を当て、おにぎりを思い浮かべている',
+    'think-say-sleepy-boy-v1.png.webp':'青い星柄パジャマの男の子が目をこすりながらあくびをしている',
+    'think-say-happy-boy-v1.png.webp':'男の子が笑い目で跳び上がり、両手を高く挙げて喜んでいる',
+    'think-say-wanting-boy-v3.png.webp':'男の子が両手をお皿の形にして、ちょうだいの身ぶりをしている',
+    'think-say-banana-v1.png.webp':'バナナが1本',
+    'think-say-milk-v2.png.webp':'白い牛乳が入った透明なガラスのコップ',
+    'think-say-teddy-bear-v1.png.webp':'くまのぬいぐるみが1体',
+    'think-say-want-to-boy-v2.png.webp':'男の子がまっすぐ手を挙げている',
+    'think-say-reading-boy-v3.png.webp':'男の子が開いた絵本を読んでいる',
+    'think-say-go-outside-boy-v4.png.webp':'白いスニーカーを履いた男の子が開いた玄関のドアから外へ歩き出している',
+    'think-say-look-boy-v1.png.webp':'男の子が画面の右を指さしている',
+    'think-say-cat-v1.png.webp':'黒白の猫が1匹',
+    'think-say-book-v1.png.webp':'閉じた赤い絵本が1冊',
+    'think-say-blocks-v2.png.webp':'色とりどりの積み木がいくつか並んでいる',
+    'think-say-please-boy-v1.png.webp':'男の子が顔の前で手を合わせてお願いしている',
+    'think-say-get-towel-dad-v1.png.webp':'パパが棚からピンクのタオルを取っている',
+    'think-say-dad-read-v1c.png.webp':'パパがベッドで絵本を読み、男の子がとなりで聞いている',
+    'think-say-dad-carry-v1b.png.webp':'パパが両腕で男の子を抱っこし、男の子の足は地面から離れている',
+    'think-say-play-blocks-boy-v1.png.webp':'男の子が床で積み木を持って遊んでいる',
+    'think-say-build-tower-boy-v1.png.webp':'男の子が積み木の塔のてっぺんに最後の1個を載せている',
+    'think-say-climb-boy-v1.png.webp':'白いスニーカーを履いた男の子がジャングルジムの上のほうに登っている',
+    'think-say-clean-up-boy-v3b.png.webp':'男の子が車やボールや電車をおもちゃ箱に入れて片付けている',
+    'think-say-socks-boy-v1.png.webp':'男の子が床に座って黄色いくつしたをはいている',
+    'think-say-lets-boy-v2.png.webp':'男の子が行き先を指して誘っている',
+    'think-say-proud-boy-v1.png.webp':'男の子が胸を張って得意げにしている'
+  };
+  const GAME_LENGTH = 5;
+  const publicImagePath = name => name;
+  const shuffle = items => {
+    const result = [...items];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i],result[j]] = [result[j],result[i]];
+    }
+    return result;
+  };
+  const leftByWord = new Map(leftCards.map(card => [card.word,card]));
+  const rightByWord = new Map(rightCards.map(card => [card.word,card]));
+  function analyzeQuestion(q) {
+    const correctLeft = leftByWord.get(q.leftAnswer), correctRight = rightByWord.get(q.rightAnswer);
+    const leftEligible = [], rightEligible = [], leftExcluded = [], rightExcluded = [];
+    if (!correctLeft || !correctRight) return {valid:false,reason:'正解カードの定義がない',leftEligible,rightEligible,leftExcluded,rightExcluded,rightPairs:[]};
+    for (const card of leftCards) {
+      if (card.word === q.leftAnswer) continue;
+      if (card.gesture === correctLeft.gesture) leftExcluded.push({word:card.word,reason:'同じ身ぶり'});
+      else leftEligible.push(card);
+    }
+    for (const card of rightCards) {
+      if (card.word === q.rightAnswer) continue;
+      const shared = card.marks.filter(mark => correctRight.marks.includes(mark));
+      if (card.noDummy) rightExcluded.push({word:card.word,reason:'ダミーに使わない'});
+      else if (shared.length) rightExcluded.push({word:card.word,reason:`同じ印（${shared.join('・')}）`});
+      else rightEligible.push(card);
+    }
+    const rightPairs = [];
+    for (let i = 0; i < rightEligible.length; i++) for (let j = i + 1; j < rightEligible.length; j++) {
+      const pair = [rightEligible[i],rightEligible[j]];
+      if (new Set([correctRight.kind,...pair.map(card => card.kind)]).size >= 2) rightPairs.push(pair);
+    }
+    return {valid:leftEligible.length >= 2 && rightPairs.length > 0,correctLeft,correctRight,leftEligible,rightEligible,leftExcluded,rightExcluded,rightPairs};
+  }
+  const thinkScreen = document.querySelector('#think-screen'), thinkBody = thinkScreen.querySelector('.think-body');
+  const $ = id => document.getElementById(`think-${id}`);
+  const slots = { left:$('left-slot'), right:$('right-slot') };
+  let gameQuestions = [], board = null, index = 0, phase = 'intro', drag = null, hintVisible = false, wrongTimer = 0, speechTimer = 0, speechStartCheckTimer = 0, nextTimer = 0, correctTimer = 0, speechGapTimer = 0, toastTimer = 0;
+  let utterance = null;
+  let speechBusy = false, pendingCardWord = null, pendingHintWord = null, pendingCorrect = false, speechUnlocked = false;
+  let runToken = 0;
+  const logThink = (stage,detail='') => {
+    if (!SPEECH_DEBUG) return;
+    const time = new Date();
+    appendDebugLine(`${time.toLocaleTimeString('ja-JP',{hour12:false})}.${String(time.getMilliseconds()).padStart(3,'0')} [Think & Say] ${stage}${detail ? ' '+detail : ''}`);
+  };
+  const playableQuestions = questions.filter(q => {
+    const result = analyzeQuestion(q);
+    if (result.valid) return true;
+    console.warn(`Think & Say: ${q.sentence} は左右2枚ずつのダミーを選べません`, {
+      reason:result.reason, leftCandidates:result.leftEligible.length,
+      rightCandidates:result.rightEligible.length, validRightPairs:result.rightPairs.length
+    });
+    return false;
+  }); // ページを開いた時点で、全問題の候補と右の種類条件を検査する
+
+  function chooseGameQuestions() {
+    const pool = shuffle(playableQuestions);
+    const chosen = [], usedLeft = new Set(), usedRightImages = new Set();
+    const pick = (start,remaining) => {
+      if (remaining === 0) return true;
+      if (pool.length - start < remaining) return false;
+      for (let i = start; i < pool.length; i++) {
+        const q = pool[i];
+        if (usedLeft.has(q.leftAnswer) || usedRightImages.has(q.rightImage)) continue;
+        chosen.push(q); usedLeft.add(q.leftAnswer); usedRightImages.add(q.rightImage);
+        if (pick(i + 1,remaining - 1)) return true;
+        chosen.pop(); usedLeft.delete(q.leftAnswer); usedRightImages.delete(q.rightImage);
+      }
+      return false;
+    };
+    const target = Math.min(GAME_LENGTH,playableQuestions.length);
+    for (let count = target; count > 0; count--) {
+      if (pick(0,count)) {
+        if (count < target) console.warn(`Think & Say: 条件を満たす${target}問を選べず、${count}問にしました`);
+        return chosen;
+      }
+    }
+    return [];
+  }
+  function chooseBoard(q) {
+    const candidates = analyzeQuestion(q);
+    if (!candidates.valid) throw new Error(`${q.sentence} のダミー候補が足りません`);
+    const leftDummies = shuffle(candidates.leftEligible).slice(0,2);
+    const rightDummies = candidates.rightPairs[Math.floor(Math.random() * candidates.rightPairs.length)];
+    const picked = {
+      left:shuffle([q.leftAnswer,...leftDummies.map(card => card.word)]),
+      right:shuffle([q.rightAnswer,...rightDummies.map(card => card.word)])
+    };
+    if (SPEECH_DEBUG) {
+      const excluded = entries => entries.length ? entries.map(item => `${item.word}: ${item.reason}`).join(' / ') : 'なし';
+      logThink('盤面',`${q.sentence} 左ダミー=${leftDummies.map(card => card.word).join(', ')} 右ダミー=${rightDummies.map(card => card.word).join(', ')}`);
+      logThink('左の除外',excluded(candidates.leftExcluded));
+      logThink('右の除外',excluded(candidates.rightExcluded));
+    }
+    return picked;
+  }
+  function startGame() {
+    gameQuestions = chooseGameQuestions(); index = 0;
+    if (gameQuestions.length) renderQuestion();
+    else { phase = 'finished'; $('finish').classList.add('show'); setStatus('もんだいを だせなかったよ'); }
+  }
+
+  function setStatus(message) { $('status').textContent = message; }
+  function showJapanese() { $('jp').textContent = gameQuestions[index].jp; }
+  function setHintsVisible(visible) {
+    hintVisible = visible;
+    thinkBody.classList.toggle('hints-visible',visible);
+    $('hint').setAttribute('aria-pressed',String(visible));
+    thinkScreen.querySelectorAll('.card-ja').forEach(label => { label.hidden = !visible; });
+  }
+  function clearTimers() {
+    [wrongTimer, speechTimer, speechStartCheckTimer, nextTimer, correctTimer, speechGapTimer, toastTimer].forEach(clearTimeout);
+    wrongTimer = speechTimer = speechStartCheckTimer = nextTimer = correctTimer = speechGapTimer = toastTimer = 0;
+  }
+  function renderQuestion() {
+    clearTimers();
+    phase = 'choosing'; drag = null; pendingCardWord = null; pendingHintWord = null; pendingCorrect = false;
+    thinkBody.classList.remove('show-correct-copy');
+    setHintsVisible(false);
+    const q = gameQuestions[index];
+    board = chooseBoard(q);
+    $('finish').classList.remove('show');
+    $('toast').classList.remove('show'); $('jp').textContent = '';
+    thinkScreen.querySelector('.joined-card')?.remove();
+    thinkScreen.querySelector('.slots').classList.remove('merging');
+    const leftVisual = $('left-visual');
+    leftVisual.replaceChildren();
+    const leftImage = document.createElement('img');
+    leftImage.src = publicImagePath(q.leftImage);
+    leftImage.alt = imageAlts[q.leftImage] || '男の子の身ぶり';
+    leftVisual.append(leftImage);
+    const rightVisual = $('right-visual');
+    rightVisual.replaceChildren();
+    const rightImage = document.createElement('img');
+    rightImage.src = publicImagePath(q.rightImage);
+    rightImage.alt = imageAlts[q.rightImage] || '男の子の状態や動作';
+    rightVisual.append(rightImage);
+    $('count').textContent = `${index + 1} / ${gameQuestions.length}`;
+    for (const side of ['left','right']) {
+      slots[side].replaceChildren();
+      const speaker = document.createElement('button');
+      speaker.type = 'button'; speaker.className = `slot-speaker ${side}`;
+      speaker.hidden = true; speaker.textContent = '🔊';
+      speaker.setAttribute('aria-label',`${side === 'left' ? '左' : '右'}の正解のカードを聞く`);
+      speaker.addEventListener('click', () => {
+        if (phase !== 'choosing' || cardIn(side)) return;
+        unlockAudio();
+        pendingHintWord = side === 'left' ? gameQuestions[index].leftAnswer : gameQuestions[index].rightAnswer;
+        continueSpeech();
+      });
+      slots[side].append(speaker);
+      const bank = $(`${side}-bank`); bank.replaceChildren();
+      board[side].forEach((word, n) => {
+        const home = document.createElement('div'); home.className = 'think-home'; home.dataset.home = `${side}-${n}`;
+        const card = document.createElement('div'); card.className = `card ${side}`;
+        const copy = document.createElement('span'); copy.className = 'card-copy';
+        const english = document.createElement('span'); english.className = 'card-en'; english.textContent = word;
+        const japanese = document.createElement('span'); japanese.className = 'card-ja';
+        japanese.textContent = (side === 'left' ? leftByWord : rightByWord).get(word).ja;
+        japanese.hidden = true;
+        copy.append(english,japanese); card.append(copy);
+        card.dataset.side = side; card.dataset.word = word; card.dataset.home = home.dataset.home;
+        card.setAttribute('role','button'); card.setAttribute('aria-label',`${word} のカード。${side === 'left' ? '青' : 'オレンジ'}の枠へドラッグ`);
+        card.addEventListener('pointerdown', startDrag); home.append(card); bank.append(home);
+      });
+    }
+    setStatus('');
+  }
+  function cardIn(side) { return slots[side].querySelector('.card'); }
+  function hideSpeaker(side) {
+    const speaker = slots[side].querySelector('.slot-speaker');
+    if (speaker) { speaker.hidden = true; speaker.classList.remove('pop'); }
+  }
+  function showSpeaker(side) {
+    const speaker = slots[side].querySelector('.slot-speaker');
+    if (!speaker || cardIn(side)) return;
+    speaker.hidden = false;
+    speaker.classList.add('pop'); // 表示時だけ1回弾む
+  }
+  function sendHome(card) {
+    const home = thinkScreen.querySelector(`[data-home="${card.dataset.home}"].think-home`);
+    if (!home) return;
+    home.append(card); home.classList.remove('empty');
+  }
+  function placeCard(card, side) {
+    hideSpeaker(side);
+    slots[side].append(card);
+    thinkScreen.querySelector(`[data-home="${card.dataset.home}"].think-home`)?.classList.add('empty');
+  }
+  function pointInside(rect, x, y, pad = 0) { return x >= rect.left-pad && x <= rect.right+pad && y >= rect.top-pad && y <= rect.bottom+pad; }
+  function candidateAt(x, y, side) {
+    const slot = slots[side];
+    return pointInside(slot.getBoundingClientRect(),x,y) ? slot : null;
+  }
+  function clearHighlight() { Object.values(slots).forEach(s => s.classList.remove('active')); }
+  function updateHighlight(x, y, side) {
+    clearHighlight();
+    const slot = candidateAt(x,y,side);
+    if (slot && (!cardIn(side) || cardIn(side) === drag?.card)) slot.classList.add('active');
+  }
+  function startDrag(event) {
+    if (phase !== 'choosing' || event.button !== 0) return;
+    event.preventDefault();
+    unlockAudio();
+    const card = event.currentTarget;
+    requestCardSpeech(card.dataset.word);
+    if (drag) return; // 読み上げはするが、同時に動かすカードは1枚だけ
+    const rect = card.getBoundingClientRect();
+    try { card.setPointerCapture(event.pointerId); } catch (_) { return; }
+    const origin = card.parentElement;
+    const ghost = card.cloneNode(true);
+    ghost.classList.add('dragging'); ghost.setAttribute('aria-hidden','true');
+    ghost.style.width = `${rect.width}px`; ghost.style.height = `${rect.height}px`;
+    ghost.style.position = 'fixed'; ghost.style.left = `${rect.left}px`; ghost.style.top = `${rect.top}px`;
+    thinkScreen.append(ghost); card.style.opacity = '0';
+    drag = { card, ghost, origin, pointerId:event.pointerId, offsetX:event.clientX-rect.left, offsetY:event.clientY-rect.top, lastX:event.clientX, lastY:event.clientY };
+    card.addEventListener('pointermove', moveDrag);
+    card.addEventListener('pointerup', endDrag);
+    card.addEventListener('pointercancel', cancelDrag);
+    card.addEventListener('lostpointercapture', lostDragCapture);
+    updateHighlight(event.clientX,event.clientY,card.dataset.side);
+  }
+  function moveDrag(event) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    drag.lastX = event.clientX; drag.lastY = event.clientY;
+    if (event.buttons === 0) { finishDrag(event.pointerId,event.clientX,event.clientY); return; }
+    drag.ghost.style.left = `${event.clientX-drag.offsetX}px`;
+    drag.ghost.style.top = `${event.clientY-drag.offsetY}px`;
+    updateHighlight(event.clientX,event.clientY,drag.card.dataset.side);
+  }
+  function stopFloating(active) {
+    const card = active.card;
+    active.ghost.remove(); card.style.opacity = '';
+    card.removeEventListener('pointermove',moveDrag);
+    card.removeEventListener('pointerup',endDrag);
+    card.removeEventListener('pointercancel',cancelDrag);
+    card.removeEventListener('lostpointercapture',lostDragCapture);
+    try { if (card.hasPointerCapture(active.pointerId)) card.releasePointerCapture(active.pointerId); } catch (_) { /* 既に解除済み */ }
+    clearHighlight();
+  }
+  function restoreOrigin(active) {
+    const {card,origin} = active;
+    origin.append(card);
+    if (origin.classList.contains('think-home')) origin.classList.remove('empty');
+  }
+  function cancelDrag(event) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    finishDrag(event.pointerId,drag.lastX,drag.lastY,true);
+  }
+  function lostDragCapture(event) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    finishDrag(event.pointerId,drag.lastX,drag.lastY);
+  }
+  function endDrag(event) { finishDrag(event.pointerId,event.clientX,event.clientY); }
+  function finishDrag(pointerId,x,y,cancelled = false) {
+    if (!drag || pointerId !== drag.pointerId) return;
+    const active = drag;
+    drag = null; // pointerup・pointercancel・lostpointercapture が続いても1回だけ処理する
+    const {card,origin} = active;
+    const side = card.dataset.side;
+    const target = cancelled ? null : candidateAt(x,y,side);
+    const ownHome = thinkScreen.querySelector(`[data-home="${card.dataset.home}"].think-home`);
+    const returnHome = !cancelled && origin.classList.contains('slot') && ownHome && pointInside(ownHome.getBoundingClientRect(),x,y,12);
+    stopFloating(active);
+    if (cancelled) { restoreOrigin(active); return; }
+    if (target && (!cardIn(side) || cardIn(side) === card)) {
+      if (origin === target) { restoreOrigin(active); return; }
+      placeCard(card,side);
+      judgeIfReady();
+    } else if (returnHome) {
+      sendHome(card); setStatus('カードを もとのばしょに もどしたよ');
+    } else {
+      restoreOrigin(active);
+    }
+  }
+  const IS_IOS_WEBKIT=/iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  function celebrateThink() { celebrate('できたね！','right',$('toast')); }
+  function judgeIfReady() {
+    if (phase !== 'choosing') return;
+    const left = cardIn('left'), right = cardIn('right');
+    if (!left || !right) { setStatus('もういちまい いれてね'); return; }
+    const q = gameQuestions[index];
+    const wrong = [left,right].filter((card,i) => card.dataset.word !== (i === 0 ? q.leftAnswer : q.rightAnswer));
+    if (!wrong.length) { succeed(); return; }
+    phase = 'rejecting'; wrongSound();
+    wrong.forEach(c => c.classList.add('reject'));
+    setStatus('もういちど、えを みてみよう');
+    wrongTimer = setTimeout(() => {
+      wrong.forEach(c => {
+        c.classList.remove('reject'); sendHome(c);
+        showSpeaker(c.dataset.side);
+      });
+      phase = 'choosing';
+    },430);
+  }
+  function waitForEnglishVoice() {
+    if (!('speechSynthesis' in window) || getEnglishVoices().length) return Promise.resolve();
+    const engine=speechSynthesis;
+    return new Promise(resolve => {
+      let settled=false;
+      const finish=reason => {
+        if (settled) return;
+        settled=true; clearTimeout(timer);
+        engine.removeEventListener('voiceschanged',onVoicesChanged);
+        logThink('intro voices',`${reason} english=${getEnglishVoices().length}`);
+        resolve();
+      };
+      const onVoicesChanged=() => { if (getEnglishVoices().length) finish('voiceschanged'); };
+      const timer=setTimeout(()=>finish('timeout'),1200);
+      engine.addEventListener('voiceschanged',onVoicesChanged);
+      engine.getVoices();
+      onVoicesChanged();
+    });
+  }
+  function primeSpeechSilently() {
+    if (!('speechSynthesis' in window)) return Promise.resolve(false);
+    const engine=speechSynthesis;
+    return new Promise(resolve => {
+      const silent=new SpeechSynthesisUtterance('a');
+      silent.lang='en-US'; silent.volume=0; silent.rate=1; silent.pitch=1;
+      let settled=false;
+      const finish=reason => {
+        if (settled) return;
+        settled=true; clearTimeout(timer);
+        const stuck=reason==='timeout' && (engine.pending || engine.speaking);
+        if (stuck) {
+          silent.onstart=silent.onend=silent.onerror=null;
+          try { engine.cancel(); } catch (_) { /* 次の発話まで間隔を空ける */ }
+        }
+        logThink('silent prime',`${reason} cancelled=${Boolean(stuck)}`);
+        resolve(Boolean(stuck));
+      };
+      silent.onstart=()=>logThink('silent prime onstart');
+      silent.onend=()=>finish('onend');
+      silent.onerror=()=>finish('onerror');
+      const timer=setTimeout(()=>finish('timeout'),700);
+      try {
+        if (IS_SAFARI || IS_IOS_WEBKIT) engine.resume();
+        engine.speak(silent); // 開始タップ内で無音の発話を行い、Let's play! と解禁を分ける
+      } catch (error) { logThink('silent prime failed',String(error)); finish('onerror'); }
+    });
+  }
+  function requestCardSpeech(word) {
+    pendingCardWord = word; // 再生中に続けて触れたら、最後の1枚だけ残す
+    continueSpeech();
+  }
+  function continueSpeech() {
+    if (speechBusy || speechGapTimer) return;
+    if (pendingHintWord === null && pendingCardWord === null) {
+      if (pendingCorrect) beginCorrectFeedback();
+      return;
+    }
+    const word = pendingHintWord !== null ? pendingHintWord : pendingCardWord;
+    if (pendingHintWord !== null) pendingHintWord = null;
+    else pendingCardWord = null;
+    speechBusy = true;
+    speakOnce(word, timedOut => {
+      speechBusy = false;
+      if (timedOut) {
+        // 詰まった声を取り消した直後に次を speak() しない。
+        speechGapTimer = setTimeout(() => { speechGapTimer = 0; continueSpeech(); },600);
+      } else continueSpeech();
+    });
+  }
+  function speakOnce(text, done) {
+    if (!('speechSynthesis' in window)) { logThink('speech unavailable',text); done(false); return; }
+    const speechRun = runToken;
+    let completed = false, started = false;
+    const engine = speechSynthesis;
+    const maxWait = Math.min(4000,Math.max(1100,800 + text.length * 110));
+    const finish = (reason, needsGap = false) => {
+      if (completed || speechRun !== runToken) return;
+      completed = true;
+      clearTimeout(speechTimer); clearTimeout(speechStartCheckTimer);
+      logThink(reason,`${text} speaking=${engine.speaking} pending=${engine.pending}`);
+      if (activeUtterance === utterance) activeUtterance = null;
+      if (speechStartTimer) clearTimeout(speechStartTimer);
+      utterance = null; done(needsGap);
+    };
+    try {
+      const selectedVoice = voice();
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = selectedVoice?.lang || 'en-US';
+      utterance.rate = speechRate; utterance.pitch = 1; utterance.volume = 1;
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.onstart = () => {
+        started = true; clearTimeout(speechStartCheckTimer);
+        if (!speechUnlocked) { speechUnlocked = true; logThink('speech unlocked','onstart confirmed'); }
+        logThink('onstart',text);
+      };
+      utterance.onend = () => finish('onend');
+      utterance.onerror = event => { logThink('error detail',event.error || 'unknown'); finish('onerror'); };
+      if (IS_SAFARI || IS_IOS_WEBKIT) engine.resume();
+      utterance._thinkSequential = true; playSpeech(utterance);
+      logThink('speak called',`${text} voice=${selectedVoice?.name || '(default)'}`);
+      speechStartCheckTimer = setTimeout(() => {
+        if (completed || started) return;
+        if (engine.speaking) { logThink('onstart missing but speaking',text); return; }
+        const stuck = engine.pending;
+        if (stuck) {
+          utterance.onstart = utterance.onend = utterance.onerror = null;
+          try { engine.cancel(); } catch (_) { /* 進行は止めない */ }
+        }
+        finish('no-start timeout',stuck);
+      },450);
+      speechTimer = setTimeout(() => {
+        if (completed) return;
+        const active = engine.speaking || engine.pending;
+        if (active) {
+          utterance.onstart = utterance.onend = utterance.onerror = null;
+          try { engine.cancel(); } catch (_) { /* 進行は止めない */ }
+        }
+        finish('duration timeout',active);
+      },maxWait);
+    } catch (error) {
+      logThink('speak failed',String(error)); finish('onerror');
+    }
+  }
+  function advanceAfterCorrect() {
+    if (phase !== 'speaking') return;
+    phase = 'advancing';
+    nextTimer = setTimeout(() => {
+      if (index + 1 < gameQuestions.length) { index++; renderQuestion(); }
+      else { phase = 'finished'; $('finish').classList.add('show'); }
+    },900);
+  }
+  function joinCorrectCards() {
+    const q = gameQuestions[index];
+    const joined = document.createElement('div');
+    joined.className = 'joined-card';
+    joined.setAttribute('aria-label',q.sentence);
+    joined.innerHTML = `<span class="joined-half left"></span><span class="joined-half right"></span>`;
+    joined.querySelector('.left').textContent = q.leftAnswer;
+    joined.querySelector('.right').textContent = q.rightAnswer + (q.sentence.match(/[.!?]$/)?.[0] || '');
+    thinkScreen.querySelector('.slots').append(joined);
+    thinkScreen.querySelector('.slots').classList.add('merging');
+    requestAnimationFrame(() => requestAnimationFrame(() => joined.classList.add('together')));
+  }
+  function beginCorrectFeedback() {
+    if (!pendingCorrect) return;
+    pendingCorrect = false; phase = 'celebrating';
+    correctSound(); celebrateThink();
+    correctTimer = setTimeout(() => {
+      if (phase !== 'celebrating') return;
+      phase = 'merging'; joinCorrectCards();
+      correctTimer = setTimeout(() => {
+        if (phase !== 'merging') return;
+        phase = 'speaking'; showJapanese(); setStatus(gameQuestions[index].sentence);
+        thinkBody.classList.add('show-correct-copy');
+        speechBusy = true;
+        speakOnce(gameQuestions[index].sentence, () => {
+          speechBusy = false;
+          advanceAfterCorrect();
+        });
+      },580);
+    },450);
+  }
+  function succeed() {
+    hideSpeaker('left'); hideSpeaker('right');
+    setHintsVisible(false);
+    phase = 'waiting-correct'; setStatus('');
+    pendingCorrect = true;
+    continueSpeech();
+  }
+  $('hint').addEventListener('click', () => { if (phase === 'choosing' || phase === 'rejecting') setHintsVisible(!hintVisible); });
+  // 試作にはホーム画面がないため、共通ヘッダーの戻る・ホームは開始画面へ戻す。
+  $('proto-back').addEventListener('click', returnHome);
+  $('proto-home').addEventListener('click', returnHome);
+  $('boy').addEventListener('error', () => { const fallback = document.createElement('span'); fallback.className = 'fallback'; fallback.textContent = '👦'; $('boy').replaceWith(fallback); });
+  $('restart').addEventListener('click', () => { unlockAudio(); startGame(); });
+  $('start').addEventListener('click', async () => {
+    const currentRun = ++runToken;
+    $('start').disabled=true;
+    unlockAudio(); // タップ内でWeb Audioをresumeする
+    const voicesReady=waitForEnglishVoice();
+    const silentPrime=primeSpeechSilently(); // タップ内で無音の発話を開始する
+    speechBusy=true; // イントロ中のカード音声は最後に触れた1枚だけ後へ送る
+    $('start-screen').hidden=true;
+    startGame(); // 声の準備やLet's play!の終了を待たず、直ちに1問目を表示する
+    const cancelledPrime=await silentPrime;
+    await voicesReady;
+    if (currentRun !== runToken || thinkScreen.hidden) return;
+    setTimeout(() => {
+      if (currentRun !== runToken || thinkScreen.hidden) return;
+      speakOnce("Let's play!", needsGap => {
+        speechBusy=false;
+        if (needsGap) speechGapTimer=setTimeout(() => { speechGapTimer=0; continueSpeech(); },600);
+        else continueSpeech();
+      });
+    },cancelledPrime ? 600 : 150); // cancel直後にはspeakしない
+  });
+  getEnglishVoices(); // 開始前から声一覧の読み込みを促し、イントロの待ちを短くする
+  logThink('ready',navigator.userAgent);
+  function openThink() {
+    homeScreen.hidden = true;
+    thinkScreen.hidden = false;
+    $('start-screen').hidden = false;
+    $('start').disabled = false;
+    $('finish').classList.remove('show');
+    unlockAudio();
+  }
+  function closeThink() {
+    runToken++;
+    clearTimers();
+    if (drag) { const active = drag; drag = null; stopFloating(active); restoreOrigin(active); }
+    pendingCardWord = pendingHintWord = null;
+    pendingCorrect = false;
+    speechBusy = false;
+    phase = 'intro';
+    thinkScreen.hidden = true;
+  }
+  document.querySelector('#open-think').addEventListener('click',openThink);
+  return {close:closeThink};
+      })();
     })();
   </script>
 </body>
