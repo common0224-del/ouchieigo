@@ -1273,6 +1273,78 @@ Plain solid pure green (#00FF00) background with no gradient, no shadow on the b
 Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
 ```
 
+## 2026-10-10 — ホームアイコン3点・Item Matchの動物2点（採用、本体用）
+
+- 公開用：`home-icon-word-match-cat-v1a.png.webp`、`home-icon-listen-do-cat-v3a.png.webp`、`home-icon-think-say-cat-v1a.png.webp`、`living-item-turtle-v1b.png.webp`、`living-item-rabbit-v1a.png.webp`。承認されたPNGは `private-prototypes/` に残し、512×512px・WebP quality 84で公開ルートへコピーした。
+- 初稿で添付した基準画像：`docs/characters/cat-mascot-v2-small.png.webp`、`private-prototypes/think-say-blocks-v2.png.webp`、`living-item-toy-car-v1.png.webp`（猫の同一性と既存絵のタッチ）。Listen & Do の再生成では `private-prototypes/home-icon-word-match-cat-v1a.png`、`private-prototypes/home-icon-think-say-cat-v1a.png`、`docs/characters/cat-mascot-v2-small.png.webp` も参照し、最終編集では右側に青い波線が3本ある直前の候補を土台にした。
+- 5点とも角の透過と拡大した輪郭を確認し、緑の縁・半透明の白いもやは見つからなかった。`tests/check-image-alpha.mjs` に合格。
+
+### Word Match アイコンの生成プロンプト全文
+
+```text
+Create one original square transparent-background illustration for a preschool English-learning game's Word Match home icon. Use the attached images only as references, not as edit targets. Image 1 is the identity reference for the same black-and-white mascot cat: preserve the distinctive black forehead/ears/outer face, white central blaze/muzzle/chest, large yellow-green eyes, pink nose, rounded friendly children's-book face. Do NOT copy the yellow star from Image 1. Image 2 is a reference for the application's colorful, softly dimensional illustration finish. Image 3 is the Item Match object-art reference for crisp shape and restrained highlights.
+Draw exactly one cat, shown from about chest upward, peering curiously through ONE large simple magnifying glass held with one forepaw. The magnifying glass must read instantly at 100 CSS px, but must not hide both eyes or the cat's identity. A clear continuous silhouette; strong clean outlines; light rim/edge around black fur so the cat remains readable on orange, blue, or purple button colors. Center the complete icon with comfortable transparent padding. Genuinely transparent alpha background: no square, no colored backdrop, no white backdrop, no shadow panel. No extra props, cards, stars, sparkle, text, letters, numbers, logo, or watermark.
+```
+
+透過前のチェッカー背景を緑に置き換えた追加指示：
+
+```text
+Edit Image 1 ONLY to replace the baked-in gray checkerboard background with one perfectly flat, uniform pure chroma green (#00FF00) background. Preserve the cat and magnifying glass exactly: pose, identity, colors, size, shape, placement and all edges. Remove every checker square and shadow from the backdrop; no new objects. The green is only a temporary chroma-key matte, not part of the artwork.
+```
+
+### Think & Say アイコンの生成プロンプト全文
+
+```text
+Create one original square transparent-background children's English game home icon. Image 1 is the identity reference for the SAME black-white mascot cat: black ears and outer face, white center blaze, white muzzle/chest, yellow-green eyes, pink nose, rounded friendly face. Never copy the yellow star in Image 1. Image 2 and Image 3 are style references only: polished children's-book illustration, soft dimensional highlights, crisp readable edges. Cat must be prominent and clear at 100px on orange, blue, or purple button colors, with a thin light edge around black fur. No background, square, panel, text, lettering, logo, or watermark.
+THINK & SAY variation A: chest-up front-facing mascot cat, curious thoughtful expression, with one compact puffy thought cloud directly above its head. In the cloud are EXACTLY TWO small, blank picture cards side by side: one solid blue and one solid orange, plain unmarked faces. Cards must be visibly distinct at 100px; no symbols or pictures inside them. Keep the whole cat, cloud, and cards inside the square with transparent padding. No other objects.
+```
+
+透過前のチェッカー背景を緑に置き換えた追加指示：
+
+```text
+Edit Image 1 ONLY: replace the gray-and-white checkerboard background completely with a perfectly uniform pure vivid chroma green (#00FF00). Preserve the entire foreground art as closely as possible: same cat identity, pose, prop, thought cloud/cards if present, colors, shapes, scale and position. Keep the white edge, white whiskers and all light-colored foreground details; remove only the checkerboard backdrop. No shadows, no added objects, no text. The green is a temporary chroma-key matte.
+```
+
+### Listen & Do アイコン最終編集のプロンプト全文
+
+```text
+Use case: precise-object-edit. Image 1 is the edit target: the black-and-white mascot cat bust with THREE blue sound-wave arcs beside its ear on the RIGHT side of the picture. Make a careful local edit to this exact artwork, not a new composition. Remove the raised front paw and foreleg touching that ear entirely. Put that front leg down naturally in front of the chest, mostly below the bust crop if needed; no paw visible beside the ear or above the cat's face. Tip ONLY the ear next to the arcs a little toward the incoming sound, a subtle natural rotation toward the arcs. Keep the cat's attentive sideward gaze, small closed-mouth smile, face identity, fur markings, head and bust size, placement, soft painterly style and white outline exactly as Image 1. Preserve the three blue/white sound arcs EXACTLY in their existing position, count, thickness, shape and colors, with no extra waves. Keep the pure uniform #00FF00 chroma-green backdrop unchanged for subsequent transparency extraction. No checkerboard, text, logos, extra props, background, or watermark. The finished icon at 100px must read as listening, never beckoning, waving or scratching.
+Variant A: lower the removed foreleg completely below the visible crop so the chest is clean and uninterrupted; rotate the right-side ear only very slightly toward the arcs.
+```
+
+### Turtle アイコンの生成プロンプト全文
+
+```text
+Create one original square illustration asset for a preschool English-learning game. It will be used both as a large Item Match card image and at 40 CSS px beside a speech-speed slider. Images 1-3 are style references only (polished, warm children's-book illustration with softly dimensional shading, restrained detail, crisp distinct silhouette); do not copy the cat, blocks, or toy car as content. Draw exactly one cute, natural-looking household pet animal, full body in clean SIDE PROFILE facing RIGHT, every limb/tail/ear entirely inside the frame, centered and taking up most of the width. Use a perfectly uniform pure chroma green (#00FF00) BACKGROUND to be removed later; a single flat solid color, no gradient, no checker pattern. No ground, grass, landscape, shadow, decoration, accessories, text, logo, or watermark. Strong colored outer edge and simple anatomy so the species reads at 40px.
+A pet turtle, leisurely stepping to the RIGHT, in a clean side profile; head and neck stretch forward slightly, front leg mid-step, back legs on the ground. Rounded warm brown and muted olive shell with broad simple shell segments, warm beige-olive face and legs, gentle eye. Make silhouette compact and unambiguous at 40px. Avoid any bright saturated green similar to the chroma backdrop.
+```
+
+### Rabbit アイコンの生成プロンプト全文
+
+```text
+Create one original square illustration asset for a preschool English-learning game, used both as an Item Match card and at 40 CSS px beside a speech-speed slider. Images 1-3 are style references only (polished warm children's-book illustration, soft dimensional shading and crisp silhouette); do not copy the cat, blocks, or car. Draw exactly ONE cute, natural household pet rabbit, full body in SIDE PROFILE facing RIGHT, actively hopping, with the head, two long upright ears, front and hind feet, and little tail all entirely visible. It should occupy about the same visual mass as a pet turtle illustration and fill most of the square width, with comfortable padding. Clear rabbit silhouette and edge contrast readable at 40px. The background must be one uniformly pure chroma green (#00FF00) matte to remove later, with no checkerboard, shadows, ground, grass, other animals, accessories, scenery, text, logo, or watermark.
+Variation A: warm cream-white rabbit with subtle soft gray-brown ear tips, mid-hop to the RIGHT; hind legs tucked just leaving the ground, forepaws extended forward, ears swept slightly back by motion, round short cotton tail. Friendly alert dark eye, anatomically natural and pet-like rather than cartoon-human. Bold clear outline.
+```
+
+## 2026-10-10 — `home-icon-word-match-cat-v2a.png.webp`（採用、本体用）
+
+- 用途：ホームの Word Match アイコン。元画像は `private-prototypes/home-icon-word-match-cat-v2a.png`、公開画像は `home-icon-word-match-cat-v2a.png.webp`。旧版 `home-icon-word-match-cat-v1a.png.webp` は削除せず保管。
+- 描き直した理由：v1a の虫めがねを持つ前足が人間の指のようで不自然だったため、前足をなくして虫めがねを片目の前に浮かせた。レンズ越しの目を少し大きく描いた。
+- 編集時の添付画像：`private-prototypes/home-icon-word-match-cat-v1a.png`（編集対象）、`private-prototypes/home-icon-listen-do-cat-v3a.png`、`private-prototypes/home-icon-think-say-cat-v1a.png`（猫の同一性、構図とタッチの参考のみ）。市松模様を純緑に置き換える編集では、その直前の生成画像だけを添付した。
+- 純緑背景を透過して512×512pxに仕上げ、WebP quality 84で保存。輪郭の緑の縁と半透明の白いもやを確認し、透過チェックに合格。
+
+### 採用版の編集プロンプト全文
+
+```text
+Use case: precise-object-edit. Image 1 is the exact edit target, the Word Match black-and-white mascot cat bust with blue-rimmed magnifying glass. Images 2 and 3 are style, character identity, scale and chest-up crop references only; do not copy their sound waves or thought cards. Produce candidate A of the Word Match home icon. Remove ONLY the forepaw and fingers gripping the magnifying-glass handle; both forepaws are lowered and may be entirely below the chest-up crop. Keep the magnifying glass floating unsupported in front of the cat's one eye. Its handle extends diagonally downward; preserve the existing bright blue lens rim, yellow connector and red/yellow handle shape and colors. Through the lens, that eye must appear subtly but clearly larger than the other eye, with an optically coherent circular lens; keep the eye centered in the lens and clearly readable at 100 px. Preserve the cat's exact identity, open-mouth curious expression, black-white markings, chest-up scale, position, soft dimensional children's-book painting, crisp white edge, and genuinely transparent background. Keep all icon elements inside the square. No human-like fingers, no paw holding the handle, no extra objects, text, logo, or checkerboard. Change nothing else.
+```
+
+市松模様を緑背景に修正した追加指示：
+
+```text
+Use case: background-extraction. Image 1 is the exact edit target. Replace ONLY its entire baked-in gray checkerboard background with a perfectly uniform flat solid pure #00FF00 chroma green matte. Preserve every foreground pixel and edge visually: same cat face and chest, fur, white whiskers and white outline, blue magnifying glass, red/yellow handle, enlarged eye, precise scale and position. Do not paint over the white whiskers or edge. Remove every checker square; no checkerboard, gradient, haze or shadow in green backdrop. Do not change any other part of Image 1. This is temporary green for later alpha extraction.
+```
+
 ## 2026-10-02 — `think-say-hungry-boy-v2.png.webp`（採用、プロトタイプ用）
 
 - 用途：Think & Say の右の絵「hungry」。所有者が v2 を承認。画像は `private-prototypes/think-say-hungry-boy-v2.png.webp` に置き、プロトタイプの1問目で使用する。本体には未組み込み。
