@@ -51,8 +51,6 @@
     .coming-card span { display:block; font-size:28px; } .coming-card strong { display:block; margin-top:6px; color:#546576; font-size:15px; } .coming-card small { font-size:11px; font-weight:700; }
     button.coming-card { width:100%; text-align:left; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .ready-place { border:0; background:linear-gradient(135deg,#ffb237,#ff8d34); box-shadow:0 4px 0 #c76c42; color:#fff; opacity:1; } .ready-place strong, .ready-place small { color:#fff; } .ready-place:active { transform:translateY(3px); box-shadow:0 1px 0 #c76c42; }
-    .home-progress { display:flex; gap:10px; align-items:center; margin:18px 4px 0; padding:12px 14px; border-radius:17px; background:#dff3ff; color:#3e718c; font-size:12px; font-weight:800; }
-    .home-progress b { color:#e85e6d; font-size:17px; }
     .game-select { display:grid; gap:13px; }
     .game-select + .game-card { margin-top:13px; }
     .game-card { position:relative; display:grid; grid-template-columns:64px 1fr auto; align-items:center; width:100%; min-height:101px; padding:13px 15px; overflow:hidden; border:0; border-radius:24px; color:#fff; text-align:left; box-shadow:0 5px 0 #bd4b4c, 0 9px 18px #8b3c4030; cursor:pointer; -webkit-tap-highlight-color:transparent; }
@@ -240,7 +238,6 @@
       .game-select { gap:9px; }
       .game-select + .game-card { margin-top:9px; }
       .game-card { min-height:88px; padding:9px 13px; }
-      .home-progress { margin-top:10px; padding:9px 11px; }
       #place-screen .home-content { padding-top:16px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); }
       .place-list { gap:11px; padding-bottom:0; }
       .place-card, .place-copy { min-height:118px; }
@@ -337,7 +334,6 @@
         <button class="game-card mode-think" id="open-think" type="button"><span class="mode-icon home-art-icon" aria-hidden="true"><img src="home-icon-think-say-cat-v1a.png.webp" alt=""></span><span class="mode-copy"><strong>Think &amp; Say</strong><small>えいごを つくってみよう</small></span><span class="mode-arrow">▶</span></button>
       </div>
       <button class="game-card mode-my" type="button" disabled aria-label="マイミーとマイルーム、準備中"><span class="mode-icon cat-mode-icon"><img src="cat-mascot-v2-small.png.webp" alt=""></span><span class="mode-copy"><strong>マイミー ＆ マイルーム</strong><small>ねこと おへやを かざろう</small></span><span class="mode-status">じゅんび中</span></button>
-      <div class="home-progress"><span>🌱</span><span>きょうの おうちえいご</span><b>0 / 1</b></div>
     </section>
   </main>
   <main class="home" id="place-screen" aria-label="Listen and Do 場所選択" hidden>
