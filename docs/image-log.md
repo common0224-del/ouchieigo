@@ -2,6 +2,13 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-12 — リビング／Item Match「Drawing」のくしゃくしゃの紙を除去
+
+- **公開画像：** `living-item-cat-drawing-v3.png.webp`（500×512px）。リビングの Listen & Do と Item Match の Drawing で共用する同名ファイルを上書きした。猫の絵の紙だけを残し、左下の別のくしゃくしゃの紙を透明にした。画像生成は使っていない。
+- **元版：** 上書き前の画像を `private-prototypes/living-item-cat-drawing-v3-with-crumpled-paper.png.webp` にバイト単位で一致するコピーとして退避した。画像の位置・寸法・透過形式は維持した。
+- **編集と確認：** 丸まりと紙の接する境目に沿う領域を指定し、元画像で可視だった9,342画素だけを透明にした。復号後のRGBA画素を比較し、指定領域外の変更は0画素。四隅のアルファ値はすべて0。暗い背景とカードに近いクリーム色の背景で左下を拡大して確認し、丸まりの消し残りや半透明のもやは見当たらなかった。
+- **指示との対応：** `cat-drawing` をゴミ箱に捨てる指示は廃止し、既存の「本→本棚」と同じ `Pick up ... and put it on the bookshelf.` 型の3文で、Drawing を本棚に置く指示へ変更した。Drawing→テーブル、Drawing→ママと、ほかの物をゴミ箱へ入れる指示は維持する。
+
 ## 2026-10-11 — Action Match 女の子版「Open it.」「Close it.」カーテンを若草色に変更
 
 - **理由・採用：** 元の淡いクリーム色のカーテンは、実際のカードのクリーム色の背景に溶けて見えにくかった。落ち着いた若草色（基準 `#8FBF6A`）で全面的に描き直した `private-prototypes/action-match/action-open-girl-v4a.png.webp` を採用し、公開ルートの `action-open-girl-v2a.png.webp` にコピーして上書きした。候補 v4b は不採用。

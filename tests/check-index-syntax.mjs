@@ -26,6 +26,12 @@ export function checkIndexSyntax(htmlPath=path.resolve('index.html')) {
     }
   }
 
+  const livingTasks=html.match(/const livingTasks = \[([\s\S]*?)\n\s*\];/)?.[1];
+  if(!livingTasks) throw new Error('index.html: リビングの指示データが見つかりません');
+  const drawingTargets=[...livingTasks.matchAll(/\{item:'cat-drawing',target:'([^']+)'/g)].map(match=>match[1]);
+  if(drawingTargets.includes('bin')) throw new Error('index.html: Drawing→bin の指示が残っています');
+  if(!drawingTargets.includes('bookshelf')) throw new Error('index.html: Drawing→bookshelf の指示がありません');
+
   const style=html.match(/<style\b[^>]*>([\s\S]*?)<\/style>/i)?.[1] || '';
   const debugSelectors=new Set();
   for(const match of style.matchAll(/(\.speech-debug(?:-[\w-]+)?(?:\s+button)?)\s*\{/g)) {
