@@ -2,6 +2,810 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-11 — Action Match 女の子版「Put it on.」「Take it off.」靴下の色を変更
+
+- **理由：** 白い靴下は実際のカードのクリーム色の背景に溶け込んで見えにくかったため、無地のオレンジ（基準色 `#F28A24`、輪郭・陰影は濃い同系色）に変更した。
+- **公開画像と候補の対応：** 公開ルートの `action-put-on-girl-v3a.png.webp` は `private-prototypes/action-match/action-put-on-girl-v4a.png.webp` の内容に、公開ルートの `action-take-off-girl-v3a.png.webp` は `private-prototypes/action-match/action-take-off-girl-v4a.png.webp` の内容に差し替えた。公開側は既存のファイル名を維持するが、中身はオレンジの靴下版。各組のバイト単位の一致を確認した。候補 v4a は移動・削除せず残す。
+- **白い靴下の元画像：** `private-prototypes/action-match/action-put-on-girl-v3a.png.webp` と `private-prototypes/action-match/action-take-off-girl-v3a.png.webp` に残す。上書き前の各公開画像とバイト単位で一致することを確認したため、別名の複製は作らない。この後に続く v3a の生成記録は、白い靴下版を制作・採用した当時の記録である。
+- **作り方：** 公開されていた採用画像を元に、靴下がある領域と白い布の色条件を組み合わせて画素を選び、同じ `#F28A24` を基準として元の明暗に沿って色を置き換えた。画像編集AI・生成プロンプトは使っていない。靴下の選択領域外のRGBA画素は元画像と一致し、アルファ面全体も一致した。800×450px、透過 lossless WebP で保存し、四隅のアルファ値はすべて0。実際のカードに近い `#FFF8E7` の背景に重ねた確認用画像は `private-prototypes/action-match/action-put-on-girl-v4a-check.png` と `private-prototypes/action-match/action-take-off-girl-v4a-check.png`。
+- **今後の確認の教訓：** 画像の見え方は暗い背景だけで判断せず、実際のカードの背景色（クリーム色）の上でも確認する。
+
+## 2026-10-11 — Action Match「Pick it up.」女の子版 v1b（採用、アプリには未組み込み）
+
+- **採用画像：** `private-prototypes/action-match/action-pick-up-girl-v1b.png.webp`。800×450px、透過WebP。非公開の候補フォルダに置いたまま、アプリには未組み込み。
+- **透過・寸法：** 緑背景で生成した原画を `scripts/chroma-key-green.py` の既定設定で透過。原画1672×941pxの端を1pxだけ切り、縦横比を保って800×450pxへ縮小し、WebP quality 84で保存した。`tests/check-image-alpha.mjs` の透過検査はPASS、四隅のアルファ値は0/0/0/0。可視画素に強い緑優勢の画素は検出されず、目視でも目立つ緑の縁や半透明のもやは見当たらなかった。
+- **不採用：** `private-prototypes/action-match/action-pick-up-girl-v1a.png.webp`。800×450px、透過WebP。**現在の保存先に存在する。**
+- **動物と色の選択：** Item Match の `Teddy bear`、`Rabbit`、`Cat`、`Turtle`、`Doll` と取り違えないよう、ぬいぐるみはぞうにした。淡い紫色は、リビング背景のおもちゃ箱に描かれた青いぞう、椅子の水色、女の子の服のピンク、靴下の白、男の子版のボールの赤と区別するため。
+- **レビューでの決定：** ひざを寄せてしゃがみ、足を開く構図を避けた。v1b は手がぞうの少し上で止まり「これから拾う」と分かるため採用。v1a は手がぞうの頭に触れて見えるため不採用。
+
+### 両案の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-pick-up-boy-v1a.png.webp`：等幅2コマ、しゃがむ→立って胸の前に持つ流れと人物の大きさ。男の子の顔・服は参考にしない。
+2. `private-prototypes/action-match/action-take-off-girl-v3a.png.webp`：絵のタッチ、女の子の描き方。
+3. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔、髪、昼服の基準。
+4. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 不採用 v1a の生成プロンプト全文
+
+```text
+Use case: illustration-story
+Asset type: Action Match two-panel character action candidate, variant v1a. The four attached images are references only, not edit targets.
+Reference image 1 (action-pick-up-boy-v1a.png.webp): equal-width two-panel composition, crouch then stand holding an object at chest, character scale; do not copy the boy's face or clothes.
+Reference image 2 (action-take-off-girl-v3a.png.webp): illustration style and rendering of the girl.
+Reference image 3 (girl-daywear-v1.png.webp): exact girl's face, hair, high bun with blue scrunchie, and approved pink short-sleeved dress.
+Reference image 4 (cat-mascot-v2-small.png.webp): tiny simplified cat face emblem on the dress only; do not draw a separate cat.
+
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The one same GIRL in approved daytime outfit, indoors and barefoot, appears once in each of two before-and-after panels; no other people.
+Action: In the LEFT panel she crouches facing mostly forward with knees together, dress hem falling naturally in front of the knees, both soles on the floor. A small seated lavender elephant plush is on the floor a little ahead of her toes, not underneath her. She reaches one hand toward it but has not touched or lifted it. In the RIGHT panel she stands in the same horizontal position, upright and front-facing, holding that same lavender elephant plush with both hands at chest level. The transition is unmistakably floor to hands.
+Expression: Left eyes look down at the plush, attentive and gentle. Right a happy small smile.
+Objects: One plush elephant per panel, pale lavender fabric, seated form, clear broad ears and long trunk, small round black eyes, plain with no pattern, lettering or decorations. Smaller than the girl's head and easy to hold in two hands. The plush is the same size and appearance in both panels.
+Composition: Exactly two equal-width side-by-side panels, BEFORE left and AFTER right, each 400x450 within a final 800x450 canvas. Match the girl's standing scale and horizontal placement between panels, as in reference 1. Keep each complete figure, feet, face, reaching hand and elephant safely within its own panel. The app overlays a 31 CSS px double arrow at the central panel boundary around vertical midpoint: leave a clear gutter there with no face, hand, or elephant. No drawn divider or arrows. Variant v1a: compact, balanced squat with both knees close together; elephant faces nearly forward on the floor. Keep all meaningful action high enough to remain visible when scaled into a card.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Additional exclusions: no sitting on the floor, no spread knees or raised-knee front pose, no twisting, side-facing body, or lifted foot. Do not place the plush on a shelf. Do not depict bear, rabbit, cat, turtle, or doll plush. Plush must not be blue, white, yellow, red, green, or pink. No book, blocks, towel, cup, blanket, trash can, ball, hat, box, chair, socks, window, curtain, large floor, or large shadow. No cat animal except the tiny clothing emblem.
+```
+
+### 採用 v1b の生成プロンプト全文
+
+```text
+Use case: illustration-story. Generate second variant of Action Match 'Pick it up.' girl. References: 1 action-pick-up-boy-v1a is two-panel crouch-to-stand action and scale only, not boy's look; 2 action-take-off-girl-v3a is girl's rendering style; 3 girl-daywear-v1 is exact girl's appearance; 4 cat-mascot-v2-small is tiny chest emblem only. [STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: Same single girl in each panel, indoors in approved daytime outfit, barefoot.
+Action: LEFT: Girl crouches with knees together and soles flat, dress hem hanging over the fronts of her knees. She reaches one hand toward a small seated lavender elephant plush on the floor just in front of her feet; she has not lifted it. Her eyes look at the plush. RIGHT: she stands at the same horizontal position and holds the identical plush at chest height with both hands, facing forward and smiling.
+Expression: Left focused and gentle; right happy smile.
+Objects: A single plain pale lavender seated stuffed elephant, smaller than girl's head, long obvious trunk, broad ears, tiny round black eyes, no pattern, writing or decoration. Same size and form across both panels.
+Composition: Final 800x450, two side-by-side exactly equal 400x450 panels, before left and after right. Full figures and feet visible, corresponding placement/scale. Variant v1b differs slightly from v1a: girl crouches a little more upright, with closed knees; the elephant's head is turned slightly in three-quarter view to show its long trunk and near ear clearly. The app places a 31 CSS px double arrow over the panel boundary at vertical midpoint, so keep the boundary gutter completely clear of faces, hands and objects. No drawn divider or arrows.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Additional exclusions: no floor sitting, spread knees, body twist, sideways body, raised foot, shelf, table, bear/rabbit/cat/turtle/doll plush; no blue, white, yellow, red, green, or pink plush; no book, blocks, towel, cup, blanket, bin, ball, hat, box, chair, socks, window or curtain; no large floor or shadow. Only tiny cat face on girl's chest, no separate cat animal.
+```
+
+## 2026-10-11 — Action Match「Close it.」女の子版 v1a（採用、アプリには未組み込み）
+
+- **採用画像：** `private-prototypes/action-match/action-close-girl-v1a.png.webp`。800×450px、透過 lossless WebP。候補フォルダに置いたままで、アプリには未組み込み。
+- **合成の由来・透過：** `action-open-girl-v2a.png.webp` の左右400×450pxを、復号後の画素そのままで入れ替えた。v1a の制作に画像生成は使っていない。元画像は緑背景（#00FF00）を `scripts/chroma-key-green.py --edge-shrink 2` で透過した画像で、v1a はその透過画素を受け継ぐ。再保存時も透明部分を含め画素を保つため `exact=True` の lossless WebP を使用。復号後の両コマが元画像の対応コマと全画素一致し、四隅と中央の矢印領域は透明で、中央の境目に手や物は重ならないことを確認した。
+- **不採用：** `action-close-girl-v1b.png.webp`。現在の保存先 `private-prototypes/action-match/` に存在する。
+- **レビューでの決定：** v1b は右コマの口元だけを満足げな小さな笑顔に編集したが、v1a との顔の違いが小さく、編集する理由がないため不採用。コマを入れ替えただけの v1a を採用した。
+
+### 不採用 v1b の画像編集時に添付した参考画像
+
+1. `private-prototypes/action-match/action-close-girl-v1a.png.webp`：編集対象。右コマの顔以外を保つ基準。
+2. `private-prototypes/action-match/action-open-girl-v2a.png.webp`：採用済みの元画像と人物の参考。
+
+### 不採用 v1b の生成プロンプト全文
+
+```text
+Use case: precise-object-edit
+Asset type: Action Match two-panel children's illustration, 800×450 composition.
+Image 1 is the exact edit target: action-close-girl-v1a.png.webp. Image 2 is the adopted source/reference action-open-girl-v2a.png.webp.
+Edit ONLY the GIRL'S FACE in the RIGHT panel (the panel with the closed cream curtains). She has just finished closing the curtains. Give her a slightly more satisfied, peaceful small smile, with relaxed happy eyes and eyebrows. Her mouth is closed or only very slightly open; no big open-mouth laugh. Keep her identity, head outline, skin tone, hair, blue scrunchie and pose the same. Keep the facial features at the same positions so they can be composited into the original face.
+Everything outside the right-panel facial features MUST stay unchanged: the entire LEFT panel, the right-panel hair, body, pink dress, chest cat emblem, arm, hand on the central curtain seam, bare feet, white window frame, pale cream closed curtains, transparency, dimensions and alignment. Do not redraw or move the window, girl or curtains. No new objects, text, divider or arrow. No angry, troubled, crying or sad expression.
+Output a transparent image with the same two-panel layout, preserving the existing alpha. The edit is only a subtle facial-expression change; nothing else.
+```
+
+## 2026-10-11 — Action Match「Open it.」女の子版 v2a（採用、アプリには未組み込み）
+
+- **採用画像：** `private-prototypes/action-match/action-open-girl-v2a.png.webp`。800×450px、透過WebP。画像は非公開の候補フォルダに置いたままで、アプリには未組み込み。
+- **透過・寸法：** 緑背景（#00FF00）で生成し、`scripts/chroma-key-green.py --edge-shrink 2` で透過。絵を引き伸ばさず縦横比を保って800×450pxの透明キャンバスに配置し、WebP品質84で保存した。四隅のアルファ値はすべて0、画像内に透明部分と不透明部分がある。淡い背景に重ねた目視確認では目立つ緑の縁・半透明の白いもやはなく、アルファ値100超の可視画素で強い緑優勢のものは0だった。
+- **不採用：** `action-open-girl-v1a.png.webp`、`action-open-girl-v1b.png.webp`（女の子が窓の端に立ち、片側のカーテンを寄せる動きに見える構図）、`action-open-girl-v2b.png.webp`（別案）。**3枚とも現在の保存先 `private-prototypes/action-match/` に存在する。**
+- **レビューでの決定：** カーテンは白に近い淡いクリーム色、窓の外は物を描かない単色の淡い空。女の子は窓の中央の手前に立ち、左コマでは手を中央のあわせ目に添え、右コマではカーテンを中央から左右へ開く。窓の端に立つ旧構図だと片側だけに寄せる動きに見えるため描き直した。v2a は小さい表示でも開閉と手の位置の違いが分かるため採用した。
+
+### v1a・v1b・v2a・v2b の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-take-off-girl-v3a.png.webp`：タッチ、人物の大きさ、等幅2コマ構図の参考。顔と椅子は参考にしない。
+2. `private-prototypes/action-match/action-open-boy-v1b.png.webp`：「閉じる→開く」を2コマで見せる参考。男の子と箱は写さない。
+3. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔、髪、昼服の基準。
+4. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 不採用 v1a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One girl, shown twice in two successive panels, daytime indoors and barefoot. Image 1 is a reference ONLY for the picture-book art style, girl scale, and equal two-panel composition; do not copy its seated pose or stool. Image 2 is a reference ONLY for clear before/after visual storytelling and panel scale; do not copy the boy or toy box. Image 3 is the authoritative reference for the girl's face, high bun with blue scrunchie and plain pink short-sleeved dress. Image 4 is ONLY the tiny simplified cat-face emblem on the dress, never a separate cat.
+Action: Illustrate "Open it." LEFT BEFORE: one white-framed upright window is completely covered by TWO closed pale near-white cream curtain panels meeting at the middle with no visible sky. The girl stands beside the window, lightly pinching the edge of one curtain with one hand, about to slide it open. RIGHT AFTER: the SAME window and the SAME girl in the SAME positions and at the SAME sizes. The two curtain panels are gathered OPEN at the left and right sides, exposing a broad central area of very pale cream-blue solid-color sky. With one hand she holds an open curtain at its edge. The opening must be unmistakably wide, not a small slit.
+Expression: In left panel intent and gentle focus; in right panel a warm open-eyed smile.
+Objects: Exactly one simple white-framed window per panel and its two plain, almost-white pale-cream curtains with a few readable soft pleats. No wall. The closed left window shows curtain only; the open right window shows ONLY one flat pale cream-blue color for sky, lighter than the blue stool in Image 1. No outside scenery, cloud, tree, bird or building.
+Composition: Wide 16:9 image with exactly two equal-width 400×450-equivalent panels. In each panel place the upright window on viewer-left, girl standing immediately to its viewer-right, with little overlap. Window top just above the girl's bun; barefoot feet fully in frame. Her entire body, shoulders, waist, legs and face turn naturally about 30 degrees toward the window, with no twisted torso. Keep window, girl, hands and curtain clear of the x=400 center boundary. The app overlays red arrowheads at the center seam around mid-height, about 18×22 CSS px per arrowhead and about 31 CSS px overall. Draw no divider or arrow. Keep window and girl large enough that curtain closed versus open reads at small card size. Pure #00FF00 background outside the isolated window and girl, with no room or floor.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not add walls, floors, large shadows, clouds, trees, birds, buildings or any outdoor object. Do not add books, blocks, towels, cups, blankets, bins, balls, plush toys, hats, toy boxes, stools, chairs or socks. No green curtains or window frame. No twisted body, full profile, lifted foot, extra cat, extra person, text, symbols, divider or arrow.
+```
+
+### 不採用 v1b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One girl, shown twice in two successive panels, daytime indoors and barefoot. Image 1 is a reference ONLY for the picture-book art style, girl scale, and equal two-panel composition; do not copy its seated pose or stool. Image 2 is a reference ONLY for clear before/after visual storytelling and panel scale; do not copy the boy or toy box. Image 3 is the authoritative reference for the girl's face, high bun with blue scrunchie and plain pink short-sleeved dress. Image 4 is ONLY the tiny simplified cat-face emblem on the dress, never a separate cat.
+Action: Illustrate "Open it." LEFT BEFORE: one white-framed upright window is completely covered by TWO closed pale near-white cream curtain panels meeting at the middle with no visible sky. The girl stands beside the window, lightly pinching the edge of one curtain with one hand, about to slide it open. RIGHT AFTER: the SAME window and the SAME girl in the SAME positions and at the SAME sizes. The two curtain panels are gathered OPEN in more visibly folded, narrower stacks at the left and right sides, exposing a broad central area of very pale cream-blue solid-color sky. With one hand she holds an open curtain at its edge. The opening must be unmistakably wide, not a small slit.
+Expression: In left panel intent and gentle focus; in right panel a warm open-eyed smile.
+Objects: Exactly one simple white-framed window per panel and its two plain, almost-white pale-cream curtains with somewhat deeper, clearly separated but still simple pleats. No wall. The closed left window shows curtain only; the open right window shows ONLY one flat pale cream-blue color for sky, lighter than the blue stool in Image 1. No outside scenery, cloud, tree, bird or building.
+Composition: Wide 16:9 image with exactly two equal-width 400×450-equivalent panels. In each panel place the upright window on viewer-left, girl standing immediately to its viewer-right, with little overlap. Make this second candidate's window slightly narrower than the first candidate, but still broad enough to show a large opening. Its top is just above the girl's bun; barefoot feet fully in frame. Keep the girl relatively large within each panel. Her entire body, shoulders, waist, legs and face turn naturally about 30 degrees toward the window, with no twisted torso. Keep window, girl, hands and curtain clear of the x=400 center boundary. The app overlays red arrowheads at the center seam around mid-height, about 18×22 CSS px per arrowhead and about 31 CSS px overall. Draw no divider or arrow. Keep window and girl large enough that curtain closed versus open reads at small card size. Pure #00FF00 background outside the isolated window and girl, with no room or floor.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not add walls, floors, large shadows, clouds, trees, birds, buildings or any outdoor object. Do not add books, blocks, towels, cups, blankets, bins, balls, plush toys, hats, toy boxes, stools, chairs or socks. No green curtains or window frame. No twisted body, full profile, lifted foot, extra cat, extra person, text, symbols, divider or arrow.
+```
+
+### 採用 v2a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One girl, shown twice in two successive panels, daytime indoors and barefoot. Image 1 is a reference ONLY for picture-book art style, girl scale, and equal two-panel composition; do not copy its seated pose or stool. Image 2 is a reference ONLY for clear before/after storytelling and panel scale; do not copy the boy or toy box. Image 3 is the authoritative reference for the girl's face, high bun with blue scrunchie and plain pink short-sleeved dress. Image 4 is ONLY the tiny simplified cat-face emblem on the dress, never a separate cat.
+Action: Illustrate "Open it." LEFT BEFORE: TWO pale near-white cream curtains fully cover one upright white-framed window, meeting at a clear VERTICAL CENTRAL JOIN. The girl stands IN FRONT OF THE WINDOW near its middle, slightly forward and a little to the viewer-right of the central join so her face does NOT cover that join. Her one outstretched hand TOUCHES THE CENTRAL JOIN at about chest height with fingertips, about to pull the two curtain halves apart. Her other arm hangs naturally at her side. RIGHT AFTER: the SAME girl and SAME window at the SAME size and position. The two curtains are pulled APART FROM THEIR CENTRAL JOIN and gathered at opposite LEFT and RIGHT edges, revealing a BROAD central opening of uniform pale cream-blue sky. She holds the edge of the viewer-right open curtain with the same one hand and smiles. The difference must clearly be a move of the hand from center to side and curtains opening from middle to both sides; NOT a one-sided curtain slide.
+Expression: Left gentle intent and focus; right warm open-eyed smile.
+Objects: Exactly one simple white-framed window per panel and two plain, almost-white pale-cream curtain panels with a few soft pleats. No wall. The closed left window shows curtain only; the open right window shows ONLY flat pale cream-blue sky, lighter than the blue stool in Image 1. No outdoor object.
+Composition: Wide 16:9 image with EXACTLY TWO equal-width 400×450-equivalent panels. The girl is IN FRONT OF THE CENTRAL PART of each window, not standing at a window's outer edge or next to the window. The window rises just above the girl's bun. Position the girl's torso in the lower center-right area of the window while keeping the vertical central join (left panel) and central sky opening (right panel) visible to the viewer. Her face should be to the right of the central join, and her arm reaches inward to it; do not obscure the central join with her head or body. She turns naturally about 30 degrees toward the window, shoulders, waist, feet and face aligned, without twisted torso. Both bare feet fully inside frame. Match girl size, window size, and alignment across both panels. The app overlays red arrowheads on the center seam at mid-height, about 18×22 CSS px per arrowhead and 31 CSS px overall; keep face, hand, window and curtains away from that panel seam. No divider or arrow. Keep the curtain change obvious at small card size. Solid pure #00FF00 background outside the isolated window and girl; no room or floor.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not add walls, floors, large shadows, clouds, trees, birds, buildings or any outdoor object. Do not add books, blocks, towels, cups, blankets, bins, balls, plush toys, hats, toy boxes, stools, chairs or socks. No green curtains or window frame. No twisted body, full profile, lifted foot, extra cat, extra person, text, symbols, divider or arrow.
+```
+
+### 不採用 v2b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One girl, shown twice in two successive panels, daytime indoors and barefoot. Image 1 is a reference ONLY for picture-book art style, girl scale, and equal two-panel composition; do not copy its seated pose or stool. Image 2 is a reference ONLY for clear before/after storytelling and panel scale; do not copy the boy or toy box. Image 3 is the authoritative reference for the girl's face, high bun with blue scrunchie and plain pink short-sleeved dress. Image 4 is ONLY the tiny simplified cat-face emblem on the dress, never a separate cat.
+Action: Illustrate "Open it." LEFT BEFORE: TWO pale near-white cream curtains fully cover one upright white-framed window, meeting at a clear VERTICAL CENTRAL JOIN. The girl stands IN FRONT OF THE WINDOW near its middle, slightly forward and a little to the viewer-right of the central join so her face does NOT cover that join. Her one outstretched hand TOUCHES THE CENTRAL JOIN at about chest height with fingertips, about to pull the two curtain halves apart. Her other arm hangs naturally at her side. RIGHT AFTER: the SAME girl and SAME window at the SAME size and position. The two curtains are pulled APART FROM THEIR CENTRAL JOIN and gathered in visibly folded but narrow stacks at opposite LEFT and RIGHT edges, revealing a BROAD central opening of uniform pale cream-blue sky. She holds the edge of the viewer-right open curtain with the same one hand and smiles. The difference must clearly be a move of the hand from center to side and curtains opening from middle to both sides; NOT a one-sided curtain slide.
+Expression: Left gentle intent and focus; right warm open-eyed smile.
+Objects: Exactly one simple white-framed window per panel and two plain, almost-white pale-cream curtain panels with somewhat deeper, more visibly separated soft pleats. No wall. The closed left window shows curtain only; the open right window shows ONLY flat pale cream-blue sky, lighter than the blue stool in Image 1. No outdoor object.
+Composition: Wide 16:9 image with EXACTLY TWO equal-width 400×450-equivalent panels. The girl is IN FRONT OF THE CENTRAL PART of each window, not standing at a window's outer edge or next to the window. For this second candidate, make the window slightly narrower and its frame more prominent, while still rising just above the girl's bun. Position the girl's torso in the lower center-right area of the window while keeping the vertical central join (left panel) and central sky opening (right panel) visible to the viewer. Her face should be to the right of the central join, and her arm reaches inward to it; do not obscure the central join with her head or body. She turns naturally about 30 degrees toward the window, shoulders, waist, feet and face aligned, without twisted torso. Both bare feet fully inside frame. Match girl size, window size, and alignment across both panels. The app overlays red arrowheads on the center seam at mid-height, about 18×22 CSS px per arrowhead and 31 CSS px overall; keep face, hand, window and curtains away from that panel seam. No divider or arrow. Keep the curtain change obvious at small card size. Solid pure #00FF00 background outside the isolated window and girl; no room or floor.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not add walls, floors, large shadows, clouds, trees, birds, buildings or any outdoor object. Do not add books, blocks, towels, cups, blankets, bins, balls, plush toys, hats, toy boxes, stools, chairs or socks. No green curtains or window frame. No twisted body, full profile, lifted foot, extra cat, extra person, text, symbols, divider or arrow.
+```
+
+## 2026-10-11 — Action Match「Take it off.」女の子版 v3a（当時採用した白い靴下の原版）
+
+- **当時の採用画像：** `private-prototypes/action-match/action-take-off-girl-v3a.png.webp`。800×450px、透過 lossless WebP。白い靴下の原版として非公開の候補フォルダに保管。現在の公開画像は上記の色変更記録のとおり。
+- **透過と合成の由来：** 採用 v3a の左コマだけを新しく画像生成した。緑背景（#00FF00）の原画を `scripts/chroma-key-green.py --edge-shrink 2` で透過し、800×450pxに縮小した。右400×450pxは `action-take-off-girl-v2a.png.webp` の右コマを復号後の画素そのままで合成し、一致を確認した。その v2a の左400×450pxは `action-put-on-girl-v3a.png.webp` の右コマを画素そのままで使用していた。画素を再圧縮で変えないため lossless WebP で保存。四隅のアルファ値は0/0/0/0、中央の境目は透明。淡い背景と青い背景に重ねた目視確認で、目立つ緑の縁や半透明の白いもやはなかった。
+- **不採用：** `action-take-off-girl-v1a.png.webp`、`action-take-off-girl-v1b.png.webp`（床に座る正面向きの旧構図）、`action-take-off-girl-v2a.png.webp`、`action-take-off-girl-v2b.png.webp`（左コマが靴下をはいて座るだけで、これから脱ぐ動きがない）、`action-take-off-girl-v3b.png.webp`（つまむ手の位置が散らばる）。**5枚とも現在の保存先 `private-prototypes/action-match/` に存在する。** v2a は画像全体として不採用だが、右コマのみ採用画像の右半分に使用した。
+- **レビューでの決定：** `Put it on.` と同じ低い水色の丸椅子に座る。右コマでは、脱いだ白い靴下2つを足から離し、両手で胸の前に持つ。足の近くに持つと「はく」絵と取り違えるため。左コマは足元を見て、両手で手前の靴下のふちをつまみ、これから脱ぐ動きを示す。ただし靴下は両足にはいたままにし、途中まで脱いだ形にはしない。v3a は両手がふちに寄り、小さい表示でもつまんでいることが分かるため採用。v3b は手の位置が散らばるため不採用。
+
+### v1a・v1b の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-put-on-girl-v1a.png.webp`：旧版の床に座る構図、人物の大きさ、靴下の参考。
+2. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔・髪・昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 不採用 v1a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The SAME girl in Image 1, daytime indoors, wearing the approved plain pink short-sleeved dress with tiny cat-face emblem. Image 1 is the exact two-panel "Put it on." reference: its RIGHT panel shows the girl's seated posture, location, scale, hairstyle, dress, smile and white socks. Image 2 is the girl's authoritative face/hair/daywear reference. Image 3 is ONLY the reference for the tiny simplified cat emblem on her dress; do not add a separate cat.
+Action: Create a two-panel BEFORE/AFTER concept for "Take it off." In the LEFT panel show the girl sitting with both knees raised and BOTH PLAIN WHITE SOCKS WORN, exactly like Image 1's right panel. This generated LEFT panel is just positional guidance; it will be discarded and replaced in final compositing by the original reference image's right 400×450 pixels, unchanged. In the RIGHT panel AFTER, draw the SAME girl sitting in precisely the SAME place, size, leg position, front-facing torso and face angle as that socked reference. Both feet are now completely BARE, with ten visible toes and no socks on the ankles or feet. Her two bare feet are clearly separated from her hands. She holds the TWO removed plain WHITE socks together with both hands at UPPER CHEST height, in front of the upper pink dress, far above and well away from her feet. The sock cuffs and foot shapes are recognizable, not a white blob. A small cheerful smile. The visual contrast must read "socks moved from feet to hands" at small Action Match card size.
+Expression: Happy, relaxed, gentle open-eyed smile, matching Image 1's right-panel girl.
+Objects: Exactly the same two white plain unpatterned child socks; no stripes, logos, letters, colors or decorative details. In RIGHT panel both socks are in her hands at chest height, none on feet or near toes. No other objects.
+Composition: Wide 16:9 image with EXACTLY two equally wide 400×450-equivalent panels, full seated girl visible in each panel from blue scrunchie and high bun to bare/socked toes. Match the reference's RIGHT-panel girl's scale, seated silhouette, foot baseline and horizontal center inside each panel. Preserve generous empty space at the vertical panel boundary x=400 and its mid-height: the app overlays red triangle arrowheads there around 18×22 CSS px each (roughly 31 CSS px overall). No hands, feet, face or socks in that center arrow region. No drawn divider or arrow. Solid pure #00FF00 green background for subsequent chroma-key transparency. No floor or large shadow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw socks on either foot in the RIGHT panel, a half-worn sock, socks close to toes, a boy, a separate cat, book, blocks, towel, cup, blanket, trash bin, ball, stuffed animal, hat, box, green socks, large floor, large shadow, standing pose, twisted torso, profile body, divider, arrow, text or watermark.
+```
+
+### 不採用 v1b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One girl in two successive panels, daytime indoors. Image 1 is the exact "Put it on." girl reference: use its RIGHT 400×450 panel for the seated position, character scale, head/feet coordinates, hairstyle, face, pink dress and white socks. Image 2 reinforces the girl's approved high dark-brown bun with blue scrunchie, face and pink daywear. Image 3 supplies ONLY the tiny simplified black-white cat emblem on the dress; do not draw a separate cat.
+Action: Illustrate "Take it off." LEFT panel BEFORE: the girl is sitting front-facing with raised knees and BOTH WHITE SOCKS ON HER FEET like Image 1's right panel. The generated left panel will NOT be used in the final file: we will instead copy Image 1's right half into the final left half pixel-for-pixel. RIGHT panel AFTER: the SAME girl sits front-facing at precisely the same location, same scale and same knee/foot placement as Image 1's right panel. Both of her feet are now COMPLETELY BARE, with all toes clearly visible. Both white socks have been REMOVED; she holds the two separate plain white socks in front of her UPPER CHEST, near but BELOW her chin, their ankle openings at shoulder height and their toe shapes hanging visibly downward. Hold one sock in EACH hand, side by side, with a little gap between them so it is unmistakably TWO socks rather than one white lump. The socks are far from her bare feet and do not touch the dress's tiny cat emblem if possible. She smiles at the viewer. At small size the action must be clear: socks on both feet before, socks in both hands and bare feet after.
+Expression: Warm pleased smile, eyes open, natural and happy.
+Objects: Exactly two plain white child-size socks, unpatterned, no logo or colored heel, no other props. In the RIGHT panel neither foot has any sock on it, even partially.
+Composition: Horizontal 16:9, EXACTLY two equal panels, 400×450-equivalent each. Full seated girl within each panel, including high bun, blue scrunchie, both hands and both feet. Match Image 1's right-panel seated posture, figure size and foot baseline very closely in the generated RIGHT half. Make both feet and the two hand-held socks large and distinct. The app overlays red arrowheads around the central panel boundary x=400 at mid-height, about 18×22 CSS px each and about 31 CSS px overall, so keep that central region empty. No internal divider or arrows. Background pure solid #00FF00 green for chroma-key extraction, no visible floor or room.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw a sock near toes or on either foot of the RIGHT panel; do not draw a half-worn sock. Do not draw a boy, cat animal, book, blocks, towel, cup, blanket, trash bin, ball, stuffed animal, hat, box, green sock, floor, large shadow, standing pose, twisting, side-facing pose, divider, arrow, text or watermark.
+```
+
+### v2a・v2b の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-put-on-girl-v3a.png.webp`：丸椅子、座り方、人物の大きさ、白い靴下の基準。v2a・v2b の左コマはこの画像の右半分を画素そのままで使用。
+2. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔・髪・昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 不採用 v2a の生成プロンプト全文（v3a 右コマの元画像）
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The SAME GIRL in two equal Action Match panels, daytime indoors, in the approved pink short-sleeved dress with a tiny simplified cat-face chest emblem. Image 1 is the edit target and exact source for the left panel: action-put-on-girl-v3a. Its RIGHT half shows the required girl seated on a low light-sky-blue round backless stool, wearing both plain white socks. Image 2 is the authoritative girl identity and dress. Image 3 guides ONLY the tiny simplified chest cat mark; draw no separate cat.
+Action: Depict "Take it off." LEFT BEFORE: retain the sock-wearing seated girl from Image 1's RIGHT half. This left panel is a registration reference only and will be replaced by exact source pixels in final assembly. RIGHT AFTER: draw the same girl on the same low pale-blue round stool at the same scale, same location within her panel, same seated posture and approximate 30-degree turn toward image-right. Align shoulders, waist, knees, feet and face in that natural direction without a twisted body. Both feet rest flat on the ground and are COMPLETELY BARE from toes to ankles. Show individual bare toes on BOTH feet. No sock remains on either foot. She holds TWO distinct, plain WHITE CHILDREN'S SOCKS at MID-CHEST HEIGHT, well away from her feet: one sock in EACH hand, gently held by its cuff. Both socks show recognizable cuff, heel and toe shapes, hanging down separately, so small viewers see two removed socks now in her hands. Keep the pink chest cat mark visible between the hands. Her head is uncovered; she smiles warmly.
+Expression: Gentle happy smile in both moments; right face turned with the body, approximately 30 degrees toward image-right, not full profile.
+Objects: Exactly the same pale-blue round stool in each panel and only the two plain white socks. No patterns, stripes, writing or colored trim on socks. No floor, background furniture or other objects. At most a tiny contact shadow under stool feet.
+Composition: One 16:9 canvas with two equal 400x450-equivalent panels. The girl, stool and feet occupy similar size and position in both halves. Show full high bun, stool and both feet without cropping. Keep heads, hands, socks and feet clear of the x=400 center boundary. The app overlays a red double arrow at the center seam around mid-height, about 18x22 CSS px per arrowhead and 31 CSS px overall; leave that area empty. Do not draw the divider or arrows. Use a single pure #00FF00 green background for later alpha extraction.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not leave a sock on either foot in the RIGHT panel. Do not place either sock near toes or legs. Do not draw the girl on the ground or with raised knees, floating feet, a twisted body, an extra person or cat, books, blocks, towel, cup, blanket, bin, ball, stuffed animal, hat, box, extra furniture, divider, arrows, text or watermark.
+```
+
+### 不採用 v2b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The SAME GIRL in two equal Action Match panels, daytime indoors, in the approved pink short-sleeved dress with a tiny simplified cat-face chest emblem. Image 1 is the edit target and exact source for the left panel: action-put-on-girl-v3a. Its RIGHT half shows the required girl seated on a low light-sky-blue round backless stool, wearing both plain white socks. Image 2 is the authoritative girl identity and dress. Image 3 guides ONLY the tiny simplified chest cat mark; draw no separate cat.
+Action: Depict "Take it off." LEFT BEFORE: retain the sock-wearing seated girl from Image 1's RIGHT half. This left panel is a registration reference only and will be replaced by exact source pixels in final assembly. RIGHT AFTER: draw the same girl on the same low pale-blue round stool at the same scale, same location within her panel, same seated posture and approximate 30-degree turn toward image-right. Align shoulders, waist, knees, feet and face in that natural direction without a twisted body. Both feet rest flat on the ground and are COMPLETELY BARE from toes to ankles. Show individual bare toes on BOTH feet. No sock remains on either foot. She holds TWO distinct, plain WHITE CHILDREN'S SOCKS at MID-CHEST HEIGHT, well away from her feet: one sock in EACH hand, gently held by its cuff, with her hands a little closer together in front of her chest than in the other candidate. The sock in the viewer-left hand hangs slightly HIGHER than the sock in the viewer-right hand. Both socks remain fully separate and show recognizable cuff, heel and toe shapes, so small viewers see two removed socks now in her hands. Keep the pink chest cat mark visible between the hands. Her head is uncovered; she smiles warmly.
+Expression: Gentle happy smile in both moments; right face turned with the body, approximately 30 degrees toward image-right, not full profile.
+Objects: Exactly the same pale-blue round stool in each panel and only the two plain white socks. No patterns, stripes, writing or colored trim on socks. No floor, background furniture or other objects. At most a tiny contact shadow under stool feet.
+Composition: One 16:9 canvas with two equal 400x450-equivalent panels. The girl, stool and feet occupy similar size and position in both halves. Show full high bun, stool and both feet without cropping. Keep heads, hands, socks and feet clear of the x=400 center boundary. The app overlays a red double arrow at the center seam around mid-height, about 18x22 CSS px per arrowhead and 31 CSS px overall; leave that area empty. Do not draw the divider or arrows. Use a single pure #00FF00 green background for later alpha extraction.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not leave a sock on either foot in the RIGHT panel. Do not place either sock near toes or legs. Do not draw the girl on the ground or with raised knees, floating feet, a twisted body, an extra person or cat, books, blocks, towel, cup, blanket, bin, ball, stuffed animal, hat, box, extra furniture, divider, arrows, text or watermark.
+```
+
+### v3a・v3b の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-put-on-girl-v3a.png.webp`：右半分の構図、丸椅子、女の子と靴下の見た目の基準。v3a・v3b の左コマを新しく描く際に添付した。
+2. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔・髪・昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 採用 v3a の生成プロンプト全文（左コマを描き直し）
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same GIRL seated indoors in her approved pink short-sleeved daytime dress with the tiny cat-face emblem, high dark-brown bun and blue scrunchie. Image 1 (action-put-on-girl-v3a) is the base and exact composition reference: use its RIGHT half showing the girl seated on the low light-sky-blue round backless stool with BOTH PLAIN WHITE SOCKS WORN. Image 2 is her authoritative identity and outfit. Image 3 guides only the tiny cat-face emblem; do not add a separate cat.
+Action: Create a two-panel Action Match illustration of "Take it off." In the LEFT BEFORE panel, keep the same girl's stool, size, location within her half, dress, hair, full-body 30-degree angle toward picture-right and BOTH fully worn white socks as in Image 1's right half. Change her action: she bends forward slightly from the hips WITHOUT TWISTING her torso, tips only her head down and LOOKS DIRECTLY AT THE SOCK ON HER NEARER FOOT (viewer-left foot). BOTH hands reach down to that same nearer ankle. Her thumb and index finger on each hand clearly PINCH THE UPPER RIM / CUFF of the sock at the ankle, as though about to pull it off. Show the actual fingers touching the sock cuff, not floating above it. The white sock remains COMPLETELY ON the foot, covering every toe, heel and ankle, not slid down even a little. The other far foot still wears its complete matching white sock. BOTH sock-covered feet remain FLAT ON THE GROUND. Calm concentrated expression with a small CLOSED-MOUTH smile, not a big open-mouth laugh. No loose sock in the left panel.
+RIGHT AFTER panel is only a visual registration guide; in final assembly its pixels will be replaced with action-take-off-girl-v2a's exact right panel, showing bare feet and two socks in her hands. Do not let left-panel art cross the x=400 boundary.
+Objects: Only the low light-blue round stool and two plain white socks worn on the feet in LEFT panel. The socks are solid white, no pattern, stripes, letters or colored cuffs. No room, furniture, large floor or objects from other cards.
+Composition: One 16:9 canvas with two equal 400x450-equivalent halves. The app overlays a red double arrow on the center boundary at mid-height, about 18x22 CSS px per arrowhead and 31 CSS px overall. Keep face, hands, sock cuffs, stool and feet fully inside each half and away from the center arrow area. Show both hands at the nearer ankle visibly, while the girl's face stays large enough to see her downward gaze. No divider or arrows drawn in the image. Pure #00FF00 chroma-green background.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not expose bare toes or skin below either sock cuff in the LEFT panel. Do not remove, roll down, or hold a loose sock. Do not place hands away from the near sock cuff. No floor sitting, spread legs, raised knees, twisting, sideways profile, lifted foot, extra people, separate cat, books, blocks, towel, cup, blanket, bin, ball, stuffed animal, hat, box, divider, arrow, text or watermark.
+```
+
+### 不採用 v3b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same GIRL seated indoors in her approved pink short-sleeved daytime dress with the tiny cat-face emblem, high dark-brown bun and blue scrunchie. Image 1 (action-put-on-girl-v3a) is the base and exact composition reference: use its RIGHT half showing the girl seated on the low light-sky-blue round backless stool with BOTH PLAIN WHITE SOCKS WORN. Image 2 is her authoritative identity and outfit. Image 3 guides only the tiny cat-face emblem; do not add a separate cat.
+Action: Create a two-panel Action Match illustration of "Take it off." In the LEFT BEFORE panel, keep the same girl's stool, size, location within her half, dress, hair, full-body 30-degree angle toward picture-right and BOTH fully worn white socks as in Image 1's right half. Change her action: she bends forward slightly from the hips WITHOUT TWISTING her torso, tips only her head down and LOOKS DIRECTLY AT THE SOCK ON HER NEARER FOOT (viewer-left foot). BOTH hands reach down to that same nearer ankle. Her thumb and index finger on each hand clearly PINCH THE UPPER RIM / CUFF of the sock at the ankle, as though about to pull it off. For this second candidate, place one hand on the front edge of that cuff and the other hand on the outer side edge, with a small visible separation between the two sets of fingers; both still grip the SAME nearer sock cuff. Show the actual fingers touching the sock cuff, not floating above it. The white sock remains COMPLETELY ON the foot, covering every toe, heel and ankle, not slid down even a little. The other far foot still wears its complete matching white sock. BOTH sock-covered feet remain FLAT ON THE GROUND. Calm concentrated expression with a small CLOSED-MOUTH smile, not a big open-mouth laugh. No loose sock in the left panel.
+RIGHT AFTER panel is only a visual registration guide; in final assembly its pixels will be replaced with action-take-off-girl-v2a's exact right panel, showing bare feet and two socks in her hands. Do not let left-panel art cross the x=400 boundary.
+Objects: Only the low light-blue round stool and two plain white socks worn on the feet in LEFT panel. The socks are solid white, no pattern, stripes, letters or colored cuffs. No room, furniture, large floor or objects from other cards.
+Composition: One 16:9 canvas with two equal 400x450-equivalent halves. The app overlays a red double arrow on the center boundary at mid-height, about 18x22 CSS px per arrowhead and 31 CSS px overall. Keep face, hands, sock cuffs, stool and feet fully inside each half and away from the center arrow area. Show both hands at the nearer ankle visibly, while the girl's face stays large enough to see her downward gaze. No divider or arrows drawn in the image. Pure #00FF00 chroma-green background.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not expose bare toes or skin below either sock cuff in the LEFT panel. Do not remove, roll down, or hold a loose sock. Do not place hands away from the near sock cuff. No floor sitting, spread legs, raised knees, twisting, sideways profile, lifted foot, extra people, separate cat, books, blocks, towel, cup, blanket, bin, ball, stuffed animal, hat, box, divider, arrow, text or watermark.
+```
+
+## 2026-10-11 — Action Match「Put it on.」女の子版 v3a（当時採用した白い靴下の原版）
+
+- **当時の採用画像：** `private-prototypes/action-match/action-put-on-girl-v3a.png.webp`。800×450px、透過 lossless WebP。白い靴下の原版として非公開の候補フォルダに保管。現在の公開画像は上記の色変更記録のとおり。
+- **透過と合成：** 左コマは `action-put-on-girl-v2b.png.webp` を参照して緑背景（#00FF00）で描き直し、`scripts/chroma-key-green.py --edge-shrink 2` で透過、800×450pxに縮小した。右コマは v2b の右400×450pxを復号後の画素そのままで合成し、lossless WebPで保存した。右コマの全画素一致、四隅のアルファ0、中央の境目の透過を確認。淡い背景に重ねた目視確認で目立つ緑の縁や半透明の白いもやはなかった。
+- **不採用（いずれも現在の保存先 `private-prototypes/action-match/` に存在）：** `action-put-on-girl-v1a.png.webp`・`action-put-on-girl-v1b.png.webp`（床に座り足を開く正面向きの旧構図）、`action-put-on-girl-v2a.png.webp`・`action-put-on-girl-v2b.png.webp`（左コマの奥の足が裸足）、`action-put-on-girl-v3b.png.webp`（奥の靴下の足首が手前の脚に少し隠れる）。
+- **レビューでの決定：** 低い水色の丸椅子に座り、体を画面の右へ約30度向ける。靴下は帽子の黄、箱の茶、ボールの赤と区別できる白い無地。左コマは「奥の足に靴下をはき、手前の足は裸足、手にもう片方の靴下」、右コマは両足に靴下をはいた姿にして対応を明確にする。v3a は奥の靴下の足首まで見えるため採用。v3b は足首が少し隠れ、小さい表示では「はいている」ことが伝わりにくいため不採用。
+
+### v2a・v2b の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-pick-up-boy-v1a.png.webp`：画風、人物の大きさ、2コマの構図のみ。
+2. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔、髪、服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+4. `private-prototypes/action-match/action-put-on-girl-v1a.png.webp`：白い靴下の形と色のみ。床に座る姿は写さない。
+
+### 不採用 v2a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same girl twice in a two-panel Action Match image, daytime indoors, approved pink short-sleeved dress with little simplified cat emblem, high dark-brown bun with blue scrunchie. Image 1 gives ONLY the two-panel layout, style and character scale, not the boy's identity or ball. Image 2 gives the girl's authoritative face, hair and dress. Image 3 gives ONLY the little chest emblem, not an actual cat. Image 4 gives ONLY the white sock shape and shading, NOT its floor-sitting posture.
+Action: She sits upright on a SIMPLE SHORT LIGHT-BLUE ROUND BACKLESS STOOL. The seat is UNDER her upper thighs, not around her hips, and supports her weight. Three short stool legs are visible. Her body and face both turn only 30 degrees toward picture right, with shoulders, pelvis, knees and head facing the same direction. Her face remains mostly visible. Dress hem covers thighs and hangs over stool seat. LOWER LEGS are visible. BOTH FEET STAY ON THE GROUND THROUGHOUT, at exactly the same ground baseline as the stool legs. Her near foot is gently slid forward on its HEEL to create a little space between legs, but its heel is firmly planted, with a SMALL CONTACT SHADOW directly UNDER THE HEEL. It is not lifted.
+LEFT before putting on socks: both feet completely barefoot. She holds ONE loose plain white sock with both hands above and slightly BEHIND the extended foot, clearly separate from toes and ankle. White sock is not on either foot. The sock opening points toward the extended toes, but there is a visible green gap before contact. Her eyes look down at it, calm concentration.
+RIGHT after: exact same girl and stool, same scale, same posture, same feet touching ground. ONE plain white sock covers EACH foot entirely from toes to ankle. Hands resting on knees; cheerful smile.
+Expression: left attentive, right delighted.
+Objects: only the light sky-blue round backless stool and plain white child socks. No patterns, lettering, colored stripes or logos. Shadows only tiny contact shadows under stool feet and the girl's heels.
+Composition: horizontal 16:9 image, two equally wide 400×450-equivalent panels. The girl and stool centered in each half and fully inside frame; no cropped bun, hands, stool, heels or toes. Her face size and body scale match Image 1. BOTH FEET are DOWN at the same ground baseline in EACH PANEL, rather than hovering; the extended foot is only farther forward horizontally, not higher. Keep important hands, sock, bare toes and stool away from the center panel seam x=400. The app places red triangle arrowheads over the seam at mid-height, roughly 18×22 CSS px each and 31 CSS px overall. Leave central seam region empty. No in-image divider or arrows. Plain solid #00FF00 chroma green background, no room or drawn floor.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not lift the girl's foot into the air or put a white sock on a foot in LEFT panel. Do not show her sitting on ground with splayed legs or raised knees. No green stool, backrest, twisted torso, profile face, one-legged standing pose, big floor or shadow, boy, books, blocks, towel, cup, blanket, bin, ball, stuffed animal, hat, box, furniture other than stool, separate cat, extra people, divider, arrows, text or watermark.
+```
+
+### 不採用 v2b の生成プロンプト全文（v3a 左コマの元画像）
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The SAME girl in two panels, daytime indoors, approved pink short-sleeved dress with tiny cat-face chest emblem, high dark-brown hair bun tied with blue scrunchie. Image 1 is a reference ONLY for Action Match two-panel layout, child scale, soft illustrated style; do not use the boy's blue clothes, face or ball. Image 2 is the girl's exact face, hair, dress and body reference. Image 3 guides ONLY the tiny cat emblem, not a separate pet. Image 4 guides ONLY the plain white child sock shape and shading; do not use its floor-sitting body pose.
+Action: Two matching moments on one simple short BACKLESS LIGHT-BLUE ROUND STOOL per panel. The stool has a round seat and three short visible legs. Girl sits on top of the seat, not on floor; straight comfortable back. Her entire head, shoulders, hips, knees and feet coherently face about 30 degrees toward image RIGHT while her face is still mostly visible. The pink dress hem drapes over the seat, hides upper thighs, and leaves shins and feet visible. BOTH FEET HAVE THEIR HEELS DOWN, resting on an INVISIBLE GROUND LINE at the SAME VERTICAL HEIGHT AS THE STOOL LEGS. The nearer leg is simply slid forward about a child's foot length, but her knee stays low and the heel/sole rests at the same ground level; no raised or hovering foot.
+LEFT BEFORE: Both feet are completely bare with visible toes. The girl holds ONE plain white sock with both hands at the height of her forward shin, a little above and just behind her forward toes, leaving a distinct green gap between the sock and the entire bare foot; sock is not worn or touching the toes. Her gaze points toward her hands and foot. RIGHT AFTER: the same stool, figure scale, body orientation, seated position and ground-level feet; both feet are entirely covered in matching plain WHITE socks through the ankles. Her hands rest on her knees; a pleased smile and eyes toward viewer. In both panels, her feet and the stool legs all stand on the SAME HORIZONTAL BASELINE near the lower part of the illustration.
+Expression: Left focused gently, right cheerful.
+Objects: only the small round light-blue backless stool and the plain white socks. No patterns, stripes, writing, logo or colored cuffs. Minuscule contact shadow below feet/stool legs may show ground contact, no floor.
+Composition: One horizontal 16:9 image, precisely two equal 400×450-equivalent panels. Full girl and stool visible, centered within each half. Make the two foot states large enough to read when the whole image is a small Action Match card. Keep girl, hands, stool and sock well away from center seam x=400, where the app overlays red arrowheads around 18×22 CSS px each (about 31 CSS px overall). Empty chroma-green gap at seam; no drawn divider or arrows. Background solid pure #00FF00 green for later alpha extraction.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Never draw a foot raised in the air. Never draw a sock touching or covering a foot in LEFT panel. No floor-sitting, splayed knees, stool backrest, green stool, green socks, twisted torso, profile face, one-legged standing, large floor or shadow, boy, books, blocks, towel, cup, blanket, bin, ball, stuffed animal, hat, box, extra furniture, separate cat or person, divider, arrows, text or watermark.
+```
+
+### v3a・v3b の生成時に添付した参考画像
+
+1. `private-prototypes/action-match/action-put-on-girl-v2b.png.webp`：構図の土台。右コマは最終合成でこの画像の画素に置換。
+2. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔、髪、昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 採用 v3a の生成プロンプト全文（左コマを描き直し）
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Precise edit of reference image action-put-on-girl-v2b. It is a two-panel Action Match illustration. Keep the entire RIGHT panel unchanged. In the LEFT panel, preserve the same girl, pose, expression, hands, held white sock, pink dress, hair, blue scrunchie, pale blue round stool, lighting, scale, placement, and perspective. Change only ONE FOOT: the FARTHER foot, the foot on the VIEWER'S RIGHT in the left panel, beyond the nearer leg and stool, now already wears a plain WHITE sock from toes through ankle. Match the white sock shape and white color of the right panel. Show its full white toe and white ankle cuff clearly. The NEARER foot on the VIEWER'S LEFT stays completely BARE with five visible toes. The other white sock stays in both hands near but NOT touching that bare foot; show a small clear air gap between held sock and bare toes. This depicts one sock already on and the second sock about to be put on. Keep both feet grounded and in the same positions. Do not hide the far foot. Make the far white sock, near bare foot, and hand-held white sock easy to distinguish at small display size. The character's body must not twist.
+
+Reference attachment roles: action-put-on-girl-v2b is the exact composition and base; girl-daywear-v1 is identity and outfit; cat-mascot-v2-small is the tiny simplified chest mark only, not an extra cat. Keep the right panel as a registration reference; it will be replaced with the source pixels in the final composite. The panel border is at x=400 in the intended 800x450 output. Leave a clear empty gutter around that center boundary.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+Do not put a sock on the near viewer-left foot. Do not move or remove the held sock. Do not add any other objects. Do not add a divider or arrow.
+```
+
+### 不採用 v3b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Precise edit of reference image action-put-on-girl-v2b. It is a two-panel Action Match illustration. Keep the entire RIGHT panel unchanged. In the LEFT panel, preserve the same girl, pose, expression, hands, held white sock, pink dress, hair, blue scrunchie, pale blue round stool, lighting, scale, placement, and perspective. Make a second, subtly different candidate from the first version. Change only ONE FOOT: the FARTHER foot, the foot on the VIEWER'S RIGHT in the left panel, beyond the nearer leg and stool, now already wears a plain WHITE sock from toes through ankle. Match the white sock shape and white color of the right panel. Show the far foot's white toe prominently, with its white ankle cuff slightly more tucked behind the near leg than in the other candidate, but still clearly identifiable as a worn sock. The NEARER foot on the VIEWER'S LEFT stays completely BARE with five visible toes. The other white sock stays in both hands near but NOT touching that bare foot; show a small clear air gap between held sock and bare toes. This depicts one sock already on and the second sock about to be put on. Keep both feet grounded and in the same positions. Do not hide the far foot. Make the far white sock, near bare foot, and hand-held white sock easy to distinguish at small display size. The character's body must not twist.
+
+Reference attachment roles: action-put-on-girl-v2b is the exact composition and base; girl-daywear-v1 is identity and outfit; cat-mascot-v2-small is the tiny simplified chest mark only, not an extra cat. Keep the right panel as a registration reference; it will be replaced with the source pixels in the final composite. The panel border is at x=400 in the intended 800x450 output. Leave a clear empty gutter around that center boundary.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+Do not put a sock on the near viewer-left foot. Do not move or remove the held sock. Do not add any other objects. Do not add a divider or arrow.
+```
+
+## 2026-10-11 — Action Match「Put it on.」女の子版 v1a（当時採用、後に不採用）
+
+- **当時の採用画像（後に不採用）：** `private-prototypes/action-match/action-put-on-girl-v1a.png.webp`。800×450px、透過 WebP（quality 84）。緑背景（#00FF00）の生成原画を `scripts/chroma-key-green.py --edge-shrink 2` で透過し、縦横比を保って800×450pxに縮小した。透過検査は PASS（四隅のアルファ値 0/0/0/0）。淡い背景と青い背景に重ねても、目立つ緑の縁や白いもやは見つからず、中央のアプリ側の矢印が重なる部分は透過している。**後に不採用とした理由：床に座って足を開く正面向きの構図は、子ども向けの絵として避けたいため。**
+- **不採用：** `action-put-on-girl-v1b.png.webp`（現在の保存先 `private-prototypes/action-match/` に存在する）。
+- **レビューでの決定：** 立ったまま靴下をはくと片足立ちで体がねじれやすいため、座って靴下を足に近づける姿にした。靴下は帽子の黄色、箱の茶色、ボールの赤と区別できる白い無地にした。左コマで両足とも裸足と分かる v1a を採用した。v1b は靴下がワンピースの猫と近く、白い塊が目立ちにくいため採用しない。
+
+### 両案に添付した参考画像
+
+1. `private-prototypes/action-match/action-pick-up-boy-v1a.png.webp`：絵のタッチ、人物の大きさ、等幅2コマの構図の参考。男の子の顔・服は写さない。
+2. `docs/characters/girl-daywear-v1.png.webp`：女の子の顔、髪（高いお団子と青いシュシュ）、昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：胸の小さな猫の顔の基準。
+
+### 採用画像 v1a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same GIRL appears once in each of two equal panels, daytime indoors. Use Image 1 only for the Action Match two-panel composition, soft colorful art style, character scale and amount of background detail; it is a BOY and must NOT influence her face, hairstyle or clothing. Image 2 is the authoritative reference for this girl's face, dark-brown hair in a HIGH BUN with a BLUE SCRUNCHIE, pink short-sleeved dress, body proportions and bare feet. Image 3 is the identity reference only for the tiny simplified cat-face mark on the dress; draw no separate cat.
+Action: BEFORE and AFTER putting on plain white socks. LEFT panel BEFORE: full-body girl sitting on the ground facing the viewer, both knees bent and raised in a comfortable stable sitting posture. BOTH feet are still BARE, with all toes visible. With both hands she holds ONE loose white sock by its opening, near but NOT ON the toes of one foot; leave a clearly visible small gap between sock and bare toes. Her gaze is down toward the sock and foot. RIGHT panel AFTER: same girl sitting at the SAME horizontal position and scale, with the SAME body and leg arrangement, facing viewer; she now wears one plain WHITE SOCK on EACH foot. Both sock-covered feet are clearly visible, white fabric from toes through ankles. Hands rest lightly on knees, not holding any sock. She looks up and smiles.
+Expression: LEFT calm concentration, eyes looking at sock/foot; RIGHT pleased open-eyed gentle smile.
+Objects: Only the pair of plain white children's socks, no patterns, stripes, logos, colored cuffs, writing or decorations. In the LEFT panel one sock is held in her hands, the other may be beside her but never on either foot. In the RIGHT panel both socks are worn, none loose. Do not draw a floor, furniture or other objects; a tiny ground shadow directly beneath her is acceptable.
+Composition: EXACTLY two equal left-to-right 400×450-equivalent panels in one 16:9 image. Same girl's identity, high bun, blue scrunchie, dress, seated position and size across both panels. Show her entire bun, knees, hands, feet and socks without cropping; the feet should be large and clear enough for a small game card. Keep the girl and socks inside each panel and well away from x=400 center seam. The app overlays red arrowheads centered on that seam at mid-height, about 18×22 CSS px each (overall Action Match center triangle about 31 CSS px); keep the entire center arrow area empty. No divider or in-image arrows. Solid pure #00FF00 chroma-green background to remove later.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw a boy, a separate cat, books, blocks, towel, cup, blanket, trash bin, ball, stuffed animal, hat, toy box, shelf, green socks, large floor or shadow, standing pose, lifted standing leg, twisted torso, profile-facing pose, divider, arrow, text or watermark.
+```
+
+### 不採用画像 v1b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+GIRL: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, dark brown hair in a high bun tied with a blue scrunchie. Default outfit: pink collared pajamas with a white star pattern; barefoot indoors. Approved daytime outfit: plain pink short-sleeved dress with a tiny simplified face of the usual cat on the chest; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same GIRL appears in both panels, daytime indoors, in her approved plain pink short-sleeved dress with tiny simplified cat-face emblem. She has DARK BROWN HAIR in a HIGH BUN tied with a clearly BLUE SCRUNCHIE. Image 1 is only a reference for the established Action Match 2-panel proportions, illustration style and figure scale; do not copy the boy's identity, blue shirt or ball. Image 2 is the authoritative girl identity, pink dress, hair, face and proportions. Image 3 is only the simplified shirt-cat emblem reference; no live cat.
+Action: Two moments for "Put it on." LEFT BEFORE: girl sits facing viewer with both knees raised, one bare foot slightly forward and clearly visible. She holds one PLAIN WHITE SOCK open with both hands directly in front of that foot, ready to pull it over her toes, but the white sock is separated from her toes by visible empty green space; BOTH feet are BARE. Her eyes look at the toes and sock, expression quietly determined. RIGHT AFTER: the very same girl remains seated in the same spot, same front-facing torso, same size and leg position. Now both feet wear the matching solid-white socks all the way over the toes and up to the ankles. Hands relax on her bent knees. She lifts her gaze and smiles happily. The primary readable difference at small size is white socks in hands versus white socks on both feet.
+Expression: attentive and gently focused on left, cheerful and satisfied on right.
+Objects: Two white child-size socks total in each story moment. No colored stripes, logos, lace, letters or patterns; subtle grey contour lines are allowed to make the white socks readable. On the left, one sock is opened between the two hands, and if a second loose sock is drawn, keep it unobtrusive and away from the feet; neither sock touches or covers a foot. On the right, there are NO loose socks because one is on each foot. No other objects, only a tiny close shadow if needed to ground the seated figure.
+Composition: Wide 16:9 before/after image split into EXACTLY two equal 400×450-equivalent panels, no drawn divider. Full body from high bun through sock/bare toes visible, not cropped. Keep her face about as large as the boy's face in reference Image 1, with the girl centered within each half and the hands and feet large enough to recognize at small card size. Her body and socks stay clear of the vertical center boundary x=400. The app adds red arrowheads around that boundary at mid-height, approximately 18×22 CSS px per arrowhead, about 31 CSS px overall; leave that region pure empty green. Background solid pure #00FF00 chroma green for alpha extraction. Do not draw arrow or line.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw a boy, separate cat, books, blocks, towels, cups, blankets, trash bin, ball, stuffed animal, hat, box, green socks, standing pose, raised standing leg, profile body, twisted torso, furniture, room, large floor, large shadow, divider, arrow, text or watermark.
+```
+
+
+## 2026-10-11 — Action Match「Pick it up.」男の子版（採用、アプリには未組み込み）
+
+- **採用画像：** `private-prototypes/action-match/action-pick-up-boy-v1a.png.webp`。800×450px、透過 WebP。生成原画の緑背景（#00FF00）を `scripts/chroma-key-green.py --edge-shrink 2` で透過し、縦横比を保って800×450pxに縮小して WebP（quality 84）で保存した。透過検査は PASS（四隅のアルファ値 0/0/0/0）。緑が強く残る画素は検出されず、中央のアプリ側の矢印が重なる部分も透過している。
+- **不採用：** `action-pick-up-boy-v1b.png.webp`（現在の保存先 `private-prototypes/action-match/` に存在する）。
+- **レビューでの決定：** v1a は赤いボールが足の前の床に小さく置かれ、まだ床にあると分かる。右コマは `Take it off.` の右コマと同じ、正面を向いて物を胸の前に両手で持つ構図。v1b はボールが大きく、膝のあいだに入り込んで、床にあるのか手のそばなのか分かりにくいため不採用とした。
+
+### 採用画像 v1a・不採用画像 v1b に添付した参考画像
+
+1. `private-prototypes/action-match/action-take-off-boy-v1b.png.webp`：絵のタッチ、人物の大きさ、2コマの構図と右コマの立ち姿の参考。
+2. `docs/characters/boy-daywear-v2.png.webp`：男の子の顔、髪、昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：Tシャツの胸の小さな猫の顔の基準。
+
+### 採用画像 v1a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same boy appears once in each panel, daytime indoors, wearing his approved blue short-sleeved T-shirt with the tiny simplified cat-face chest emblem and navy knee-length shorts, barefoot. Image 1 is a reference for the Action Match two-panel layout, art style, boy's scale and the RIGHT-panel front-facing pose of holding an object at chest height; do not copy the yellow hat. Image 2 is the authoritative face, short brown hair, daytime outfit and body proportions. Image 3 is only the identity reference for the tiny simplified shirt emblem; draw no separate cat.
+Action: Make an EXACTLY TWO PANEL before/after illustration for "Pick it up." LEFT panel BEFORE: the boy is front-facing and squats with both feet flat on the floor, knees bent and torso naturally lowered, looking DOWN at one red ball on the floor a little in FRONT OF his bare feet. He reaches ONE hand toward the ball, fingers almost touching it; the ball is still resting on the floor, not in his hand and not beneath his foot. RIGHT panel AFTER: same boy, same horizontal position and adult-view camera angle, now standing upright, facing forward, holding the very same red ball with BOTH hands at mid-chest height, smiling warmly. The standing boy's scale matches Image 1's right panel. The left boy is shorter in the frame ONLY because he is squatting, not because his body has been scaled down. Maintain the same foot baseline and body identity across panels. Make the ball's change from ground to hands unmistakeable at small card size.
+Expression: Left focused, looking at the ball; right cheerful smile looking at the viewer.
+Objects: Exactly ONE plain solid-red rubber ball per panel, round, no lines, patterns, letters or gloss marks that resemble a logo. Its diameter is clearly smaller than the boy's head and can fit naturally between his two hands. Only a very small subtle shadow immediately beneath the ball in the LEFT panel; no drawn floor or large cast shadow.
+Composition: One wide 16:9 image of two equally wide 400×450-equivalent panels, LEFT before and RIGHT after. Show the boy's full body including both bare feet in both panels. Keep face, reaching hand, red ball and feet inside their own panels, away from the vertical center boundary. The app overlays two red triangle arrows at the center boundary around mid-height, each about 18×22 CSS px, so leave that area empty. Do not draw divider lines or arrows. No room or furniture. Solid pure chroma-green background for later removal.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw books, blocks, towels, cup, blanket, trash bin, hat, toy box, stuffed animal, shelf, platform, table, other toys, a separate cat, another person, green or yellow ball, ball under foot, twisted torso, side-facing body, raised foot, room floor, large shadow, divider line or arrow.
+```
+
+### 不採用画像 v1b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same BOY in two successive moments, daytime indoors, approved plain blue short-sleeved T-shirt with a tiny simplified cat-face chest emblem, navy knee-length shorts, bare feet. Image 1 guides the established two-panel Action Match style and boy scale; its RIGHT panel guides the forward-facing posture for holding an object at chest level, but replace the hat with a red ball. Image 2 guides face, hair, approved daytime clothes and body proportions. Image 3 guides ONLY the tiny shirt emblem, not a separate cat.
+Action: Show "Pick it up." in two side-by-side equal-width panels with NO dividing line. LEFT BEFORE: the boy is in a balanced low squat, shoulders and hips facing the viewer, both feet flat. He bends his knees and reaches his RIGHT hand down and slightly forward toward ONE plain RED rubber ball lying on the GROUND IN FRONT OF his feet, beyond his toes, with a clear gap so the ball is neither beneath nor touching a foot. The hand is about to grasp the ball but does not lift it; his gaze points down at it. RIGHT AFTER: he stands straight up in the SAME horizontal spot, shoulders and hips still facing the viewer, and holds the SAME red ball with both hands in front of his chest, pleased open-mouth smile. The left squatting body and right standing body have the SAME anatomy and the same height WHEN standing; left appears shorter only due to bent legs.
+Expression: Attentive, intent eyes on ball in left panel; happy proud smile looking toward viewer in right panel.
+Objects: One smooth uniformly red, unpatterned child-size rubber ball in each panel, smaller than the boy's head, small enough for his hands to cup around. No stripes, seams, printed symbols, words or decorative highlights. The only ground cue is a tiny soft shadow directly below the ball in the LEFT panel.
+Composition: Horizontal 16:9 illustration, two equal 400×450-equivalent panels. The boy occupies approximately the same center of each panel. In the left panel the ball sits slightly forward and toward viewer's right of the boy, clearly separate from his feet and center seam. In the right panel the ball is lifted to chest height. Full body and feet visible in both panels, no cropping. Keep hands, feet, face and ball clear of the central panel boundary; at mid-height the app overlays two red triangle arrowheads, about 18×22 CSS px each, so reserve an empty green gutter there. Background pure solid #00FF00 chroma green, no scene or floor. Draw neither divider nor arrow.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw books, blocks, towels, cup, blanket, trash bin, hat, toy box, stuffed animal, shelf, platform, table, other toys, a separate cat, another person, green or yellow ball, ball under foot, twisted torso, side-facing body, raised foot, room floor, large shadow, divider line or arrow.
+```
+
+## 2026-10-11 — Action Match「Close it.」男の子版（採用、アプリには未組み込み）
+
+- **採用画像：** `private-prototypes/action-match/action-close-boy-v1a.png.webp`。800×450px、透過 WebP。採用済み `private-prototypes/action-match/action-open-boy-v1b.png.webp` の左右400×450pxを、デコード後の画素をそのまま入れ替えて合成した。新しい画像生成は使っていない。入れ替え後の各コマを合成元と照合し、両方とも画素一致した。透過は、元画像の緑背景（#00FF00）を `scripts/chroma-key-green.py --edge-shrink 2` で除去したアルファをそのまま引き継いだ。四隅のアルファ値は0/0/0/0。
+- **lossless WebP の理由：** 画素を再圧縮で変えず、左右コマが元画像と一致することを保証するため。元の `action-open-boy-v1b.png.webp` は41,152バイト、採用画像は173,436バイト。公開アプリには未組み込みなので、公開用画像の容量は変わらない。
+- **不採用：** `action-close-boy-v1b.png.webp`（現在の保存先 `private-prototypes/action-match/` に存在する）。
+- **レビューでの決定：** v1b は右コマの顔を満足そうな小さな笑顔に編集したが、v1a との表情の違いが小さく、編集する理由がないため採用しない。
+
+### 不採用 v1b の添付画像と編集・透過の由来
+
+1. `private-prototypes/action-match/action-close-boy-v1a.png.webp`：編集対象。左コマと右コマの顔以外は最終画像でもこの画素を使用。
+2. `private-prototypes/action-match/action-open-boy-v1b.png.webp`：男の子の顔・色・絵のタッチの参考。
+
+v1b は画像生成による顔の編集を2回試し、2回目の結果から右コマの顔の領域のみを v1a に合成した。左コマと顔以外の画素、背景の透過アルファは v1a から保持した。v1b も800×450pxの lossless 透過 WebP だが、上記の理由で不採用。
+
+### 不採用 v1b の編集プロンプト全文（最初の試行）
+
+```text
+Use case: precise-object-edit
+Asset type: Action Match two-panel children's game illustration.
+Input images: Image 1 is the exact edit target, the 800×450 transparent two-panel "Close it." image. Image 2 is the approved "Open it." illustration for the boy's identity, art style, and colors only.
+Primary request: Change ONLY the expression on the face of the boy in the RIGHT panel (the panel with the toy chest already CLOSED). Give him a satisfied, content little CLOSED-MOUTH smile after closing the lid: gently upturned mouth corners and a pleased relaxed gaze. Keep his head shape, hair, eye size and positions, ears, skin tone, neck, head angle and gaze toward the closed box otherwise unchanged. No anger, worry, tears or big open-mouth laugh.
+Invariants: The LEFT panel must remain absolutely unchanged. Within the RIGHT panel, do not redraw or move anything except the expression inside the facial oval: body, arms, hands, shirt and tiny cat emblem, shorts, legs, feet, the closed wooden chest, lid, shadows, positions, scale, layout, and empty center gutter must remain unchanged. Preserve the 800×450 two-panel framing and original fully transparent background/alpha; no green background, no new objects, no text, no divider or arrow. The result must be suitable for surgically compositing only the RIGHT boy's face region back over Image 1 so every pixel outside the face stays exact.
+```
+
+### 不採用 v1b の編集プロンプト全文（最終合成に使用した試行）
+
+```text
+Use case: precise-object-edit
+Asset type: a transparent two-panel Action Match game image.
+Input images: Image 1 is the edit target, the exact "Close it." composite. Image 2 is the approved "Open it." reference for boy identity and color/style only.
+Change only the RIGHT boy's facial expression in the CLOSED-CHEST panel. Make him visibly but gently SATISFIED that he finished closing the lid: mouth stays small and CLOSED, both mouth corners lifted a little more than in Image 1, subtle rounded happy cheeks, eyes slightly softened/narrowed into a content look while still open. This must look different from Image 1's neutral little smile, but not a big grin, not open-mouth laughing, not sleepy. Keep him looking toward the closed chest. Preserve the same face identity, oval/head outline, hair, ears, brow position, nose, skin tone, head angle, and all body proportions.
+Strict invariants: Do not change a single thing in the LEFT panel. Do not change right panel outside the inner face. Preserve the boy's body, arms, shirt and cat emblem, shorts, feet, wooden box, closed lid, placement, size, transparent background, and empty center seam. No anger, worry, crying, open mouth, extra objects, text, arrows, or divider. Output the whole image with the same framing, even though only the right facial features should be modified.
+```
+
+## 2026-10-11 — Action Match「Open it.」男の子版（採用、アプリには未組み込み）
+
+- **採用画像：** `private-prototypes/action-match/action-open-boy-v1b.png.webp`。800×450px、透過 WebP（quality 84）。緑背景（#00FF00）の生成原画を `scripts/chroma-key-green.py --edge-shrink 2` で透過し、縦横比を保って800×450pxに縮小した。`tests/check-image-alpha.mjs` は PASS（四隅のアルファ値 0/0/0/0）。淡い背景に重ねた目視確認で目立つ緑の縁・半透明の白いもやは見つからず、不透明・半透明画素に緑が強く残る画素もなかった。
+- **レビューでの決定：** 採用 v1b は箱をひざ程度の高さにおさめ、おもちゃ箱として読める構図にした。v1a は箱が腰に近い高さで棚と取り違えるおそれがあるため採用しない。
+- **不採用：** `action-open-boy-v1a.png.webp`。現在の保存先 `private-prototypes/action-match/` に存在する。
+
+### 採用画像 v1b の添付画像
+
+1. `private-prototypes/action-match/action-take-off-boy-v1b.png.webp`：絵のタッチ、人物の大きさ、2コマの構図の参考。
+2. `docs/characters/boy-daywear-v2.png.webp`：男の子の顔、髪、昼服の基準。
+3. `docs/characters/cat-mascot-v2-small.png.webp`：Tシャツの胸の猫の顔の基準。
+
+### 採用画像 v1b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy only, daytime indoors, approved daytime blue T-shirt and navy knee-length shorts, barefoot. Reference Image 1 is style and full-body scale for the 2-panel Action Match illustration, not content to copy. Reference Image 2 is the boy's face, hairstyle and clothes. Reference Image 3 is only the tiny simplified cat emblem on his shirt.
+Action: Two equal before/after panels for opening a small toy chest. Same full-body front-facing boy standing next to same toy chest, with same ground line and same size in both panels. He is about THREE TIMES TALLER than the CLOSED chest. The CLOSED chest top is NO HIGHER THAN his knees. It is a single plain light-brown wood box with flat hinged top, no other furniture. LEFT panel before: closed flat lid, the boy lightly grips the front edge with BOTH hands; focused little smile. RIGHT panel after: the exact same small box, in the exact same spot; its ONLY lid rotates up on the REAR hinge to a near-vertical open position. Boy holds the upright lid with one hand, peeks into DARK EMPTY box and smiles gently. Draw the boy so his entire head, shirt, shorts, legs and bare feet remain visible; box to one side, not in front of boy or obscuring him. The lid is clearly closed left and clearly open right, readable small.
+Expression: Calm anticipation on left, happy discovery on right, eyes toward box on right.
+Objects: Only the small wooden chest with no contents, pattern or lettering. Same rectangular geometry in both panels.
+Composition: Wide horizontal 16:9; two equal 400×450-equivalent panels. Within EACH panel, boy occupies one side and small chest the other, without overlap. Boy roughly 350 units tall within 450; closed chest roughly 110 units tall within 450, its top exactly near the boy's knees. Keep exact same character and box scale/location in both panels. Leave a clear gap around the center seam, because the app overlays a 31 CSS px triangle there. Absolutely no image-internal arrows or divider lines. Solid uniform pure green background for later chroma key. No room or floor drawn.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Additional exclusions: No oversized chest, no chest in front of boy, no contents or toys, no blocks, balls, stuffed animals, books, hat, towel, cup, blanket, bin, drawer, furniture doors, cat animal, other people, twisting or turning, green chest, divider, arrow, text or watermark.
+```
+
+## 2026-10-11 — Action Match 帽子の2動詞・男の子版（採用、アプリには未組み込み）
+
+- **Put it on.：** `private-prototypes/action-match/action-put-on-boy-v3b.png.webp`（最終採用、アプリには未組み込み）。800×450px、透過 WebP。緑背景の生成原画を `scripts/chroma-key-green.py --edge-shrink 1` で透過し、縦横比を保って左コマを400×450pxに配置した。右コマは下記 v1a の右半分を画素そのままで合成し、画素一致を確認するため lossless WebP で保存。四隅のアルファ値は0、目立つ緑縁・半透明のもやは見つからなかった。
+- **Take it off.：** `private-prototypes/action-match/action-take-off-boy-v1b.png.webp`（採用、アプリには未組み込み）。800×450px、透過 WebP。緑背景の生成原画を同じ `--edge-shrink 1` で透過し、縦横比を保って右コマを400×450pxに配置した。左コマは v1a の右半分を画素そのままで合成し、画素一致を確認するため lossless WebP で保存。四隅のアルファ値は0、目立つ緑縁・半透明のもやは見つからなかった。
+- **共通の合成元：** `private-prototypes/action-match/action-put-on-boy-v1a.png.webp` の右半分は、正面を向いて黄色い帽子をかぶった男の子。Put it on. では完成後の右コマ、Take it off. では動作前の左コマとして使用する。v1a の左コマ（帽子を頭上に持ち上げた姿）は最終採用していない。
+- **レビューでの決定：** 頭上に帽子を持ち上げる姿は「かぶる」とも「ぬぐ」とも読めるため、Put it on. の左コマは、フックの帽子に手を伸ばす斜め後ろ向きの姿にした。帽子がボールに見えないよう、横からつばが見える向きにした。Take it off. の右コマをフックへ帽子を戻す絵にすると Put it on. の左右を入れ替えただけになるため、正面を向き、胸の前で帽子を両手に持つ姿にした。
+- **不採用：** `action-put-on-boy-v1b.png.webp`（現在の保存先 `private-prototypes/action-match/` には存在しない）、`action-put-on-boy-v2a.png.webp`、`action-put-on-boy-v2b.png.webp`、`action-put-on-boy-v3a.png.webp`、`action-take-off-boy-v1a.png.webp`。
+
+### Put it on. 採用画像 v3b の添付画像
+
+1. 直前の v3a 左コマの生成原画 `/Users/y.komon/.codex/generated_images/01a09c8c-f410-7831-9c4c-50d2efa2ffc2/exec-56ff4b98-a560-4e5c-8108-9cdc88bcb84e.png`：絵のタッチと構図の参考。ほぼ後ろ向きの姿勢は写さない。
+2. `private-prototypes/action-match/action-put-on-boy-v1a.png.webp`：帽子・男の子の大きさと、最終右コマの画素の基準。
+3. `docs/characters/boy-daywear-v2.png.webp`：昼服、髪、体型の基準。
+4. `docs/characters/word-target-boy-v1.png.webp`：人物の基準。
+5. `docs/characters/cat-mascot-v2-small.png.webp`：胸の猫の印の基準（左コマの背中には描かない）。
+
+### Take it off. 採用画像 v1b の添付画像
+
+1. `private-prototypes/action-match/action-put-on-boy-v1a.png.webp`：帽子の形、男の子の大きさと、最終左コマの画素の基準。
+2. `docs/characters/boy-daywear-v2.png.webp`：昼服と正面全身の基準。
+3. `docs/characters/word-target-boy-v1.png.webp`：人物の基準。
+4. `docs/characters/bathroom-stage-v5.jpg.webp`：人物の補助基準。
+5. `docs/characters/cat-mascot-v2-small.png.webp`：胸の猫の印の基準。
+
+### 合成元 v1a の添付画像
+
+`action-put-boy-v5.png.webp`（Action Match の等幅2コマ・タッチ・大きさ）、`docs/characters/boy-daywear-v2.png.webp`（昼服・顔・髪）、`docs/characters/cat-mascot-v2-small.png.webp`（胸の猫の印）、`docs/characters/word-target-boy-v1.png.webp` と `docs/characters/bathroom-stage-v5.jpg.webp`（人物の補助基準）。
+
+### 合成元 v1a の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same BOY appears once in each panel, in his approved daytime outfit, indoors and barefoot. Image 1 (action-put-boy-v5.png.webp) is ONLY the reference for two equal panels, boy scale, drawing style, and restrained background detail; do not copy its blue star pajamas, red block, stool, or action. Image 2 (boy-daywear-v2.png.webp) is the authoritative face, hair, daytime outfit and full-body proportions. Image 3 (cat-mascot-v2-small.png.webp) is ONLY the identity reference for the tiny simplified cat-face emblem on the T-shirt, not a separate cat. Images 4 (word-target-boy-v1.png.webp) and 5 (bathroom-stage-v5.jpg.webp) are supplementary boy identity references; do not copy their pajamas or room objects.
+Action: EXACTLY TWO sequential equal-width panels, left BEFORE and right AFTER putting on a hat. LEFT: boy stands front-facing, feet still, holding one yellow hat with both hands directly above his head, ready to put it on; the hat is NOT touching the head and a clearly visible gap of about one tenth of head height separates hat and hair. RIGHT: same boy stands in exactly the same place at the same scale and facing angle; the same hat is fully and firmly worn on his head, with its brim clearly visible; both hands rest naturally down by his sides. No other movement.
+Expression: Left attentive and gently eager, right a warm small smile. Keep his facial identity the same in both panels.
+Objects: Exactly one simple yellow Japanese preschool commuting-style hat per panel: round crown and a clearly visible rounded brim, no pattern, badge, writing, or logo. Hat size and color match across panels. No other objects.
+Composition: One horizontal Action Match image, final 800x450px (16:9), divided conceptually into two equal 400px-wide panels. Same standing position, body size, shoulders, feet and simple frontal pose in each panel; characters fully visible and large enough that the hat-on versus hat-off difference reads at small card size. Keep the boy near the center of EACH panel, not near the boundary. Leave a completely empty gutter around the x=400px panel boundary so the app can overlay its red double arrows there (about 38x22 CSS px centered on the boundary); keep all faces, hands and hat clear of this area and away from the card's rounded edges. The app also overlays a thin card border, but no labels on the image. Keep the important hat action in the upper 80% and show the feet without cropping. Only very minimal grounding; no room furniture or background scene.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+
+Do not draw books, blocks, towel, cup, blanket, trash bin, ball, teddy bear, toy box, a separate cat, other people, hat held behind or beside the head, twisted torso, side view, large steps, divider line or arrow.
+```
+
+### Put it on. 採用画像 v3b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: The same boy as the references, indoors in the approved daytime blue short-sleeved shirt and navy shorts, barefoot. Only one boy in each panel.
+Action: Create a two-panel before/after illustration for "Put it on." In the LEFT panel ONLY, redraw the boy from a 70-DEGREE rear-to-side profile, clearly MORE SIDE-ON than Image 1. The viewer sees the boy's right side and only the rear third of his back, not a mostly rear view. His nose is hidden behind the cheek contour, and no eye or mouth is visible: he faces a hook toward the LEFT. The viewer sees his back and the RIGHT SIDE of his body. His shoulder line, shirt, hips, both legs, feet, neck and head all face the same diagonal-left direction with no twist. Only a sliver of rounded cheek and one ear may be visible; neither eye nor mouth is visible. One hand reaches to lightly touch the BRIM of a yellow hat that is still hanging on a hook, without covering the hat. Both feet flat; no tiptoeing. The hat is not on or over the boy's head. The RIGHT panel is a visual guide only: the original right panel of image 2 showing the boy front-facing, wearing the yellow hat and smiling. The generated right panel will be discarded; the right 400×450 pixels from image 2 will be inserted unchanged.
+Expression: No visible facial expression in the LEFT panel; head stays aligned with the rest of the body.
+Objects: Exactly one yellow rounded school hat matching image 2's right hat. Show the hat in clear SIDE PROFILE with a broad BRIM projecting horizontally to the LEFT and a dome above it, not the top/crown view that resembles a ball. The hat hangs from a small loop at the rear of the crown so the wooden board and single round hook remain unobscured. It hangs from exactly ONE round hook on ONE small wooden board. The board and round hook remain visibly exposed, not hidden behind the hat. No wall is drawn; only the board and hook appear against green. No other objects.
+Composition: Two equal-width panels across a wide 16:9 image. Match the height and size of the boy in image 2's RIGHT panel, and align the bottoms of his bare feet. In LEFT, his torso is turned as a single rigid unit toward the left: the front shirt surface stays hidden, the right shoulder projects toward the viewer, and the right hip and right foot follow the SAME angle. This is a rear-side profile, not the back view of image 1. The boy is toward the center of the LEFT panel; the hat and board are farther LEFT, at a height he can reach without stretching or lifting his feet. Leave a clear, unmistakable green gap between his hair and the hat. Keep the central boundary clear because the app overlays two red arrowheads there at mid-height, each about 18×22 CSS px. No panel divider or in-image arrow. Image 1 is the previous left-panel variant; use it ONLY as style and composition reference. Do not copy its mostly rear-facing pose. Rotate the entire boy leftward by about 25 more degrees to reveal significantly more right-side profile, without showing his face or the front cat emblem. Make the hat brim more clearly horizontal. Smooth the boy's short hair, reducing spiky/shaggy volume to match the right boy in image 2. Image 2 is the exact source for final right-panel pixels and reference for boy scale, clothes and hat; do not copy its LEFT lifted-hat pose. Image 3 is the approved daytime body and hair reference. Image 4 is boy identity reference. Image 5 is cat emblem reference; no cat is drawn on the back of the LEFT boy's shirt.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
+### Take it off. 採用画像 v1b の生成プロンプト全文
+
+```text
+[STYLE]
+Children's picture-book illustration for a kids' English learning app. Bright, saturated colors, clean soft outlines, soft cel shading with gentle highlights, cute rounded proportions, large expressive eyes. Match the art style of the attached reference images exactly. Not watercolor, not colored pencil, not realistic, not 3D render.
+
+[CHARACTERS]
+BOY: 4 to 6 years old, small build, round face, large brown eyes, rosy cheeks, light skin, short brown hair swept to his right. Default outfit: blue collared pajamas with a white star pattern and white piping on the collar and cuffs; barefoot. Approved daytime outfit: plain blue short-sleeved T-shirt with a tiny simplified face of the usual cat on the chest, and navy knee-length shorts; barefoot indoors, white sneakers outdoors.
+
+[SCENE]
+Who: One boy, indoors in his approved daytime blue short-sleeved T-shirt with the small simplified cat-face emblem, navy knee-length shorts, and bare feet.
+Action: A two-panel Action Match image for "Take it off." In the LEFT panel, show the front-facing boy wearing the yellow hat, standing still, exactly as in the RIGHT HALF of Image 1. This LEFT panel is only a generation guide; the final image will use those original Image 1 pixels without changes. In the RIGHT panel ONLY, newly draw the SAME boy standing in the same position, same size, same front-facing pose and foot baseline. He has REMOVED the hat; his brown short hair is fully uncovered. He holds that one hat with BOTH hands at LOWER CHEST height, clearly far below and separated from his head. His hands hold the two sides of the brim, but the hat is rotated about 30 degrees to HIS LEFT, showing both its rounded crown and the brim in clear three-quarter profile. The brim projects diagonally outward; both hands and the hat silhouette are fully visible. His body is upright, not twisted, with no extra gesture.
+Expression: Small cheerful open-mouth smile in the RIGHT panel, looking at the viewer. Same face and hair as the references.
+Objects: Exactly one yellow rounded child's school hat matching Image 1, now in the boy's hands in the RIGHT panel. The cap is in a stronger three-quarter SIDE view than a face-on symmetrical view, with the projecting curved brim clearly visible; do not show only the top of the crown. No wall, hook, shelf, room, or other item.
+Composition: Wide 16:9 two-panel illustration with equal-width panels. Match the boy's height, overall scale and foot position to the hat-wearing boy in Image 1's RIGHT half. Hold the hat slightly to the boy's own left side at lower-chest height, while still in front of his torso and well below his chin; keep it clearly away from the head and not so large that it hides his entire torso; allow the tiny shirt emblem to peek above or beside the hat if possible. Leave the boundary between panels clear because the app overlays two red arrowheads there at mid-height, each about 18×22 CSS px. No in-image divider or arrow. Image 1 is the exact pixel source for the final LEFT panel and the reference for hat shape, boy size, and style. Image 2 is the approved daytime full-body reference; Images 3 and 4 are boy identity references; Image 5 is the cat emblem reference.
+
+[TECHNICAL A — transparent-use asset: Action Match, Think & Say thought bubble, etc.]
+Plain solid pure green (#00FF00) background with no gradient, no shadow on the background, no checkerboard pattern. Keep all important actions and objects within the upper 80% of the image. Characters fully inside the frame. For Action Match, draw no divider lines or arrows inside the image; leave a clear gutter at each equal-width panel boundary for app-rendered arrows. The final Action Match image must be exactly 800x450 pixels (16:9); preserve the artwork's proportions and use transparent padding rather than stretching if the generated aspect ratio differs. No text, no watermark.
+
+[DO NOT]
+Do not change any character's hairstyle, hair color, face, or selected approved outfit from the reference images. DAD has no beard and no stubble. MOM's hair is always tied back, never loose. GIRL always has a high bun tied with a blue scrunchie; never a ponytail or twin tails. Do not replace the approved blue-star or pink-star pajama pattern. No extra people who are not listed. No text or letters in the image.
+```
+
 ## 2026-10-04 — Think & Say 右の絵：外へ出る・ジャングルジム・ねむい（承認済み・採用）
 
 - 所有者が `private-prototypes/think-say-go-outside-boy-v4.png.webp`、`private-prototypes/think-say-climb-boy-v1.png.webp`、`private-prototypes/think-say-sleepy-boy-v1.png.webp` を承認した。3枚とも 512×512px の透過 WebP（quality 84）。本体には未組み込み。

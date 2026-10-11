@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {checkIndexSyntax} from './check-index-syntax.mjs';
@@ -14,10 +15,36 @@ const output=path.join(root,'tests','artifacts','responsive');
 fs.mkdirSync(output,{recursive:true});
 const url=pathToFileURL(path.join(root,'index.html')).href;
 const sizes=[[375,667],[390,844],[430,932]];
+const actionDefinitions={
+  put:{phrase:'Put it.',images:['action-put-boy-v5.png.webp','action-put-girl-v5.png.webp']},
+  get:{phrase:'Get it.',images:['action-get-boy-v4.png.webp','action-get-girl-v4.png.webp']},
+  bring:{phrase:'Bring it to me.',images:['action-bring-boy-v3.png.webp','action-bring-girl-v4.png.webp']},
+  throw:{phrase:'Throw it away.',images:['action-throw-boy-v3.png.webp','action-throw-girl-v5.png.webp']},
+  'put-on':{phrase:'Put it on.',images:['action-put-on-boy-v3b.png.webp','action-put-on-girl-v3a.png.webp']},
+  'take-off':{phrase:'Take it off.',images:['action-take-off-boy-v1b.png.webp','action-take-off-girl-v3a.png.webp']},
+  open:{phrase:'Open it.',images:['action-open-boy-v1b.png.webp','action-open-girl-v2a.png.webp']},
+  close:{phrase:'Close it.',images:['action-close-boy-v1a.png.webp','action-close-girl-v1a.png.webp']},
+  'pick-up':{phrase:'Pick it up.',images:['action-pick-up-boy-v1a.png.webp','action-pick-up-girl-v1b.png.webp']},
+};
+const actionKeys=Object.keys(actionDefinitions);
+const actionImageNames=Object.values(actionDefinitions).flatMap(({images})=>images);
+const actionImageBatches=Array.from({length:Math.ceil(actionImageNames.length/4)},(_,index)=>{
+  const batch=actionImageNames.slice(index*4,index*4+4);
+  return [...batch,...actionImageNames.slice(0,4-batch.length)];
+});
+assert.equal(actionKeys.length,9);
+assert.equal(new Set(actionImageNames).size,18);
+const actionSource=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const actionPhrasesLiteral=actionSource.match(/const actionPhrases=(\{[^;]+\});/)?.[1];
+assert(actionPhrasesLiteral,'Action Match speech phrase table is missing');
+const actualActionPhrases=JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionPhrasesLiteral})`)));
+assert.deepEqual(actualActionPhrases,Object.fromEntries(Object.entries(actionDefinitions).map(([key,{phrase}])=>[key,phrase])),'Action Match speech phrase table differs from the nine approved sentences');
 const actionFixtures=[
-  {name:'swap',draws:[0,0,0,0,0,0,0,0],expected:['action-get-girl-v4.png.webp','action-bring-girl-v4.png.webp','action-throw-girl-v5.png.webp','action-put-girl-v5.png.webp']},
-  {name:'keep',draws:[0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99],expected:['action-put-boy-v5.png.webp','action-get-boy-v4.png.webp','action-bring-boy-v3.png.webp','action-throw-boy-v3.png.webp']},
+  {name:'low',draws:[0],expected:['action-bring-girl-v4.png.webp','action-throw-girl-v5.png.webp','action-put-on-girl-v3a.png.webp','action-get-girl-v4.png.webp']},
+  {name:'middle',draws:[0.45],expected:['action-open-girl-v2a.png.webp','action-pick-up-girl-v1b.png.webp','action-get-girl-v4.png.webp','action-put-girl-v5.png.webp']},
+  {name:'half',draws:[0.5],expected:['action-put-boy-v5.png.webp','action-close-boy-v1a.png.webp','action-take-off-boy-v1b.png.webp','action-get-boy-v4.png.webp']},
 ];
+assert.deepEqual(new Set(actionFixtures.flatMap(fixture=>fixture.expected.map(name=>Object.entries(actionDefinitions).find(([,definition])=>definition.images.includes(name))?.[0]))),new Set(actionKeys),'Seeded fixtures must cover all nine action words');
 const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene']];
 const engines=[
   ['chromium',chromium,{...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}),args:['--mute-audio']}],
@@ -121,16 +148,15 @@ async function inspectMatchedSlots(page,selected,label) {
   console.log(`PASS ${label}: correct answer keeps four grid slots and remaining-card order`);
 }
 
-async function inspectActionImages(page,engineName,width,height,gender,opening,fixtureName) {
-  await page.evaluate(gender=>{
-    for(const action of ['put','get','bring','throw']) {
-      const cards=[...document.querySelectorAll(`#action-screen .action-card[data-action="${action}"]`)];
-      if(cards.length!==2) throw new Error(`${action}: expected two image variants`);
-      const selected=cards.find(card=>card.querySelector('img')?.getAttribute('src')?.includes(`-${gender}-`));
-      if(!selected) throw new Error(`${action}: missing ${gender} image`);
-      cards.forEach(card=>card.classList.toggle('queued',card!==selected));
-    }
-  },gender);
+async function showActionImages(page,names) {
+  await page.evaluate(names=>{
+    const visible=new Set(names);
+    for(const card of document.querySelectorAll('#action-screen .action-card')) card.classList.toggle('queued',!visible.has(card.querySelector('img').getAttribute('src')));
+  },names);
+}
+
+async function inspectActionImages(page,engineName,width,height,names,batchNumber) {
+  await showActionImages(page,names);
   await page.waitForFunction(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued) img')].every(img=>img.complete && img.naturalWidth>0),null,{timeout:12000});
   const cards=await page.evaluate(()=>{
     const rect=element=>{ const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}; };
@@ -143,11 +169,13 @@ async function inspectActionImages(page,engineName,width,height,gender,opening,f
     });
   });
   assert.equal(cards.length,4,`${engineName} ${width}×${height}: expected four visible Action Match cards`);
+  assert.deepEqual(new Set(cards.map(card=>card.name)),new Set(names),`${engineName} ${width}×${height}: wrong image batch is visible`);
   const near=(a,b)=>Math.abs(a-b)<=1.5;
   const offset=(value,span)=>value.endsWith('%') ? Number.parseFloat(value)*span/100 : Number.parseFloat(value);
   for(const card of cards) {
-    const label=`${engineName} ${width}×${height} ${card.name}, opening ${opening}`;
+    const label=`${engineName} ${width}×${height} ${card.name}, image batch ${batchNumber}`;
     assert(card.imageParentIsCard,`${label}: image must remain a direct child of its card`);
+    assert(card.card.w>=48 && card.card.h>=48,`${label}: tap target is smaller than 48px`);
     assert(card.complete && card.naturalWidth>0 && card.naturalHeight>0,`${label}: image did not load`);
     assert(card.image.w>60 && card.image.h>40,`${label}: image is blank or collapsed: ${JSON.stringify(card)}`);
     assert(card.image.x>=card.card.x-1.5 && card.image.right<=card.card.right+1.5 && card.image.y>=card.card.y-1.5 && card.image.bottom<=card.card.bottom+1.5,`${label}: image extends beyond card: ${JSON.stringify(card)}`);
@@ -187,9 +215,26 @@ async function inspectActionImages(page,engineName,width,height,gender,opening,f
     const hit=await page.evaluate(name=>window.__actionTapHits[name]||0,tap.name);
     assert.equal(hit,1,`${engineName} ${width}×${height} ${tap.name}: double arrow blocked the card tap`);
   }
-  await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-action-${fixtureName}-${gender}-open${opening}.png`)});
-  console.log(`PASS ${engineName} ${width}×${height} Action Match ${fixtureName}/${gender}: four loaded images, sizes, boundaries, and tap targets`);
+  await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-action-images-batch${batchNumber}.png`)});
+  console.log(`PASS ${engineName} ${width}×${height} Action Match image batch ${batchNumber}: four loaded images, sizes, boundaries, and tap targets`);
   return cards;
+}
+
+async function finishActionGame(page,label) {
+  for(let step=0;step<4;step++) {
+    if(await page.locator('#action-finish.show').count()) break;
+    const names=await page.locator('#action-screen .action-card:not(.queued):not(.matched) img').evaluateAll(images=>images.map(img=>img.getAttribute('src')));
+    const before=await page.locator('#action-screen .action-card.matched').count();
+    let advanced=false;
+    for(const name of names) {
+      await page.locator(`#action-screen .action-card:has(img[src="${name}"])`).click();
+      if(await page.locator('#action-screen .action-card.matched').count()>before) { advanced=true; break; }
+    }
+    assert(advanced,`${label}: no remaining card was accepted`);
+    await page.waitForTimeout(700);
+  }
+  assert.equal(await page.locator('#action-screen .action-card.matched').count(),4,`${label}: game did not finish after four correct answers`);
+  assert.equal(await page.locator('#action-finish.show').count(),1,`${label}: finish screen is missing`);
 }
 
 for(const [engineName,engine,launchOptions] of engines) {
@@ -218,6 +263,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         await page.locator('#open-word').click(); await capture('match-mode-screen','mode');
         await page.locator('#open-item-match').click(); await capture('word-screen','word');
         await page.locator('#word-home').click();
+        const selectedWords=new Set();
         for(const fixture of actionFixtures) {
           const openings=[];
           for(const opening of [1,2]) {
@@ -228,30 +274,37 @@ for(const [engineName,engine,launchOptions] of engines) {
             if(fixture===actionFixtures[0] && opening===1) {
               await capture('action-screen','action');
               const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
-              assert.deepEqual(panelCounts,{two:8,three:0,total:8},`${current}: Action Match panel metadata must cover eight two-panel images and no three-panel images`);
+              assert.deepEqual(panelCounts,{two:18,three:0,total:18},`${current}: Action Match panel metadata must cover 18 two-panel images`);
             }
             const selected=await inspectActionSelection(page,engineName,width,height,fixture,opening);
-            const inspected=new Map();
-            for(const gender of ['boy','girl']) {
-              for(const card of await inspectActionImages(page,engineName,width,height,gender,opening,fixture.name)) {
-                assert(!inspected.has(card.name),`${current}: duplicate image identity ${card.name}`);
-                inspected.set(card.name,card);
+            for(const card of selected) selectedWords.add(card.action);
+            if(fixture===actionFixtures[0] && opening===1) {
+              const inspected=new Set();
+              for(const [index,batch] of actionImageBatches.entries()) {
+                for(const card of await inspectActionImages(page,engineName,width,height,batch,index+1)) inspected.add(card.name);
+              }
+              assert.deepEqual(inspected,new Set(actionImageNames),`${current}: not all 18 Action Match images were inspected`);
+              await showActionImages(page,selected.map(card=>card.name));
+            }
+            openings.push(selected);
+            if(opening===1) {
+              await inspectMatchedSlots(page,selected,current);
+              if(fixture===actionFixtures[0]) {
+                await finishActionGame(page,current);
+                await page.evaluate(draws=>window.__setActionTestRandom(draws),fixture.draws);
+                await page.locator('#action-play-again').click();
+                const restarted=await inspectActionSelection(page,engineName,width,height,fixture,'Play again');
+                assert.deepEqual(restarted.map(card=>card.name),selected.map(card=>card.name),`${current}: Play again did not reset the seeded selection`);
+                assert.equal(await page.locator('#action-screen .action-card.matched').count(),0,`${current}: Play again retained matched cards`);
+                assert.equal(await page.locator('#action-screen .action-card.queued').count(),14,`${current}: Play again did not reset hidden cards`);
+                assert.equal(await page.locator('#action-finish.show').count(),0,`${current}: Play again retained finish screen`);
               }
             }
-            assert.equal(inspected.size,8,`${current}: all eight Action Match images were not inspected`);
-            openings.push({selected,inspected});
-            if(opening===1) await inspectMatchedSlots(page,selected,current);
             await page.locator('#action-home').click();
           }
-          assert.deepEqual(openings[1].selected,openings[0].selected,`${current}: same random draws changed the visible order after reopening`);
-          for(const [name,first] of openings[0].inspected) {
-            const second=openings[1].inspected.get(name);
-            assert(second,`${current}: image ${name} disappeared after reopening`);
-            for(const part of ['card','image']) for(const coordinate of ['x','y','w','h']) {
-              assert(Math.abs(second[part][coordinate]-first[part][coordinate])<=1.5,`${current}: ${name} ${part}.${coordinate} changed after reopening`);
-            }
-          }
+          assert.deepEqual(openings[1],openings[0],`${current}: same random draws changed the visible order after reopening`);
         }
+        assert.deepEqual(selectedWords,new Set(actionKeys),`${engineName} ${width}×${height}: seeded games did not cover all nine verbs`);
         await page.evaluate(()=>window.__restoreActionTestRandom());
         await page.locator('#open-listen').click(); await capture('place-screen','place');
         for(const [name,openId,screenId,backId] of scenes) {
@@ -269,4 +322,4 @@ for(const [engineName,engine,launchOptions] of engines) {
   } finally { await browser.close(); }
 }
 if(failures) process.exitCode=1;
-else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 9 screens, all 8 Action Match images, and reopening. Screenshots: ${output}`);
+else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 9 screens, all 18 Action Match images, Play again, and reopening. Screenshots: ${output}`);
