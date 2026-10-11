@@ -107,6 +107,86 @@ async function inspect(page,id,kind,width,height) {
   console.log(`PASS ${width}×${height} ${id}: controls ${result.controls.length}, ${kind==='scene' ? `tray items ${result.items.length}, zones ${result.zones.length}` : `cards ${(result.cards || []).length}`}`);
 }
 
+async function inspectWordCaption(page,width,height) {
+  const getStep=()=>page.evaluate(()=>document.body.classList.contains('text-bilingual') ? 2 : document.body.classList.contains('text-english') ? 1 : 0);
+  const originalStep=await getStep();
+  const button=page.locator('#word-kana');
+  while(await getStep()!==0) await button.click();
+  const snapshot=()=>page.evaluate(()=>{
+    const board=document.querySelector('#word-board');
+    const caption=board.querySelector('.word-caption');
+    const english=board.querySelector('#word-caption-english');
+    const japanese=board.querySelector('#word-caption-jp');
+    const rect=element=>{ const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}; };
+    return {
+      board:rect(board),caption:rect(caption),cards:[...board.querySelectorAll('.word-card:not(.queued)')].map(card=>{
+        const art=card.querySelector('img,.word-sprite');
+        const band=card.querySelector('.word-labels');
+        const ja=band.querySelector('.word-label-ja');
+        const en=band.querySelector('.word-label-en');
+        return {card:rect(card),art:rect(art),band:rect(band),bandVisible:band.getClientRects().length>0,
+          jaVisible:ja.getClientRects().length>0,enVisible:en.getClientRects().length>0,
+          jaFits:ja.scrollWidth<=ja.clientWidth+1,enFits:en.scrollWidth<=en.clientWidth+1};
+      }),
+      titleCount:board.querySelectorAll('.word-title').length,
+      captionVisible:caption.getClientRects().length>0,
+      englishVisible:english.getClientRects().length>0,
+      japaneseVisible:japanese.getClientRects().length>0,
+      background:getComputedStyle(caption).backgroundColor,
+    };
+  });
+  const baseline=await snapshot();
+  const label=`${width}×${height} Item Match`;
+  assert.equal(baseline.titleCount,0,`${label}: in-game Word Match title remains`);
+  assert.equal(baseline.captionVisible,false,`${label}: caption shown at text stage 0`);
+  const checkCards=(state,step)=>{
+    assert.equal(state.cards.length,12,`${label}: stage ${step} changed the number of visible cards`);
+    state.cards.forEach((entry,index)=>{
+      const before=baseline.cards[index];
+      for(const key of ['x','y','width','height']) {
+        assert(Math.abs(entry.card[key]-before.card[key])<0.5,`${label}: stage ${step} moved card ${index} (${key})`);
+        assert(Math.abs(entry.art[key]-before.art[key])<0.5,`${label}: stage ${step} moved or resized card art ${index} (${key})`);
+      }
+    });
+  };
+  const checkLabels=(state,step)=>state.cards.forEach((entry,index)=>{
+    assert.equal(entry.bandVisible,step!==0,`${label}: card ${index} label band visibility is wrong at stage ${step}`);
+    assert.equal(entry.jaVisible,step!==0,`${label}: card ${index} Japanese label visibility is wrong at stage ${step}`);
+    assert.equal(entry.enVisible,step===2,`${label}: card ${index} English label visibility is wrong at stage ${step}`);
+    if(!entry.bandVisible) return;
+    assert(entry.band.x>=entry.card.x-0.5 && entry.band.right<=entry.card.right+0.5 && entry.band.y>=entry.card.y-0.5 && entry.band.bottom<=entry.card.bottom+0.5,`${label}: card ${index} label band extends outside card at stage ${step}`);
+    assert(entry.card.bottom-entry.band.bottom<=4,`${label}: card ${index} label band is not at the bottom`);
+    assert(entry.jaFits && (step===1 || entry.enFits),`${label}: card ${index} label text overflows at stage ${step}`);
+  });
+  const checkCaption=(state,step)=>{
+    const firstCardTop=Math.min(...state.cards.map(entry=>entry.card.y));
+    assert(state.caption.x>=state.board.x-0.5 && state.caption.right<=state.board.right+0.5,`${label}: stage ${step} caption extends past board width`);
+    assert(Math.abs(state.caption.y-(state.board.y+8))<0.5,`${label}: stage ${step} caption is not 8px below board top`);
+    assert(state.caption.bottom<=firstCardTop-8,`${label}: stage ${step} caption is too close to or overlaps the top cards`);
+    assert(state.caption.bottom<=state.board.y+55,`${label}: stage ${step} caption exceeds the reserved 55px row`);
+    assert.equal(state.background,'rgb(255, 253, 244)',`${label}: caption should be opaque`);
+  };
+  checkLabels(baseline,0);
+  await button.click();
+  const english=await snapshot();
+  assert.equal(english.captionVisible,true,`${label}: English caption missing at stage 1`);
+  assert.equal(english.englishVisible,true,`${label}: English text missing at stage 1`);
+  assert.equal(english.japaneseVisible,false,`${label}: Japanese text shown at stage 1`);
+  checkCards(english,1); checkLabels(english,1); checkCaption(english,1);
+  await button.click();
+  const bilingual=await snapshot();
+  assert.equal(bilingual.captionVisible,true,`${label}: bilingual caption missing at stage 2`);
+  assert.equal(bilingual.englishVisible,true,`${label}: English text missing at stage 2`);
+  assert.equal(bilingual.japaneseVisible,true,`${label}: Japanese text missing at stage 2`);
+  checkCards(bilingual,2); checkLabels(bilingual,2); checkCaption(bilingual,2);
+  await button.click();
+  const hidden=await snapshot();
+  assert.equal(hidden.captionVisible,false,`${label}: caption remains at stage 0 after cycling`);
+  checkCards(hidden,0); checkLabels(hidden,0);
+  for(let step=0;step<originalStep;step++) await button.click();
+  console.log(`PASS ${label}: stages 0/1/2 preserve card and artwork rectangles; labels stay inside cards without text overflow`);
+}
+
 async function inspectActionSelection(page,engineName,width,height,fixture,opening) {
   const cards=await page.evaluate(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued)')].map(card=>{
     const rect=card.getBoundingClientRect();
@@ -331,6 +411,152 @@ async function finishActionGame(page,label) {
   assert.equal(await page.locator('#action-finish.show').count(),1,`${label}: finish screen is missing`);
 }
 
+async function checkHintExitResets(page,engineName) {
+  const label=`${engineName} 375×667 hint exit`;
+  const sharedStep=()=>page.evaluate(()=>document.body.classList.contains('text-bilingual') ? 2 : document.body.classList.contains('text-english') ? 1 : 0);
+  const checkShared=async(step,context)=>assert.equal(await sharedStep(),step,`${label}: ${context} shared text step`);
+  const checkAction=async(step,context)=>assert.equal(await page.locator('#action-screen').getAttribute('data-action-hint-step'),String(step),`${label}: ${context} Action Match step`);
+  const checkThink=async(pressed,context)=>assert.equal(await page.locator('#think-hint').getAttribute('aria-pressed'),String(pressed),`${label}: ${context} Think & Say hint`);
+
+  await page.evaluate(()=>localStorage.setItem('ouchieigo-settings-v1',JSON.stringify({speechRate:1.1,textDisplayStep:2})));
+  await page.reload({waitUntil:'load'});
+  await assertSilentAudio(page);
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ouchieigo-settings-v1')).textDisplayStep),2,`${label}: legacy saved hint was not present for the startup check`);
+  assert.equal(await page.locator('#word-speed').inputValue(),'1.1',`${label}: saved speech rate was lost`);
+  await checkShared(0,'startup ignores the legacy saved value');
+
+  await page.locator('#open-word').click(); await page.locator('#open-item-match').click();
+  await page.locator('#word-kana').click(); await checkShared(1,'Item Match hint enabled');
+  await page.locator('#word-back').click(); await checkShared(0,'Item Match back');
+  await page.locator('#open-item-match').click(); await checkShared(0,'Item Match reentry after back');
+  await page.locator('#word-kana').click(); await page.locator('#word-kana').click();
+  await page.locator('#word-home').click(); await checkShared(0,'Item Match home');
+  await page.locator('#open-word').click(); await page.locator('#open-item-match').click(); await checkShared(0,'Item Match reentry after home');
+  await page.locator('#word-back').click();
+
+  await page.locator('#open-action-match').click();
+  await page.locator('#action-hint').click(); await checkAction(1,'Action Match hint enabled');
+  await page.locator('#action-back').click(); await checkAction(0,'Action Match back');
+  await page.locator('#open-action-match').click(); await checkAction(0,'Action Match reentry after back');
+  await page.locator('#action-hint').click(); await page.locator('#action-hint').click();
+  await page.locator('#action-home').click(); await checkAction(0,'Action Match home');
+  await page.locator('#open-word').click(); await page.locator('#open-action-match').click(); await checkAction(0,'Action Match reentry after home');
+  await page.locator('#action-home').click();
+
+  await page.locator('#open-listen').click(); await page.locator('#open-bathroom').click();
+  await page.locator('#kana').click(); await checkShared(1,'bathroom hint enabled');
+  await page.locator('#bathroom-back').click(); await checkShared(1,'bathroom to place selection');
+  await page.locator('#open-breakfast').click(); await checkShared(1,'breakfast keeps the scene hint');
+  await page.locator('#breakfast-back').click();
+  await page.locator('#open-bedroom').click(); await checkShared(1,'bedroom keeps the scene hint');
+  await page.locator('#bedroom-back').click();
+  await page.locator('#back-games').click(); await checkShared(0,'place selection to home');
+  await page.locator('#open-listen').click(); await page.locator('#open-living').click(); await checkShared(0,'living reentry after home');
+  await page.locator('#living-kana').click(); await page.locator('#living-kana').click();
+  await checkShared(2,'living bilingual hint enabled');
+  await page.locator('#living-home').click(); await checkShared(0,'living home');
+  await page.locator('#open-listen').click(); await page.locator('#open-living').click(); await checkShared(0,'living reentry after home');
+  await page.locator('#living-home').click();
+
+  await page.locator('#open-think').click(); await page.locator('#think-start').click();
+  await page.locator('#think-hint').click(); await checkThink(true,'Think & Say hint enabled');
+  await page.locator('#think-proto-back').click(); await checkThink(false,'Think & Say back');
+  await page.locator('#open-think').click(); await page.locator('#think-start').click(); await checkThink(false,'Think & Say reentry after back');
+  await page.locator('#think-hint').click(); await page.locator('#think-proto-home').click(); await checkThink(false,'Think & Say home');
+  await page.locator('#open-think').click(); await page.locator('#think-start').click(); await checkThink(false,'Think & Say reentry after home');
+  await page.locator('#think-proto-home').click();
+  console.log(`PASS ${label}: return/home resets; Listen & Do scene changes retain hints; legacy saved text step is ignored`);
+}
+
+async function finishWordForHintReset(page) {
+  for(let count=1;count<=12;count++) {
+    const answer=await page.evaluate(()=>{
+      const name=document.querySelector('#word-caption-english').textContent;
+      const card=[...document.querySelectorAll('#word-board .word-card:not(.queued):not(.matched)')].find(candidate=>candidate.dataset.label===name);
+      return card?.dataset.word || null;
+    });
+    assert(answer,`Item Match: no card matches question ${count}`);
+    const previous=await page.locator('#word-caption-english').innerText();
+    await page.locator(`#word-board .word-card[data-word="${answer}"]`).click();
+    await page.waitForFunction(({count,previous})=>{
+      const matched=document.querySelectorAll('#word-board .word-card.matched').length;
+      return matched>=count && (document.querySelector('#word-finish').classList.contains('show') || document.querySelector('#word-caption-english').textContent!==previous);
+    },{count,previous},{timeout:4000});
+  }
+  assert.equal(await page.locator('#word-finish.show').count(),1,'Item Match did not reach the finish screen');
+}
+
+async function finishListenForHintReset(page,sceneName) {
+  for(let round=0;round<12;round++) {
+    const before=await page.evaluate(name=>window.__ouchieigoTest.state(name),sceneName);
+    if(before.finish) { assert.equal(before.done,before.total,`${sceneName}: finished early`); return; }
+    assert(before.item && before.target,`${sceneName}: missing current item or target`);
+    const selector=await page.evaluate(({name,item})=>window.__ouchieigoTest.selector(name,item),{name:sceneName,item:before.item});
+    const item=page.locator(`#${before.sceneId} ${selector}`);
+    const itemBox=await item.boundingBox();
+    assert(itemBox,`${sceneName}: current item ${before.item} is not visible`);
+    const destination=await page.evaluate(({sceneId,target})=>{
+      const scene=document.getElementById(sceneId),box=scene.querySelector(`g[data-target="${target}"] rect`).getBoundingClientRect(),stage=scene.getBoundingClientRect();
+      const left=Math.max(box.left,stage.left+27),right=Math.min(box.right,stage.right-27);
+      const top=Math.max(box.top,stage.top+27),bottom=Math.min(box.bottom,stage.bottom-27);
+      if(right<=left || bottom<=top) throw new Error(`${sceneId}: target ${target} is not reachable`);
+      return {x:(left+right)/2,y:(top+bottom)/2};
+    },{sceneId:before.sceneId,target:before.target});
+    await page.mouse.move(itemBox.x+itemBox.width/2,itemBox.y+itemBox.height/2);
+    await page.mouse.down();
+    let pointer={...destination};
+    await page.mouse.move(pointer.x,pointer.y,{steps:5});
+    for(let attempt=0;attempt<3;attempt++) {
+      const center=await item.evaluate(element=>{ const r=(element.querySelector('img') || element).getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; });
+      const dx=destination.x-center.x,dy=destination.y-center.y;
+      if(Math.hypot(dx,dy)<=2) break;
+      pointer={x:pointer.x+dx,y:pointer.y+dy};
+      await page.mouse.move(pointer.x,pointer.y,{steps:2});
+    }
+    await page.mouse.up();
+    await page.waitForFunction(({name,done})=>{
+      const state=window.__ouchieigoTest.state(name);
+      return state.done===done+1 && (state.finish || !state.transitioning);
+    },{name:sceneName,done:before.done},{timeout:7000});
+  }
+  throw new Error(`${sceneName}: exceeded expected task count before Play again`);
+}
+
+async function checkPlayAgainHintResets(page,engineName) {
+  const label=`${engineName} 375×667 Play again hint reset`;
+  await page.goto(`${url}?debug=1&automation=1`,{waitUntil:'load'});
+  await assertSilentAudio(page);
+  const sharedStep=()=>page.evaluate(()=>document.body.classList.contains('text-bilingual') ? 2 : document.body.classList.contains('text-english') ? 1 : 0);
+
+  await page.locator('#open-word').click(); await page.locator('#open-item-match').click();
+  await page.locator('#word-kana').click(); await page.locator('#word-kana').click();
+  await finishWordForHintReset(page);
+  assert.equal(await sharedStep(),2,`${label}: Item Match lost hints before Play again`);
+  await page.locator('#word-play-again').click();
+  assert.equal(await sharedStep(),0,`${label}: Item Match Play again kept hint stage`);
+  assert.equal(await page.locator('#word-kana').getAttribute('aria-pressed'),'false',`${label}: Item Match button stayed pressed`);
+  assert(await page.locator('#word-board .word-card:not(.queued) .word-labels').first().isHidden(),`${label}: Item Match label stayed visible`);
+  await page.locator('#word-home').click();
+
+  for(const [name,openId,screenId,backId] of scenes) {
+    await page.locator('#open-listen').click(); await page.locator(`#${openId}`).click();
+    const buttonId={bathroom:'kana',breakfast:'breakfast-kana',living:'living-kana',bedroom:'bedroom-kana'}[name];
+    const finishId={bathroom:'finish-panel',breakfast:'breakfast-finish',living:'living-finish',bedroom:'bedroom-finish'}[name];
+    const againId={bathroom:'play-again',breakfast:'breakfast-play-again',living:'living-play-again',bedroom:'bedroom-play-again'}[name];
+    const captionSelector={bathroom:'#instruction-caption',breakfast:'#breakfast-screen .breakfast-instruction-caption',living:'#living-screen .living-instruction-caption',bedroom:'#bedroom-screen .living-instruction-caption'}[name];
+    await page.locator(`#${buttonId}`).click(); await page.locator(`#${buttonId}`).click();
+    await finishListenForHintReset(page,name);
+    assert.equal(await page.locator(`#${finishId}.show`).count(),1,`${label}: ${name} did not finish`);
+    assert.equal(await sharedStep(),2,`${label}: ${name} lost hints before Play again`);
+    await page.locator(`#${againId}`).click();
+    assert.equal(await sharedStep(),0,`${label}: ${name} Play again kept hint stage`);
+    assert.equal(await page.locator(`#${buttonId}`).getAttribute('aria-pressed'),'false',`${label}: ${name} button stayed pressed`);
+    assert(await page.locator(captionSelector).isHidden(),`${label}: ${name} caption stayed visible`);
+    await page.locator(`#${backId}`).click(); await page.locator('#back-games').click();
+  }
+  console.log(`PASS ${label}: Item Match and all four Listen & Do scenes reset on Play again`);
+}
+
 for(const [engineName,engine,launchOptions] of engines) {
   if(engineName==='webkit' && !fs.existsSync(engine.executablePath())) {
     console.log(`SKIP webkit: Playwright WebKit is not installed (${engine.executablePath()}). Chromium and other tests continue.`);
@@ -356,6 +582,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         await capture('home-screen','home');
         await page.locator('#open-word').click(); await capture('match-mode-screen','mode');
         await page.locator('#open-item-match').click(); await capture('word-screen','word');
+        await inspectWordCaption(page,width,height);
         await page.locator('#word-home').click();
         const selectedWords=new Set();
         for(const fixture of actionFixtures) {
@@ -390,6 +617,7 @@ for(const [engineName,engine,launchOptions] of engines) {
                 await page.locator('#action-hint').click();
                 await assertActionHintStep(page,2,width,height);
                 await finishActionGame(page,current);
+                await assertActionHintStep(page,2,width,height);
                 await page.evaluate(draws=>window.__setActionTestRandom(draws),fixture.draws);
                 await page.locator('#action-play-again').click();
                 await assertActionHintStep(page,0,width,height);
@@ -410,6 +638,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         for(const [name,openId,screenId,backId] of scenes) {
           await page.locator(`#${openId}`).click(); await capture(screenId,'scene'); await page.locator(`#${backId}`).click();
         }
+        if(width===375) { current=`${engineName} 375×667 hint exit`; await checkHintExitResets(page,engineName); current=`${engineName} 375×667 Play again`; await checkPlayAgainHintResets(page,engineName); }
         completed++;
       } catch(error) {
         failures++;

@@ -125,9 +125,9 @@
     .word-paw .pad { left:57px; top:115px; width:204px; height:157px; border-radius:54% 54% 48% 48%; }
     .word-paw i { width:72px; height:91px; border-radius:58% 58% 48% 48%; }
     .word-paw i:nth-child(2) { left:22px; top:52px; transform:rotate(-28deg); } .word-paw i:nth-child(3) { left:94px; top:4px; } .word-paw i:nth-child(4) { right:94px; top:4px; } .word-paw i:nth-child(5) { right:22px; top:52px; transform:rotate(28deg); }
-    .word-title { position:absolute; z-index:2; left:16px; top:13px; padding:7px 12px; border-radius:999px; background:#ff8c47; box-shadow:0 3px 0 #c76c42; color:#fff; font-size:16px; font-weight:900; }
-    .word-caption { position:absolute; z-index:3; top:14px; right:16px; left:142px; display:none; padding:5px 9px; border-radius:10px; background:#fffdf4e8; color:#30445a; font-size:12px; font-weight:900; text-align:center; }
-    .text-english .word-caption, .text-bilingual .word-caption { display:block; } .text-english .word-caption .word-jp { display:none; } .word-caption .word-jp { display:block; margin-top:1px; color:#a25372; font-size:10px; }
+    .word-caption { position:absolute; z-index:3; top:8px; right:16px; left:16px; display:none; padding:4px 9px; border-radius:10px; background:#fffdf4; color:#30445a; font-size:12px; font-weight:900; line-height:15px; text-align:center; }
+    .text-english .word-caption, .text-bilingual .word-caption { display:block; } .text-english .word-caption .word-jp { display:none; } .word-caption .word-jp { display:block; margin-top:1px; color:#a25372; font-size:10px; line-height:12px; }
+    #word-screen { --item-hint-opacity:.8; }
     .word-card { position:relative; z-index:1; display:grid; place-items:center; min-width:0; min-height:0; border:3px solid #fff9; border-radius:22px; background:linear-gradient(145deg,#fffdf4,#f9ecd8); box-shadow:0 5px 0 #8a4d26,0 9px 14px #41251655; cursor:pointer; transition:opacity .2s,transform .2s; -webkit-tap-highlight-color:transparent; }
     .word-card:active { transform:translateY(3px) scale(.98); box-shadow:0 2px 0 #8a4d26,0 4px 9px #41251655; } .word-card.matched { opacity:0; transform:scale(.62) rotate(8deg); pointer-events:none; } .word-card.queued { display:none; }
     .word-card img, .word-card .word-sprite { width:91%; height:91%; object-fit:contain; filter:drop-shadow(0 3px 1px #5f45262e); pointer-events:none; }
@@ -164,11 +164,12 @@
     #action-screen[data-action-hint-step="1"] .action-label-ja,
     #action-screen[data-action-hint-step="2"] .action-label-ja,
     #action-screen[data-action-hint-step="2"] .action-label-en { display:block; }
-    .word-card::before, .word-card::after { position:absolute; z-index:2; display:none; left:4px; right:4px; overflow:hidden; color:#654632; font-weight:900; line-height:1.05; text-align:center; text-overflow:ellipsis; white-space:nowrap; pointer-events:none; text-shadow:0 1px 0 #fff; }
-    .word-card::after { content:attr(data-label); bottom:4px; font-size:10px; }
-    .word-card::before { content:attr(data-jp); bottom:15px; color:#a25372; font-size:9px; }
-    .text-english .word-card::after { display:block; } .text-bilingual .word-card::after, .text-bilingual .word-card::before { display:block; }
-    .text-english .word-card img, .text-english .word-card .word-sprite { width:80%; height:80%; } .text-bilingual .word-card img, .text-bilingual .word-card .word-sprite { width:69%; height:69%; }
+    .word-card .word-labels { position:absolute; z-index:2; right:0; bottom:0; left:0; display:none; padding:3px 4px 4px; border-radius:0 0 18px 18px; background:rgb(255 249 236 / var(--item-hint-opacity)); text-align:center; pointer-events:none; }
+    .word-card .word-label-ja, .word-card .word-label-en { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-weight:900; text-shadow:1px 0 #fff,-1px 0 #fff,0 1px #fff,0 -1px #fff; }
+    .word-card .word-label-ja { color:#654632; font-size:9px; line-height:11px; }
+    .word-card .word-label-en { display:none; color:#26364a; font-size:10px; line-height:12px; }
+    .text-english .word-card .word-labels, .text-bilingual .word-card .word-labels { display:block; }
+    .text-bilingual .word-card .word-label-en { display:block; }
     .word-sprite { background:url('breakfast-items-v2.png.webp') var(--word-sprite, 100% 100%) / 300% 200% no-repeat; }
     .word-finish { position:absolute; z-index:5; inset:0; display:none; place-items:center; padding:24px; background:#fff8e8e8; text-align:center; } .word-finish.show { display:grid; animation:appear .3s ease-out; }
     .speech-speed input { flex:1 1 auto; min-width:48px; height:48px; margin:0; appearance:none; background:transparent; cursor:pointer; touch-action:none; }
@@ -376,7 +377,7 @@
   <main class="app" id="word-screen" hidden aria-label="Word Match">
     <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="word-back" type="button" aria-label="ホームへ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="word-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="word-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="word-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="word-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="word-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
     <section class="word-board" id="word-board" aria-label="音をきいて同じアイコンをえらぶ">
-      <div class="word-paw" aria-hidden="true"><span class="pad"></span><i></i><i></i><i></i><i></i></div><span class="word-title">🔎 Word Match</span><div class="word-caption" aria-live="polite"><span id="word-caption-english"></span><span class="word-jp" id="word-caption-jp"></span></div>
+      <div class="word-paw" aria-hidden="true"><span class="pad"></span><i></i><i></i><i></i><i></i></div><div class="word-caption" aria-live="polite"><span id="word-caption-english"></span><span class="word-jp" id="word-caption-jp"></span></div>
       <button class="word-card" data-word="toothbrush" type="button" aria-label="Toothbrush"><img src="bathroom-item-toothbrush-v4.png.webp" alt=""></button><button class="word-card" data-word="cup" type="button" aria-label="Cup"><img src="bathroom-item-cup-v5.png.webp" alt=""></button><button class="word-card" data-word="towel" type="button" aria-label="Towel"><img src="bathroom-item-towel-v4.png.webp" alt=""></button><button class="word-card" data-word="soap" type="button" aria-label="Soap"><img src="bathroom-item-soap-v4.png.webp" alt=""></button><button class="word-card" data-word="toothpaste" type="button" aria-label="Toothpaste"><img src="bathroom-item-toothpaste-v4.png.webp" alt=""></button><button class="word-card" data-word="comb" type="button" aria-label="Comb"><img src="bathroom-item-comb-v4.png.webp" alt=""></button><button class="word-card" data-word="toast" type="button" aria-label="Toast"><span class="word-sprite" style="--word-sprite:0 0" aria-hidden="true"></span></button><button class="word-card" data-word="banana" type="button" aria-label="Banana"><span class="word-sprite" style="--word-sprite:50% 0" aria-hidden="true"></span></button><button class="word-card" data-word="milk" type="button" aria-label="Milk"><span class="word-sprite" style="--word-sprite:100% 0" aria-hidden="true"></span></button><button class="word-card" data-word="cereal" type="button" aria-label="Cereal"><span class="word-sprite" style="--word-sprite:0 100%" aria-hidden="true"></span></button><button class="word-card" data-word="spoon" type="button" aria-label="Spoon"><span class="word-sprite" style="--word-sprite:50% 100%" aria-hidden="true"></span></button><button class="word-card" data-word="plate" type="button" aria-label="Plate"><img src="breakfast-item-plate-v1.png.webp" alt=""></button><button class="word-card" data-word="mug" type="button" aria-label="Mug"><img src="breakfast-item-mug-v1.png.webp" alt=""></button><button class="word-card" data-word="fork" type="button" aria-label="Fork"><img src="breakfast-item-fork-v1.png.webp" alt=""></button><button class="word-card" data-word="chopsticks" type="button" aria-label="Chopsticks"><img src="breakfast-item-chopsticks-v1.png.webp" alt=""></button><button class="word-card" data-word="apple" type="button" aria-label="Apple"><img src="breakfast-item-apple-v1.png.webp" alt=""></button><button class="word-card" data-word="bowl" type="button" aria-label="Bowl"><img src="word-item-bowl-v1.png.webp" alt=""></button><button class="word-card" data-word="napkin" type="button" aria-label="Napkin"><span class="word-sprite" aria-hidden="true"></span></button><button class="word-card" data-word="sink" type="button" aria-label="Sink"><img src="word-target-sink-v1.png.webp" alt=""></button><button class="word-card" data-word="tray" type="button" aria-label="Tray"><img src="word-target-tray-v1.png.webp" alt=""></button><button class="word-card" data-word="rack" type="button" aria-label="Towel rack"><img src="word-target-rack-v1.png.webp" alt=""></button><button class="word-card" data-word="basket" type="button" aria-label="Laundry basket"><img src="word-target-basket-v1.png.webp" alt=""></button><button class="word-card" data-word="table" type="button" aria-label="Table"><img src="word-target-table-v1.png.webp" alt=""></button><button class="word-card" data-word="boy" type="button" aria-label="Boy"><img src="word-target-boy-v1.png.webp" alt=""></button><button class="word-card" data-word="girl" type="button" aria-label="Girl"><img src="word-target-girl-v2.png.webp" alt=""></button><button class="word-card" data-word="book" type="button" aria-label="Book"><img src="living-item-book-v1.png.webp" alt=""></button><button class="word-card" data-word="remote" type="button" aria-label="Remote"><img src="living-item-remote-v1.png.webp" alt=""></button><button class="word-card" data-word="blanket" type="button" aria-label="Blanket"><img src="living-item-blanket-v1.png.webp" alt=""></button><button class="word-card" data-word="blocks" type="button" aria-label="Blocks"><img src="living-item-blocks-v1.png.webp" alt=""></button><button class="word-card" data-word="car" type="button" aria-label="Toy car"><img src="living-item-toy-car-v1.png.webp" alt=""></button><button class="word-card" data-word="tissue" type="button" aria-label="Tissue"><img src="living-item-tissue-v3.png.webp" alt=""></button><button class="word-card" data-word="crayons" type="button" aria-label="Crayons"><img src="living-item-crayons-v1.png.webp" alt=""></button><button class="word-card" data-word="cookie-wrapper" type="button" aria-label="Cookie"><img src="living-item-cookie-wrapper-v3.png.webp" alt=""></button><button class="word-card" data-word="cat-drawing" data-label="Drawing" data-jp="え" type="button" aria-label="Drawing"><img src="living-item-cat-drawing-v3.png.webp" alt=""></button><button class="word-card" data-word="bookshelf" type="button" aria-label="Bookshelf"><img src="word-target-bookshelf-v1.png.webp" alt=""></button><button class="word-card" data-word="mom" type="button" aria-label="Mom"><img src="word-target-mom-v1.png.webp" alt=""></button><button class="word-card" data-word="sofa" type="button" aria-label="Sofa"><img src="word-target-sofa-v1.png.webp" alt=""></button><button class="word-card" data-word="toybox" type="button" aria-label="Toy box"><img src="word-target-toybox-v1.png.webp" alt=""></button><button class="word-card" data-word="bin" type="button" aria-label="Trash can"><img src="word-target-bin-v1.png.webp" alt=""></button>
       <div class="word-finish" id="word-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>You found every word!</p><button class="round" id="word-play-again" type="button">Play again</button></div></div>
     </section>
@@ -480,14 +481,14 @@
       const homeScreen = document.querySelector('#home-screen'), placeScreen = document.querySelector('#place-screen'), wordScreen = document.querySelector('#word-screen'), breakfastScreen = document.querySelector('#breakfast-screen'), livingScreen = document.querySelector('#living-screen'), gameScreen = document.querySelector('#game-screen'), scene = document.querySelector('#scene'), speaker = document.querySelector('#speaker'), kanaButton = document.querySelector('#kana'), breakfastKanaButton = document.querySelector('#breakfast-kana'), livingKanaButton = document.querySelector('#living-kana'), wordKanaButton = document.querySelector('#word-kana'), prompt = document.querySelector('#prompt'), finishPanel = document.querySelector('#finish-panel'), toast = document.querySelector('#toast'), captionEnglish = document.querySelector('#caption-english'), captionKana = document.querySelector('#caption-kana');
       const matchModeScreen=document.querySelector('#match-mode-screen'), actionScreen=document.querySelector('#action-screen'), actionSpeaker=document.querySelector('#action-speaker'), actionFinish=document.querySelector('#action-finish'), bedroomScreen=document.querySelector('#bedroom-screen'), bedroomScene=document.querySelector('#bedroom-scene'), bedroomSpeaker=document.querySelector('#bedroom-speaker'), bedroomCaptionEnglish=document.querySelector('#bedroom-caption-english'), bedroomCaptionKana=document.querySelector('#bedroom-caption-kana'), bedroomToast=document.querySelector('#bedroom-toast'), bedroomFinish=document.querySelector('#bedroom-finish'), bedroomKanaButton=document.querySelector('#bedroom-kana');
       const settingsStorageKey='ouchieigo-settings-v1'; let savedSettings={}; try { savedSettings=JSON.parse(localStorage.getItem(settingsStorageKey) || '{}') || {}; } catch (_) {}
-      const savedRate=Number(savedSettings.speechRate), savedTextDisplayStep=Number(savedSettings.textDisplayStep);
-      let current, currentPhrase, drag, voicesReady = false, speaking = false, audioContext, speechRate = savedRate>=.7 && savedRate<=1.2 ? savedRate : .95, textDisplayStep = [0,1,2].includes(savedTextDisplayStep) ? savedTextDisplayStep : 0, activeUtterance = null;
+      const savedRate=Number(savedSettings.speechRate);
+      let current, currentPhrase, drag, voicesReady = false, speaking = false, audioContext, speechRate = savedRate>=.7 && savedRate<=1.2 ? savedRate : .95, textDisplayStep = 0, activeUtterance = null;
       const wordBoard=document.querySelector('#word-board'), wordSpeaker=document.querySelector('#word-speaker'), wordFinish=document.querySelector('#word-finish'), wordCaptionEnglish=document.querySelector('#word-caption-english'), wordCaptionJapanese=document.querySelector('#word-caption-jp');
       const wordNames={toothbrush:'Toothbrush',cup:'Cup',towel:'Towel',soap:'Soap',toothpaste:'Toothpaste',comb:'Comb',toast:'Toast',banana:'Banana',milk:'Milk',cereal:'Cereal',spoon:'Spoon',plate:'Plate',mug:'Mug',fork:'Fork',chopsticks:'Chopsticks',apple:'Apple',bowl:'Bowl',napkin:'Napkin',sink:'Sink',tray:'Tray',rack:'Towel rack',basket:'Laundry basket',table:'Table',boy:'Boy',girl:'Girl',book:'Book',remote:'Remote',blanket:'Blanket',blocks:'Blocks',car:'Toy car',tissue:'Tissue',crayons:'Crayons',doll:'Doll','teddy-bear':'Teddy bear',cat:'Cat',turtle:'Turtle',rabbit:'Rabbit','cookie-wrapper':'Cookie','cat-drawing':'Drawing',bookshelf:'Bookshelf',mom:'Mom',sofa:'Sofa',toybox:'Toy box',bin:'Trash can',pajamas:'Pajamas',pillow:'Pillow',socks:'Socks','alarm-clock':'Alarm clock',nightcap:'Nightcap',bed:'Bed',dad:'Dad',drawer:'Drawer','night-table':'Night table'};
       const wordJapanese={toothbrush:'はぶらし',cup:'コップ',towel:'タオル',soap:'せっけん',toothpaste:'はみがきこ',comb:'くし',toast:'トースト',banana:'バナナ',milk:'ミルク',cereal:'シリアル',spoon:'スプーン',plate:'おさら',mug:'マグカップ',fork:'フォーク',chopsticks:'おはし',apple:'りんご',bowl:'ボウル',napkin:'ナプキン',sink:'シンク',tray:'トレー',rack:'タオルかけ',basket:'せんたくかご',table:'テーブル',boy:'おとこのこ',girl:'おんなのこ',book:'ほん',remote:'リモコン',blanket:'ブランケット',blocks:'つみき',car:'ミニカー',tissue:'ティッシュ',crayons:'クレヨン',doll:'おにんぎょう','teddy-bear':'くまのぬいぐるみ',cat:'ねこ',turtle:'かめ',rabbit:'うさぎ','cookie-wrapper':'クッキー','cat-drawing':'え',bookshelf:'ほんだな',mom:'ママ',sofa:'ソファ',toybox:'おもちゃばこ',bin:'ゴミばこ',pajamas:'パジャマ',pillow:'まくら',socks:'くつした','alarm-clock':'めざましどけい',nightcap:'ナイトキャップ',bed:'ベッド',dad:'パパ',drawer:'ドロアー','night-table':'ナイトテーブル'};
       [['pajamas','bedroom-item-pajamas-v1.png.webp'],['pillow','bedroom-item-pillow-v1.png.webp'],['socks','bedroom-item-socks-v1.png.webp'],['alarm-clock','bedroom-item-alarm-clock-v1.png.webp'],['nightcap','bedroom-item-nightcap-v1.png.webp'],['doll','living-item-doll-v1.png.webp'],['teddy-bear','think-say-teddy-bear-v1.png.webp'],['cat','think-say-cat-v1.png.webp'],['turtle','living-item-turtle-v1b.png.webp'],['rabbit','living-item-rabbit-v1a.png.webp']].forEach(([word,src])=>{ if(wordBoard.querySelector(`[data-word="${word}"]`)) return; const card=document.createElement('button'); card.className='word-card'; card.dataset.word=word; card.type='button'; card.setAttribute('aria-label',wordNames[word]); card.innerHTML=`<img src="${src}" alt="">`; wordBoard.insertBefore(card,wordFinish); });
       [['bed','word-target-bed-v1.png.webp'],['dad','word-target-dad-v1.png.webp'],['drawer','word-target-drawer-v1.png.webp'],['night-table','word-target-night-table-v1.png.webp']].forEach(([word,src])=>{ const card=document.createElement('button'); card.className='word-card'; card.dataset.word=word; card.type='button'; card.setAttribute('aria-label',wordNames[word]); card.innerHTML=`<img src="${src}" alt="">`; wordBoard.insertBefore(card,wordFinish); });
-      document.querySelectorAll('.word-card').forEach(card=>{ const word=card.dataset.word; card.dataset.label=wordNames[word] || ''; card.dataset.jp=wordJapanese[word] || ''; });
+      document.querySelectorAll('.word-card').forEach(card=>{ const word=card.dataset.word; card.dataset.label=wordNames[word] || ''; card.dataset.jp=wordJapanese[word] || ''; const labels=document.createElement('span'); labels.className='word-labels'; const japanese=document.createElement('span'); japanese.className='word-label-ja'; japanese.textContent=card.dataset.jp; const english=document.createElement('span'); english.className='word-label-en'; english.textContent=card.dataset.label; labels.append(japanese,english); card.append(labels); });
       let wordCurrent=null;
       const breakfastTasks = [
         {item:'toast', target:'plate', phrases:['Put the toast on the plate.','Please put the toast on the plate.','Can you put the toast on the plate?']},
@@ -779,11 +780,11 @@
       }
       setActionHintStep(0);
       function openActionMatch() { matchModeScreen.hidden=true; actionScreen.hidden=false; unlockAudio(); prepareActionCards(); selectAction(); }
-      function closeWord() { stopSpeech(); wordScreen.hidden=true; matchModeScreen.hidden=false; }
-      function closeActionMatch() { stopSpeech(); actionScreen.hidden=true; matchModeScreen.hidden=false; }
+      function closeWord() { stopSpeech(); resetHintStages(); wordScreen.hidden=true; matchModeScreen.hidden=false; }
+      function closeActionMatch() { stopSpeech(); resetHintStages(); actionScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeMatchMode() { matchModeScreen.hidden=true; homeScreen.hidden=false; }
       function prepareActionCards() {
-        setActionHintStep(0);
+        resetHintStages();
         actionFinish.classList.remove('show');
         for(const card of actionCards) {
           card.classList.remove('matched','queued');
@@ -1006,7 +1007,7 @@
         events(){ return {speech:[...speechEvents],recovery:[...recoveryEvents]}; }
       };
       function openPlaces() { homeScreen.hidden=true; placeScreen.hidden=false; }
-      function backToGames() { placeScreen.hidden=true; homeScreen.hidden=false; }
+      function backToGames() { resetHintStages(); placeScreen.hidden=true; homeScreen.hidden=false; }
       function prepareSceneImage(sceneElement) {
         if(sceneElement.dataset.imageReady) return;
         sceneElement.classList.add('scene-loading');
@@ -1025,7 +1026,7 @@
       function openLiving() { prepareSceneImage(livingScene); placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving(),'living'); }
       function openBedroom() { prepareSceneImage(bedroomScene); placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom(),'bedroom'); }
       function backToPlaces() { stopSpeech(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
-      function returnHome() { stopSpeech(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
+      function returnHome() { stopSpeech(); resetHintStages(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
       document.querySelector('#open-word').addEventListener('click', openWord);
       document.querySelector('#open-listen').addEventListener('click', openPlaces);
       document.querySelector('#back-games').addEventListener('click', backToGames);
@@ -1040,15 +1041,15 @@
       document.querySelector('#breakfast-home').addEventListener('click', returnHome);
       document.querySelector('#breakfast-reset').addEventListener('click',()=>{ unlockAudio(); resetBreakfast(); });
       breakfastSpeaker.addEventListener('click',()=>{ unlockAudio(); if (!breakfastStarted) resetBreakfast(); else speakBreakfast(true); });
-      document.querySelector('#breakfast-play-again').addEventListener('click',()=>{ unlockAudio(); resetBreakfast(); });
+      document.querySelector('#breakfast-play-again').addEventListener('click',()=>{ resetHintStages(); unlockAudio(); resetBreakfast(); });
       document.querySelector('#living-home').addEventListener('click',returnHome);
       document.querySelector('#living-reset').addEventListener('click',()=>{ unlockAudio(); resetLiving(); });
       livingSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!livingCurrent) resetLiving(false); speakLiving(true); });
-      document.querySelector('#living-play-again').addEventListener('click',()=>{ unlockAudio(); resetLiving(); });
+      document.querySelector('#living-play-again').addEventListener('click',()=>{ resetHintStages(); unlockAudio(); resetLiving(); });
       document.querySelector('#bedroom-home').addEventListener('click',returnHome);
       document.querySelector('#bedroom-reset').addEventListener('click',()=>{ unlockAudio(); resetBedroom(); });
       bedroomSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!bedroomCurrent)resetBedroom(false); speakBedroom(true); });
-      document.querySelector('#bedroom-play-again').addEventListener('click',()=>{ unlockAudio(); resetBedroom(); });
+      document.querySelector('#bedroom-play-again').addEventListener('click',()=>{ resetHintStages(); unlockAudio(); resetBedroom(); });
       document.querySelector('#word-back').addEventListener('click', closeWord);
       document.querySelector('#word-home').addEventListener('click', returnHome);
       document.querySelector('#match-mode-back').addEventListener('click',closeMatchMode);
@@ -1063,15 +1064,16 @@
       document.querySelector('#action-play-again').addEventListener('click',()=>{ unlockAudio(); prepareActionCards(); selectAction(); });
       document.querySelector('#word-reset').addEventListener('click',()=>{ unlockAudio(); resetWord(); });
       wordSpeaker.addEventListener('click',()=>{ unlockAudio(); if(!wordCurrent) resetWord(false); speakWord(true); });
-      document.querySelector('#word-play-again').addEventListener('click',()=>{ unlockAudio(); resetWord(); });
+      document.querySelector('#word-play-again').addEventListener('click',()=>{ resetHintStages(); unlockAudio(); resetWord(); });
       document.querySelector('#home').addEventListener('click', returnHome);
       speaker.addEventListener('click', () => { unlockAudio(); if (!current) resetGame(false); speak(); });
       document.querySelector('#reset').addEventListener('click', () => { unlockAudio(); resetGame(); });
-      function saveSettings() { try { localStorage.setItem(settingsStorageKey,JSON.stringify({speechRate,textDisplayStep})); } catch (_) {} }
+      function saveSettings() { try { localStorage.setItem(settingsStorageKey,JSON.stringify({speechRate})); } catch (_) {} }
       function applyTextDisplay() { document.body.classList.toggle('text-english',textDisplayStep===1); document.body.classList.toggle('text-bilingual',textDisplayStep===2); const labels=['字幕を表示','英語と日本語の字幕を表示','字幕を非表示']; [kanaButton, breakfastKanaButton, livingKanaButton, bedroomKanaButton, wordKanaButton].forEach(control=>{ control.setAttribute('aria-pressed',String(textDisplayStep!==0)); control.setAttribute('aria-label',labels[textDisplayStep]); }); updateCaption(); updateBreakfastCaption(); updateLivingCaption(); updateBedroomCaption(); updateWordCaption(); }
-      function cycleTextDisplay() { textDisplayStep=(textDisplayStep+1)%3; applyTextDisplay(); saveSettings(); }
+      function resetHintStages() { textDisplayStep=0; applyTextDisplay(); setActionHintStep(0); }
+      function cycleTextDisplay() { textDisplayStep=(textDisplayStep+1)%3; applyTextDisplay(); }
       [kanaButton, breakfastKanaButton, livingKanaButton, bedroomKanaButton, wordKanaButton].forEach(button=>button.addEventListener('click', cycleTextDisplay));
-      document.querySelector('#play-again').addEventListener('click', () => { unlockAudio(); resetGame(); });
+      document.querySelector('#play-again').addEventListener('click', () => { resetHintStages(); unlockAudio(); resetGame(); });
       document.querySelectorAll('.speech-speed-input').forEach(slider=>{ slider.value=String(speechRate); slider.addEventListener('input',()=>{ speechRate=Number(slider.value); document.querySelectorAll('.speech-speed-input').forEach(other=>{ if(other!==slider) other.value=String(speechRate); }); saveSettings(); }); });
       if ('speechSynthesis' in window) { speechSynthesis.addEventListener('voiceschanged',onVoicesChanged); voicesReady=getEnglishVoices().length>0; }
       applyTextDisplay();
@@ -1630,7 +1632,7 @@
   $('proto-back').addEventListener('click', returnHome);
   $('proto-home').addEventListener('click', returnHome);
   $('boy').addEventListener('error', () => { const fallback = document.createElement('span'); fallback.className = 'fallback'; fallback.textContent = '👦'; $('boy').replaceWith(fallback); });
-  $('restart').addEventListener('click', () => { unlockAudio(); startGame(); });
+  $('restart').addEventListener('click', () => { setHintsVisible(false); unlockAudio(); startGame(); });
   $('start').addEventListener('click', async () => {
     const currentRun = ++runToken;
     $('start').disabled=true;
@@ -1669,6 +1671,7 @@
     pendingCardWord = pendingHintWord = null;
     pendingCorrect = false;
     speechBusy = false;
+    setHintsVisible(false);
     phase = 'intro';
     thinkScreen.hidden = true;
   }

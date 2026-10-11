@@ -275,6 +275,7 @@ async function runGame(page,width,height,seed) {
       await checkHint(page);
       await checkWrongAndSpeaker(page,q,board,width===375 ? 'left' : width===390 ? 'right' : 'both');
     } else {
+      if(round===4) { await page.locator('#think-hint').click(); assert.equal(await page.locator('#think-hint').getAttribute('aria-pressed'),'true','final question hint did not turn on'); }
       await dropCard(page,'left',q.leftAnswer);
       await dropCard(page,'right',q.rightAnswer);
     }
@@ -284,6 +285,11 @@ async function runGame(page,width,height,seed) {
   }
   assert.equal(seenLeft.size,5);
   assert.equal(seenImages.size,5);
+  await page.locator('#think-restart').click();
+  await page.waitForFunction(()=>document.querySelector('#think-count').textContent.trim()==='1 / 5');
+  assert.equal(await page.locator('#think-hint').getAttribute('aria-pressed'),'false','Play again kept the Think & Say hint pressed');
+  assert.equal(await page.locator('#think-screen .card-ja:not([hidden])').count(),0,'Play again kept Think & Say Japanese labels visible');
+  assert.equal(await page.locator('#think-finish.show').count(),0,'Play again did not dismiss the finish screen');
   await page.locator('#think-proto-home').click();
   assert(await page.locator('#home-screen').isVisible(),'Home button did not return home');
   await page.locator('#open-think').click();
