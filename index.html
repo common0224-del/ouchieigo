@@ -145,7 +145,7 @@
     .match-choice-icon { display:grid; place-items:center; width:58px; height:58px; border-radius:50% 48% 52% 46%; background:#fff3; border:2px solid #fff9; font-size:31px; }
     .match-choice-copy { min-width:0; padding:0 8px; }
     .match-choice strong { display:block; overflow:hidden; font-size:21px; line-height:1.05; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 2px 0 #0002; } .match-choice small { display:block; margin-top:5px; font-size:13px; font-weight:800; line-height:1.15; } .match-choice-arrow { font-size:24px; font-weight:900; text-align:right; }
-    #action-screen { min-height:0; }
+    #action-screen { min-height:0; --action-hint-opacity:.8; }
     .action-board { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:1fr; grid-template-rows:repeat(4,minmax(0,1fr)); gap:8px; padding:10px 14px 14px; overflow:hidden; background:repeating-linear-gradient(8deg,#c98644 0 3px,#d99d59 4px 8px,#ba7134 9px 12px); }
     .action-card { position:relative; display:grid; place-items:center; min-width:0; min-height:0; overflow:hidden; border:3px solid #fff9; border-radius:18px; background:linear-gradient(145deg,#fffdf4,#f6dfc1); box-shadow:0 4px 0 #8a4d26,0 6px 10px #41251655; cursor:pointer; transition:opacity .2s,transform .2s; }
     .action-card:active { transform:translateY(3px); box-shadow:0 2px 0 #8a4d26,0 4px 8px #41251655; } .action-card img { position:absolute; top:0; left:0; display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; }
@@ -154,6 +154,16 @@
     .action-card[data-panels="2"]::after { left:calc(50% + 10px); }
     .action-card.queued { display:none; }
     .action-card.matched { opacity:0; transform:scale(.72); pointer-events:none; }
+    #action-screen #action-hint { background:linear-gradient(145deg,#ecd8ff,#c695e4); font-size:13px; }
+    #action-screen #action-hint[aria-pressed="true"] { background:linear-gradient(145deg,#d8f5ff,#81c8e6); }
+    #action-screen .action-labels { position:absolute; z-index:3; top:0; right:0; left:0; height:26px; display:none; align-items:center; justify-content:space-between; gap:4px; padding:0 7px; background:rgb(255 249 236 / var(--action-hint-opacity)); pointer-events:none; }
+    #action-screen .action-label-en, #action-screen .action-label-ja { display:none; max-width:calc(50% - 9px); min-width:0; overflow:hidden; white-space:nowrap; font-weight:900; line-height:1.2; text-shadow:1px 0 #fff,-1px 0 #fff,0 1px #fff,0 -1px #fff; }
+    #action-screen .action-label-en { color:#26364a; font-size:clamp(11px,2.9vw,12px); }
+    #action-screen .action-label-ja { margin-left:auto; color:#654632; font-size:clamp(12px,3.1vw,13px); text-align:right; }
+    #action-screen:is([data-action-hint-step="1"],[data-action-hint-step="2"]) .action-labels { display:flex; }
+    #action-screen[data-action-hint-step="1"] .action-label-ja,
+    #action-screen[data-action-hint-step="2"] .action-label-ja,
+    #action-screen[data-action-hint-step="2"] .action-label-en { display:block; }
     .word-card::before, .word-card::after { position:absolute; z-index:2; display:none; left:4px; right:4px; overflow:hidden; color:#654632; font-weight:900; line-height:1.05; text-align:center; text-overflow:ellipsis; white-space:nowrap; pointer-events:none; text-shadow:0 1px 0 #fff; }
     .word-card::after { content:attr(data-label); bottom:4px; font-size:10px; }
     .word-card::before { content:attr(data-jp); bottom:15px; color:#a25372; font-size:9px; }
@@ -360,7 +370,7 @@
     <section class="match-mode"><div class="match-mode-intro"><img class="match-mode-cat" src="cat-mascot-v2-small.png.webp" alt=""><div><h2>Word Match</h2><p>えいごを きいて、ぴったりの えを みつけよう</p></div></div><button class="match-choice match-choice-item" id="open-item-match" type="button"><span class="match-choice-icon" aria-hidden="true">🔎</span><span class="match-choice-copy"><strong>Item Match</strong><small>ものの なまえを みつけよう</small></span><span class="match-choice-arrow" aria-hidden="true">▶</span></button><button class="match-choice action" id="open-action-match" type="button"><span class="match-choice-icon" aria-hidden="true">✋</span><span class="match-choice-copy"><strong>Action Match</strong><small>うごきを みつけよう</small></span><span class="match-choice-arrow" aria-hidden="true">▶</span></button></section>
   </main>
   <main class="app" id="action-screen" hidden aria-label="Action Match">
-    <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="action-back" type="button" aria-label="Word Match の選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="action-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="action-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="action-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
+    <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="action-back" type="button" aria-label="Word Match の選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="action-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="action-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="action-hint" type="button" aria-label="日本語を表示" aria-pressed="false">もじ</button><button class="round compact-control" id="action-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
     <section class="action-board" aria-label="動作をきいてカードをえらぶ"><button class="action-card" data-action="put" data-panels="2" type="button" aria-label="Put"><img src="action-put-boy-v5.png.webp" alt=""></button><button class="action-card" data-action="put" data-panels="2" type="button" aria-label="Put"><img src="action-put-girl-v5.png.webp" alt=""></button><button class="action-card" data-action="get" data-panels="2" type="button" aria-label="Get"><img src="action-get-boy-v4.png.webp" alt=""></button><button class="action-card" data-action="get" data-panels="2" type="button" aria-label="Get"><img src="action-get-girl-v4.png.webp" alt=""></button><button class="action-card" data-action="bring" data-panels="2" type="button" aria-label="Bring"><img src="action-bring-boy-v3.png.webp" alt=""></button><button class="action-card" data-action="bring" data-panels="2" type="button" aria-label="Bring"><img src="action-bring-girl-v4.png.webp" alt=""></button><button class="action-card" data-action="throw" data-panels="2" type="button" aria-label="Throw away"><img src="action-throw-boy-v3.png.webp" alt=""></button><button class="action-card" data-action="throw" data-panels="2" type="button" aria-label="Throw away"><img src="action-throw-girl-v5.png.webp" alt=""></button><button class="action-card" data-action="put-on" data-panels="2" type="button" aria-label="Put it on"><img src="action-put-on-boy-v3b.png.webp" alt=""></button><button class="action-card" data-action="put-on" data-panels="2" type="button" aria-label="Put it on"><img src="action-put-on-girl-v3a.png.webp" alt=""></button><button class="action-card" data-action="take-off" data-panels="2" type="button" aria-label="Take it off"><img src="action-take-off-boy-v1b.png.webp" alt=""></button><button class="action-card" data-action="take-off" data-panels="2" type="button" aria-label="Take it off"><img src="action-take-off-girl-v3a.png.webp" alt=""></button><button class="action-card" data-action="open" data-panels="2" type="button" aria-label="Open it"><img src="action-open-boy-v1b.png.webp" alt=""></button><button class="action-card" data-action="open" data-panels="2" type="button" aria-label="Open it"><img src="action-open-girl-v2a.png.webp" alt=""></button><button class="action-card" data-action="close" data-panels="2" type="button" aria-label="Close it"><img src="action-close-boy-v1a.png.webp" alt=""></button><button class="action-card" data-action="close" data-panels="2" type="button" aria-label="Close it"><img src="action-close-girl-v1a.png.webp" alt=""></button><button class="action-card" data-action="pick-up" data-panels="2" type="button" aria-label="Pick it up"><img src="action-pick-up-boy-v1a.png.webp" alt=""></button><button class="action-card" data-action="pick-up" data-panels="2" type="button" aria-label="Pick it up"><img src="action-pick-up-girl-v1b.png.webp" alt=""></button><div class="breakfast-finish" id="action-finish" aria-live="assertive"><div class="finish-card"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great action words!</p><button class="round" id="action-play-again" type="button">Play again</button></div></div></section>
   </main>
   <main class="app" id="word-screen" hidden aria-label="Word Match">
@@ -750,11 +760,30 @@
       const actionBoard=document.querySelector('#action-screen .action-board');
       const actionCards=[...actionBoard.querySelectorAll('.action-card')];
       const actionPhrases={put:'Put it.',get:'Get it.',bring:'Bring it to me.',throw:'Throw it away.','put-on':'Put it on.','take-off':'Take it off.',open:'Open it.',close:'Close it.','pick-up':'Pick it up.'};
+      const actionJapanese={put:['おく','おく'],get:['とる','とる'],bring:['もってきて','もってきて'],throw:['すてる','すてる'],'put-on':['ぼうしを かぶる','くつしたを はく'],'take-off':['ぼうしを ぬぐ','くつしたを ぬぐ'],open:['ふたを あける','カーテンを あける'],close:['ふたを しめる','カーテンを しめる'],'pick-up':['ボールを ひろう','ぬいぐるみを ひろう']};
+      const actionHintButton=document.querySelector('#action-hint');
+      let actionHintStep=0;
+      function setActionHintStep(step) {
+        actionHintStep=step;
+        actionScreen.dataset.actionHintStep=String(step);
+        actionHintButton.setAttribute('aria-pressed',String(step!==0));
+        actionHintButton.setAttribute('aria-label',['日本語を表示','英語も表示','文字を消す'][step]);
+      }
+      for(const card of actionCards) {
+        const action=card.dataset.action;
+        const gender=card.querySelector('img').getAttribute('src').includes('-girl-') ? 1 : 0;
+        const labels=document.createElement('span'); labels.className='action-labels';
+        const english=document.createElement('span'); english.className='action-label-en'; english.textContent=actionPhrases[action];
+        const japanese=document.createElement('span'); japanese.className='action-label-ja'; japanese.textContent=actionJapanese[action][gender];
+        labels.append(english,japanese); card.append(labels);
+      }
+      setActionHintStep(0);
       function openActionMatch() { matchModeScreen.hidden=true; actionScreen.hidden=false; unlockAudio(); prepareActionCards(); selectAction(); }
       function closeWord() { stopSpeech(); wordScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeActionMatch() { stopSpeech(); actionScreen.hidden=true; matchModeScreen.hidden=false; }
       function closeMatchMode() { matchModeScreen.hidden=true; homeScreen.hidden=false; }
       function prepareActionCards() {
+        setActionHintStep(0);
         actionFinish.classList.remove('show');
         for(const card of actionCards) {
           card.classList.remove('matched','queued');
@@ -1028,6 +1057,7 @@
       document.querySelector('#open-action-match').addEventListener('click',openActionMatch);
       document.querySelector('#action-back').addEventListener('click',closeActionMatch);
       document.querySelector('#action-home').addEventListener('click',returnHome);
+      actionHintButton.addEventListener('click',()=>setActionHintStep((actionHintStep+1)%3));
       document.querySelector('#action-speaker').addEventListener('click',()=>{ unlockAudio(); speakAction(true); });
       document.querySelectorAll('[data-action]').forEach(card=>card.addEventListener('click',()=>{ if(card.classList.contains('queued')||card.classList.contains('matched'))return; unlockAudio(); if(card.dataset.action===actionCurrent) { card.classList.add('matched'); card.setAttribute('aria-hidden','true'); card.tabIndex=-1; correctSound(); setTimeout(selectAction,600); } else { wrongSound(); setTimeout(()=>speakAction(true),500); } }));
       document.querySelector('#action-play-again').addEventListener('click',()=>{ unlockAudio(); prepareActionCards(); selectAction(); });

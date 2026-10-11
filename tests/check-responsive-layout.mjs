@@ -27,6 +27,7 @@ const actionDefinitions={
   'pick-up':{phrase:'Pick it up.',images:['action-pick-up-boy-v1a.png.webp','action-pick-up-girl-v1b.png.webp']},
 };
 const actionKeys=Object.keys(actionDefinitions);
+const actionJapaneseExpected={put:['おく','おく'],get:['とる','とる'],bring:['もってきて','もってきて'],throw:['すてる','すてる'],'put-on':['ぼうしを かぶる','くつしたを はく'],'take-off':['ぼうしを ぬぐ','くつしたを ぬぐ'],open:['ふたを あける','カーテンを あける'],close:['ふたを しめる','カーテンを しめる'],'pick-up':['ボールを ひろう','ぬいぐるみを ひろう']};
 const actionImageNames=Object.values(actionDefinitions).flatMap(({images})=>images);
 const actionImageBatches=Array.from({length:Math.ceil(actionImageNames.length/4)},(_,index)=>{
   const batch=actionImageNames.slice(index*4,index*4+4);
@@ -39,6 +40,9 @@ const actionPhrasesLiteral=actionSource.match(/const actionPhrases=(\{[^;]+\});/
 assert(actionPhrasesLiteral,'Action Match speech phrase table is missing');
 const actualActionPhrases=JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionPhrasesLiteral})`)));
 assert.deepEqual(actualActionPhrases,Object.fromEntries(Object.entries(actionDefinitions).map(([key,{phrase}])=>[key,phrase])),'Action Match speech phrase table differs from the nine approved sentences');
+const actionJapaneseLiteral=actionSource.match(/const actionJapanese=(\{[^;]+\});/)?.[1];
+assert(actionJapaneseLiteral,'Action Match Japanese hint table is missing');
+assert.deepEqual(JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionJapaneseLiteral})`))),actionJapaneseExpected,'Action Match Japanese hints differ from the approved text');
 const actionFixtures=[
   {name:'low',draws:[0],expected:['action-bring-girl-v4.png.webp','action-throw-girl-v5.png.webp','action-put-on-girl-v3a.png.webp','action-get-girl-v4.png.webp']},
   {name:'middle',draws:[0.45],expected:['action-open-girl-v2a.png.webp','action-pick-up-girl-v1b.png.webp','action-get-girl-v4.png.webp','action-put-girl-v5.png.webp']},
@@ -119,6 +123,96 @@ async function inspectActionSelection(page,engineName,width,height,fixture,openi
   }
   console.log(`PASS ${label}: four distinct words in seeded visual and accessibility order`);
   return cards;
+}
+
+async function inspectActionHintLabels(page) {
+  const labels=await page.locator('#action-screen .action-card').evaluateAll(cards=>cards.map(card=>({
+    action:card.dataset.action,
+    gender:card.querySelector('img').getAttribute('src').includes('-girl-') ? 1 : 0,
+    en:card.querySelector('.action-label-en')?.textContent,
+    ja:card.querySelector('.action-label-ja')?.textContent,
+    count:card.querySelectorAll('.action-labels').length
+  })));
+  assert.equal(labels.length,18,'Action Match: expected hint labels on all 18 cards');
+  for(const label of labels) {
+    assert.equal(label.count,1,`${label.action} has duplicate or missing label groups`);
+    assert.equal(label.en,actionDefinitions[label.action].phrase,`${label.action} English differs from speech`);
+    assert.equal(label.ja,actionJapaneseExpected[label.action][label.gender],`${label.action} Japanese differs from the approved text`);
+    assert(!/[一-龯々]/u.test(label.ja),`${label.action} Japanese contains kanji`);
+  }
+}
+
+async function assertActionHintStep(page,step,width,height,baselineImages) {
+  const result=await page.evaluate(()=>{
+    const screen=document.querySelector('#action-screen'),button=document.querySelector('#action-hint');
+    const rect=el=>{ const r=el.getBoundingClientRect(); return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
+    const cards=[...screen.querySelectorAll('.action-card:not(.queued):not(.matched)')].map(card=>{
+      const image=rect(card.querySelector('img'));
+      const labels={en:card.querySelector('.action-label-en'),ja:card.querySelector('.action-label-ja')};
+      const r=rect(card),band=card.querySelector('.action-labels'),seen={};
+      for(const [kind,el] of Object.entries(labels)) seen[kind]=el.getClientRects().length ? {box:rect(el),scrollWidth:el.scrollWidth,clientWidth:el.clientWidth} : null;
+      return {name:card.querySelector('img').getAttribute('src'),card:r,image,band:band.getClientRects().length ? rect(band) : null,labels:seen};
+    });
+    return {step:screen.dataset.actionHintStep,pressed:button.getAttribute('aria-pressed'),description:button.getAttribute('aria-label'),button:rect(button),cards};
+  });
+  const context=`${width}×${height} hint step ${step}`;
+  assert.equal(result.step,String(step),`${context}: wrong hint step`);
+  assert.equal(result.pressed,String(step!==0),`${context}: wrong aria-pressed`);
+  assert.equal(result.description,['日本語を表示','英語も表示','文字を消す'][step],`${context}: wrong button description`);
+  assert(result.button.width>=48 && result.button.height>=48,`${context}: hint button is too small`);
+  for(const card of result.cards) {
+    if(baselineImages) {
+      const baseline=baselineImages.get(card.name);
+      assert(baseline,`${context}: no baseline image rectangle for ${card.name}`);
+      for(const key of ['x','y','width','height']) assert(Math.abs(card.image[key]-baseline[key])<=.5,`${context}: ${card.name} image ${key} changed when hints were toggled`);
+    }
+    assert.equal(Boolean(card.band),step!==0,`${context}: top band visibility is wrong`);
+    assert.equal(Boolean(card.labels.ja),step>=1,`${context}: Japanese visibility is wrong`);
+    assert.equal(Boolean(card.labels.en),step===2,`${context}: English visibility is wrong`);
+    if(card.band) {
+      assert(Math.abs(card.band.x-card.card.x)<=4 && Math.abs(card.band.right-card.card.right)<=4,`${context}: band does not span the card width`);
+      assert(Math.abs(card.band.y-card.card.y)<=4,`${context}: band is not at the card top`);
+    }
+    for(const label of Object.values(card.labels).filter(Boolean)) {
+      const box=label.box;
+      assert(box.x>=card.card.x-1 && box.right<=card.card.right+1 && box.y>=card.card.y-1 && box.bottom<=card.card.bottom+1,`${context}: hint label leaves its card`);
+      assert(label.scrollWidth<=label.clientWidth+1,`${context}: hint text is clipped`);
+      const arrowTop=card.card.y+card.card.height/2;
+      const arrow={x:card.card.x+card.card.width/2-19,right:card.card.x+card.card.width/2+19,y:arrowTop-11,bottom:arrowTop+11};
+      assert(box.right<=arrow.x || box.x>=arrow.right || box.bottom<=arrow.y || box.y>=arrow.bottom,`${context}: hint label covers the double arrow`);
+      assert(box.y>=card.band.y-1 && box.bottom<=card.band.bottom+1,`${context}: label leaves the top band`);
+    }
+    if(card.labels.en && card.labels.ja) assert(card.labels.en.box.right<=card.labels.ja.box.x,`${context}: English and Japanese labels overlap`);
+  }
+  return new Map(result.cards.map(card=>[card.name,card.image]));
+}
+
+async function checkActionHintCycle(page,width,height) {
+  await inspectActionHintLabels(page);
+  const baseline=await assertActionHintStep(page,0,width,height);
+  for(const step of [1,2,0]) {
+    await page.locator('#action-hint').click();
+    await assertActionHintStep(page,step,width,height,baseline);
+  }
+}
+
+async function checkAllActionHintGeometry(page,engineName,width,height,selected) {
+  await checkActionHintCycle(page,width,height);
+  for(const batch of actionImageBatches) {
+    await showActionImages(page,batch);
+    const baseline=await assertActionHintStep(page,0,width,height);
+    await page.locator('#action-hint').click(); // 日本語
+    await assertActionHintStep(page,1,width,height,baseline);
+    await page.locator('#action-hint').click(); // 日本語と英語
+    await assertActionHintStep(page,2,width,height,baseline);
+    await page.locator('#action-hint').click(); // 消す
+  }
+  await showActionImages(page,selected.map(card=>card.name));
+  await page.locator('#action-hint').click(); // 比較用に両方のラベルを表示
+  await page.locator('#action-hint').click();
+  await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-action-hints.png`)});
+  await page.locator('#action-hint').click(); // 消す
+  await assertActionHintStep(page,0,width,height);
 }
 
 async function inspectMatchedSlots(page,selected,label) {
@@ -285,14 +379,20 @@ for(const [engineName,engine,launchOptions] of engines) {
               }
               assert.deepEqual(inspected,new Set(actionImageNames),`${current}: not all 18 Action Match images were inspected`);
               await showActionImages(page,selected.map(card=>card.name));
+              await checkAllActionHintGeometry(page,engineName,width,height,selected);
             }
             openings.push(selected);
             if(opening===1) {
+              if(fixture===actionFixtures[0]) await page.locator('#action-hint').click();
               await inspectMatchedSlots(page,selected,current);
               if(fixture===actionFixtures[0]) {
+                await assertActionHintStep(page,1,width,height); // 問題が進んでも段階を保持
+                await page.locator('#action-hint').click();
+                await assertActionHintStep(page,2,width,height);
                 await finishActionGame(page,current);
                 await page.evaluate(draws=>window.__setActionTestRandom(draws),fixture.draws);
                 await page.locator('#action-play-again').click();
+                await assertActionHintStep(page,0,width,height);
                 const restarted=await inspectActionSelection(page,engineName,width,height,fixture,'Play again');
                 assert.deepEqual(restarted.map(card=>card.name),selected.map(card=>card.name),`${current}: Play again did not reset the seeded selection`);
                 assert.equal(await page.locator('#action-screen .action-card.matched').count(),0,`${current}: Play again retained matched cards`);
