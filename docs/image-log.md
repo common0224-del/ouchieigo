@@ -2,6 +2,47 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-11 — Action Match 女の子版「Open it.」「Close it.」カーテンを若草色に変更
+
+- **理由・採用：** 元の淡いクリーム色のカーテンは、実際のカードのクリーム色の背景に溶けて見えにくかった。落ち着いた若草色（基準 `#8FBF6A`）で全面的に描き直した `private-prototypes/action-match/action-open-girl-v4a.png.webp` を採用し、公開ルートの `action-open-girl-v2a.png.webp` にコピーして上書きした。候補 v4b は不採用。
+- **Close it.：** `private-prototypes/action-match/action-close-girl-v3a.png.webp` は、若草色の Open it. v4a の左右400×450pxを復号後の画素そのままで入れ替えたもの。こちらを公開ルートの `action-close-girl-v1a.png.webp` にコピーして上書きした。Close it. の画像生成プロンプトはなく、別案 v3b は不採用。両候補の元ファイルは非公開フォルダに残した。
+- **旧版の保存先：** 上書き前の公開画像は、`private-prototypes/action-match/action-open-girl-v2a.png.webp` と `private-prototypes/action-match/action-close-girl-v1a.png.webp` にそれぞれバイト単位で一致した。これらをクリーム色の元版として保管し、別名の退避ファイルは作らない。この後の v2a／v1a の生成・採用記録は、クリーム色版を制作した当時の記録である。公開側はファイル名を維持するが、中身は若草色版（それぞれ元は v4a／v3a）。
+- **不採用にした過程：** カーテンを領域指定で色置換した `action-open-girl-v3a.png.webp`／`action-close-girl-v2a.png.webp` と、人物マスクを追加した `action-open-girl-v3b.png.webp`／`action-close-girl-v2b.png.webp` は、人物との境目に緑のにじみやクリーム色のまだらが出たため不採用。画像を生成し直した v4a を採用した。
+- **元画像との差：** v4a はカーテン以外にも窓枠とレールがやや太く、顔・手の描線に小さな差がある。動作の意味は変わらないため許容した。
+- **仕上げ・検査：** 純緑背景 `#00FF00` の生成画像をアルファ透過し、縦横比を保って各800×450pxに収め、lossless WebP として保存。公開側と採用候補はそれぞれバイト単位で一致。公開2枚の四隅のアルファ値はすべて0。Close it. の対応コマは Open it. と復号後の画素が一致する。
+
+### v4a・v4b の生成時に添付した参考画像
+
+1. 公開ルートの旧 `action-open-girl-v2a.png.webp`（生成時の編集対象。構図・人物・窓・手・表情の基準。現在の公開ファイルは若草色版に差し替え済み）
+2. `docs/characters/girl-daywear-v1.png.webp`（顔・髪・昼服）
+3. 公開ルートの `cat-mascot-v2-small.png.webp`（胸の猫の顔）
+
+### 採用 v4a の生成プロンプト全文
+
+```text
+Use case: precise-object-edit
+Asset type: Action Match two-panel children's game illustration, Open it.
+Input images: Image 1 is the exact edit target and master for composition, character, window, hands, expressions, and proportions: action-open-girl-v2a.png.webp. Image 2 is only a reference for the same girl's face, high brown hair bun, blue scrunchie, pink daywear dress, and bare feet: girl-daywear-v1.png.webp. Image 3 is only a reference for the tiny simplified black-and-white cat face on her chest: cat-mascot-v2-small.png.webp.
+Primary request: Recreate Image 1 as faithfully as possible. Change ONLY the curtain and curtain tiebacks from pale cream to solid muted young-grass green centered around #8FBF6A. Use lighter and darker shades of the same green for fabric folds, with a fine darker-green contour. Never use chroma-key #00FF00 in the curtain.
+Composition: Wide 16:9, two equal-width side-by-side panels, no divider, no arrow. Left panel is BEFORE: curtains fully closed, the girl stands slightly in front of the window near its middle, body turned about 30 degrees toward it, with one hand touching the vertical center seam and the other arm at her side; calm focused gentle closed-mouth expression. Right panel is AFTER: curtains open from the middle to both sides, held by green fabric tiebacks, revealing a single flat pale blue sky; the same girl stands in the same place and size, holding a curtain edge with one hand; cheerful open-mouth smile. Keep the centered seam visible beside the girl. Keep all subjects clear of the panel boundary.
+Identity and invariants: Same single little girl in both panels; short pink sleeve dress, small cat-face emblem, bare feet, high brown bun with blue scrunchie. Keep her face shape, hair, body proportions, expression in each panel, pose, hand placements, height, foot baseline, and window size/position as close to Image 1 as possible. Shoulders, waist, legs, and face align naturally with no twist. White window frame and white curtain rail unchanged. Pale blue sky unchanged; no objects outside the window. Same polished children's-book digital illustration style.
+Backdrop: Pure flat chroma-key green #00FF00 outside the illustration, with no shadows, vignette, haze, translucent white mist, or extra background. The curtains are a clearly different muted green, not #00FF00.
+Avoid: changing the girl, pink outfit, cat badge, white frame, rail, sky color, window position, or panel layout; extra characters, cats, chairs, hats, socks, toys, books, boxes, text, symbols, arrows, stripes, patterns, ornamentation. No green bleed on hair, face, hands, dress, legs, or cat badge. All outline boundaries clean.
+```
+
+### 不採用 v4b の生成プロンプト全文
+
+```text
+Use case: precise-object-edit
+Asset type: Action Match two-panel children's game illustration, Open it., second candidate
+Input images: Image 1 is the exact edit target and master for composition, character, window, hands, expressions, and proportions: action-open-girl-v2a.png.webp. Image 2 is only the identity/daywear reference: girl-daywear-v1.png.webp. Image 3 is only the tiny simplified black-and-white cat-face emblem reference: cat-mascot-v2-small.png.webp.
+Primary request: Recreate Image 1 as faithfully as possible. The ONLY intentional difference from Image 1 is the curtain fabric color, including both tied-back curtain bands: muted young-grass green around #8FBF6A instead of pale cream. Make this an alternate candidate with slightly softer, broader fold shading than the other candidate, while preserving the same green hue and a fine darker same-hue contour. No patterns, stripes, writing, or ornaments. The curtain green must remain unmistakably different from pure chroma-key #00FF00.
+Composition: Wide 16:9 two equal-width panels with no divider and no arrow. BEFORE on the left: the curtain completely closed with a clear vertical center meeting line, girl slightly in front near center of window, body toward window by around 30 degrees, one hand on the center meeting line, the other at her side; quiet focused gentle smile. AFTER on the right: that same curtain split and opened from the center to both sides, tied with matching muted-green bands, single flat pale-blue sky visible; same girl at the same size and foot baseline, gently holding the side curtain with one hand and smiling brightly. Keep all shapes away from the center panel boundary.
+Identity and strict invariants: Use the exact same girl design and proportions as Image 1: brown high bun, bright blue scrunchie, pink short-sleeve daywear dress, tiny black-and-white cat face on chest, bare feet. Preserve the position and shapes of her face, arms, hands, shoulders, waist, feet, and posture as close as possible. No twisted anatomy. Preserve white window frame and rail, their size and position, and the pale blue sky color. Keep the original polished storybook-digital illustration touch.
+Backdrop: pure flat vivid chroma-key #00FF00 outside the illustration, no floor, wall, other scene, shadows, mist, alpha-like haze, or extra props.
+Avoid: altering the girl, hair, face, expressions, hands, cat emblem, clothing, window dimensions, white frame or rail, sky hue, panel layout; no extra people or cats, no toys, boxes, chairs, socks, balls, hats, text, arrows or symbols. No muted-green color bleeding into the girl or white window parts. Crisp clean boundaries.
+```
+
 ## 2026-10-11 — Action Match 女の子版「Put it on.」「Take it off.」靴下の色を変更
 
 - **理由：** 白い靴下は実際のカードのクリーム色の背景に溶け込んで見えにくかったため、無地のオレンジ（基準色 `#F28A24`、輪郭・陰影は濃い同系色）に変更した。
