@@ -11,6 +11,8 @@ chrome_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 if [[ ! -x "$node_bin" ]]; then node_bin="$(command -v node)"; fi
 suite_result=0
 NODE_PATH="$node_modules" CHROME_PATH="$chrome_path" "$node_bin" tests/check-image-alpha.mjs || suite_result=1
+"$node_bin" tests/shopping-data.mjs || suite_result=1
+"$node_bin" tests/shopping-screen.mjs || suite_result=1
 zsh tests/run-listen-drag-recovery.zsh || suite_result=1
 zsh tests/run-layout-check.zsh || suite_result=1
 zsh tests/run-think-and-say.zsh || suite_result=1

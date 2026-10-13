@@ -40,6 +40,7 @@
     .place-card.place-breakfast { background:linear-gradient(135deg,#ffad35,#ff7f35); } .place-card.place-breakfast .place-illustration { background-image:linear-gradient(90deg,#ff8335 0%,#ff8335 28%,#ff8335d9 48%,#ff833500 85%),url('breakfast-stage-v7.jpg.webp'); background-position:center,58% 48%; } .place-card.place-breakfast .place-copy h3 { text-shadow:0 3px 0 #d96834; }
     .place-card.place-living { background:linear-gradient(135deg,#a66be5,#7652d6); } .place-card.place-living .place-illustration { background-image:linear-gradient(90deg,#7652d6 0%,#7652d6 28%,#7652d6d9 48%,#7652d600 85%),url('living-stage-v2.png.webp'); background-position:center,53% 47%; background-size:cover; } .place-card.place-living .place-copy h3 { text-shadow:0 3px 0 #6242bf; }
     .place-card.place-bedroom { background:linear-gradient(135deg,#43578f,#283866); } .place-card.place-bedroom .place-illustration { background-image:linear-gradient(90deg,#283866 0%,#283866 28%,#283866d9 48%,#28386600 85%),url('bedroom-stage-v2.png.webp'); background-position:center,52% 42%; background-size:cover; } .place-card.place-bedroom .place-copy h3 { text-shadow:0 3px 0 #25365f; }
+    .place-card.place-shopping { background:linear-gradient(135deg,#72b58e,#438c74); } .place-card.place-shopping .place-illustration { background-image:linear-gradient(90deg,#438c74 0%,#438c74 28%,#438c74d9 48%,#438c7400 85%),url('shopping-scene-bg-v2a.png.webp'); background-position:center,50% 51%; } .place-card.place-shopping .place-copy h3 { text-shadow:0 3px 0 #39735e; }
     .place-copy { position:relative; z-index:1; display:grid; align-content:center; width:63%; min-height:136px; padding:16px 0 16px 18px; }
     .place-pill { display:inline-block; padding:5px 9px; border-radius:999px; color:#3f8b6a; background:#e0f4df; font-size:12px; font-weight:900; }
     .place-copy h3 { margin:0 0 4px; font-size:27px; line-height:1.1; text-shadow:0 2px 0 #2361ae; }
@@ -67,6 +68,36 @@
     .place-top-title { display:flex; align-items:center; gap:10px; font-size:21px; font-weight:900; text-shadow:0 2px 0 #c84451; }
     .back-games { cursor:pointer; }
     .breakfast-scene, .living-scene { position:relative; flex:1; min-height:0; width:100%; overflow:hidden; background:#fff7e2; touch-action:none; user-select:none; }
+    #shopping-screen { --shopping-card-width:68px; --shopping-card-height:62px; --shopping-card-gap:8px; --shopping-slot-width:90px; --shopping-slot-height:80px; --shopping-slot-gap:4px; --shopping-hint-height:58px; --shopping-hint-opacity:.8; }
+    .shopping-scene { position:relative; flex:1; min-height:0; overflow:hidden; background:#f7e8d0; touch-action:none; user-select:none; }
+    .shopping-scene > svg { position:absolute; inset:0; display:block; width:100%; height:100%; pointer-events:none; }
+    .shopping-column { position:absolute; z-index:5; top:21%; display:flex; flex-direction:column; gap:var(--shopping-card-gap); width:var(--shopping-card-width); }
+    .shopping-column.item { left:8px; } .shopping-column.number { right:8px; }
+    .shopping-card { position:relative; display:grid; place-items:center; flex:none; width:var(--shopping-card-width); height:var(--shopping-card-height); padding:2px; border:2px solid #815839; border-radius:13px; background:#fff9eb; box-shadow:0 3px 0 #8052378c; color:#2d3c51; cursor:grab; touch-action:none; -webkit-tap-highlight-color:transparent; }
+    .shopping-card.in-slot { visibility:hidden; pointer-events:none; }
+    .shopping-card.dragging { z-index:25; cursor:grabbing; box-shadow:0 6px 13px #3d332b80; }
+    .shopping-card-art { display:block; width:min(85%,68px); aspect-ratio:1; object-fit:contain; background-repeat:no-repeat; background-size:300% 200%; pointer-events:none; }
+    .shopping-card-number { font-size:clamp(31px,9vw,41px); font-weight:1000; line-height:1; pointer-events:none; }
+    .shopping-card-hint { position:absolute; z-index:2; right:0; bottom:0; left:0; display:none; flex-direction:column; align-items:center; justify-content:center; min-height:17px; max-height:100%; padding:2px 1px; border-radius:0 0 10px 10px; background:rgba(255,248,231,var(--shopping-hint-opacity)); color:#754c35; text-align:center; line-height:1.1; pointer-events:none; }
+    .shopping-card-hint-ja { display:block; max-width:100%; font-size:9px; font-weight:900; white-space:nowrap; letter-spacing:-.06em; text-shadow:0 1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff; }
+    .shopping-card-hint-en { display:none; max-width:100%; margin-top:1px; color:#26364a; font-size:8px; font-weight:900; white-space:nowrap; letter-spacing:-.045em; text-shadow:0 1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff; }
+    #shopping-screen[data-shopping-hint-step="1"] .shopping-card-hint, #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint { display:flex; }
+    #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint-en { display:block; }
+    .shopping-instruction-hint { position:absolute; z-index:8; top:2%; right:12px; left:12px; height:var(--shopping-hint-height); display:none; flex-direction:column; align-items:center; justify-content:center; padding:4px 8px; border-radius:12px; background:rgba(255,248,231,.93); box-shadow:0 2px 8px #55412c2e; text-align:center; pointer-events:none; }
+    #shopping-screen[data-shopping-hint-step="1"] .shopping-instruction-hint, #shopping-screen[data-shopping-hint-step="2"] .shopping-instruction-hint { display:flex; }
+    .shopping-instruction-ja { color:#754c35; font-size:12px; font-weight:900; line-height:1.2; overflow-wrap:anywhere; }
+    .shopping-instruction-en { display:none; margin-top:2px; color:#26364a; font-size:11px; font-weight:800; line-height:1.15; overflow-wrap:anywhere; }
+    #shopping-screen[data-shopping-hint-step="2"] .shopping-instruction-en { display:block; }
+    .shopping-slot-pair { position:absolute; z-index:6; top:69%; left:50%; display:flex; gap:var(--shopping-slot-gap); transform:translateX(-50%); }
+    .shopping-slot { display:grid; place-items:center; width:var(--shopping-slot-width); height:var(--shopping-slot-height); border:3px dashed #9b5b29; border-radius:14px; background:#fff8e2bd; box-shadow:inset 0 2px 5px #49351b33; pointer-events:none; }
+    .shopping-slot.filled { background:#fff9ebed; } .shopping-slot.locked { border-style:solid; border-color:#36855b; }
+    .shopping-slot-content { display:grid; place-items:center; width:100%; height:100%; pointer-events:none; }
+    .shopping-slot-content .shopping-card-art { width:min(78%,68px); }
+    .shopping-slot.wrong { animation:shoppingWrong .34s ease-in-out 2; }
+    @keyframes shoppingWrong { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-4px); } 75% { transform:translateX(4px); } }
+    .shopping-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media (min-width:380px) { #shopping-screen { --shopping-card-width:74px; --shopping-card-height:70px; --shopping-card-gap:10px; --shopping-slot-width:93px; --shopping-slot-height:96px; --shopping-slot-gap:6px; --shopping-hint-height:62px; } }
+    @media (min-width:410px) { #shopping-screen { --shopping-card-width:82px; --shopping-card-height:78px; --shopping-card-gap:12px; --shopping-slot-width:103px; --shopping-slot-height:106px; --shopping-hint-height:66px; } .shopping-card-hint-ja { font-size:10px; } .shopping-card-hint-en { font-size:9px; } }
     .breakfast-scene svg, .living-scene svg { position:absolute; top:0; left:0; display:block; width:100%; height:calc(100% - var(--tray-height) - env(safe-area-inset-bottom)); }
     .breakfast-title { position:absolute; z-index:2; left:16px; top:14px; padding:8px 13px; border-radius:999px; background:#ff8c47; box-shadow:0 3px 0 #c76c42; color:#fff; font-size:16px; font-weight:900; }
     .breakfast-controls { display:flex; justify-content:space-between; align-items:center; gap:var(--header-gap); width:100%; min-width:0; }
@@ -109,12 +140,12 @@
     #home { padding:0; background:#6b9db5; box-shadow:0 3px 0 #47778e; font-size:17px; }
     .screen-header .round, .screen-header .stage-back { display:grid; place-items:center; flex:0 0 var(--header-button); width:var(--header-button); min-width:var(--header-button); height:var(--header-button); min-height:var(--header-button); padding:0; border:3px solid #fff9e8; border-radius:17px 19px 17px 19px; background:linear-gradient(145deg,#fffdf0,#f6dba8); box-shadow:0 4px 0 #bc765c,inset 0 2px 0 #fff; color:#764b39; text-align:center; line-height:1; text-shadow:0 1px 0 #fff; white-space:nowrap; }
     .screen-header .round:active, .screen-header .stage-back:active { transform:translateY(2px) rotate(-1deg); box-shadow:0 2px 0 #bc765c,inset 0 2px 0 #fff; }
-    .app > header #home, .app > header #breakfast-home, .app > header #living-home, .app > header #bedroom-home, .app > header #word-home, .app > header #action-home, .app > header #match-mode-home { background:linear-gradient(145deg,#fff5a3,#ffc95b); font-size:19px; }
-    .app > header #reset, .app > header #breakfast-reset, .app > header #living-reset, .app > header #bedroom-reset, .app > header #word-reset { background:linear-gradient(145deg,#d9f1ff,#8ac8e9); font-size:0; }
-    .app > header #reset::after, .app > header #breakfast-reset::after, .app > header #living-reset::after, .app > header #bedroom-reset::after, .app > header #word-reset::after { content:"↻"; font-size:21px; }
-    .app > header #kana, .app > header #breakfast-kana, .app > header #living-kana, .app > header #bedroom-kana, .app > header #word-kana { background:linear-gradient(145deg,#ecd8ff,#c695e4); font-size:13px; }
-    .app > header #kana[aria-pressed="true"], .app > header #breakfast-kana[aria-pressed="true"], .app > header #living-kana[aria-pressed="true"], .app > header #bedroom-kana[aria-pressed="true"], .app > header #word-kana[aria-pressed="true"] { background:linear-gradient(145deg,#d8f5ff,#81c8e6); }
-    .app > header #speaker, .app > header #breakfast-speaker, .app > header #living-speaker, .app > header #bedroom-speaker, .app > header #word-speaker, .app > header #action-speaker { background:linear-gradient(145deg,#ffe9b6,#ffb966); font-size:20px; }
+    .app > header #home, .app > header #breakfast-home, .app > header #living-home, .app > header #bedroom-home, .app > header #shopping-home, .app > header #word-home, .app > header #action-home, .app > header #match-mode-home { background:linear-gradient(145deg,#fff5a3,#ffc95b); font-size:19px; }
+    .app > header #reset, .app > header #breakfast-reset, .app > header #living-reset, .app > header #bedroom-reset, .app > header #shopping-reset, .app > header #word-reset { background:linear-gradient(145deg,#d9f1ff,#8ac8e9); font-size:0; }
+    .app > header #reset::after, .app > header #breakfast-reset::after, .app > header #living-reset::after, .app > header #bedroom-reset::after, .app > header #shopping-reset::after, .app > header #word-reset::after { content:"↻"; font-size:21px; }
+    .app > header #kana, .app > header #breakfast-kana, .app > header #living-kana, .app > header #bedroom-kana, .app > header #shopping-kana, .app > header #word-kana { background:linear-gradient(145deg,#ecd8ff,#c695e4); font-size:13px; }
+    .app > header #kana[aria-pressed="true"], .app > header #breakfast-kana[aria-pressed="true"], .app > header #living-kana[aria-pressed="true"], .app > header #bedroom-kana[aria-pressed="true"], .app > header #shopping-kana[aria-pressed="true"], .app > header #word-kana[aria-pressed="true"] { background:linear-gradient(145deg,#d8f5ff,#81c8e6); }
+    .app > header #speaker, .app > header #breakfast-speaker, .app > header #living-speaker, .app > header #bedroom-speaker, .app > header #shopping-speaker, .app > header #word-speaker, .app > header #action-speaker { background:linear-gradient(145deg,#ffe9b6,#ffb966); font-size:20px; }
     .controls { display:flex; align-items:center; gap:var(--header-gap); flex:none; }
     .stage-back { flex:none; font:900 25px/1 inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .speech-speed { flex:0 0 clamp(90px,24vw,98px); width:clamp(90px,24vw,98px); display:flex; align-items:center; justify-content:center; gap:2px; height:48px; padding:0 2px; border:2px solid #fff9e8; border-radius:999px; background:#fff3; box-shadow:inset 0 1px 0 #fff5; color:#fff; font-size:12px; }
@@ -363,7 +394,22 @@
         <button class="place-card place-bedroom" id="open-bedroom" type="button" aria-label="寝室であそぶ">
           <div class="place-illustration" aria-hidden="true"></div><div class="place-copy"><h3>しんしつ</h3><p>Bedroom</p></div>
         </button>
+        <button class="place-card place-shopping" id="open-shopping" type="button" aria-label="おかいものであそぶ">
+          <div class="place-illustration" aria-hidden="true"></div><div class="place-copy"><h3>おかいもの</h3><p>Shopping</p></div>
+        </button>
       </div>
+    </section>
+  </main>
+  <main class="app" id="shopping-screen" hidden aria-label="おかいもののゲーム画面">
+    <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="shopping-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="shopping-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="shopping-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="shopping-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="shopping-kana" type="button" aria-label="日本語を表示" aria-pressed="false">もじ</button><button class="round compact-control" id="shopping-speaker" type="button" aria-label="もう一度聞く" aria-pressed="false">🔊</button></div></div></header>
+    <section class="shopping-scene" id="shopping-scene" aria-label="スーパーのおかいもの">
+      <svg viewBox="0 0 900 1200" preserveAspectRatio="none" aria-hidden="true"><image href="shopping-scene-bg-v2a.png.webp" width="900" height="1200"/></svg>
+      <div class="shopping-column item" id="shopping-items" aria-label="アイテムのカード"></div>
+      <div class="shopping-column number" id="shopping-numbers" aria-label="かずのカード"></div>
+      <div class="shopping-slot-pair" aria-label="カートのスロット"><div class="shopping-slot" id="shopping-item-slot" data-shopping-slot="item" aria-label="アイテムをいれる"></div><div class="shopping-slot" id="shopping-number-slot" data-shopping-slot="number" aria-label="かずをいれる"></div></div>
+      <div class="shopping-instruction-hint" id="shopping-instruction-hint" aria-live="polite"><span class="shopping-instruction-ja" id="shopping-instruction-ja"></span><span class="shopping-instruction-en" id="shopping-instruction-en"></span></div>
+      <div class="breakfast-finish" id="shopping-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great shopping!</p><button class="round" id="shopping-play-again" type="button">Play again</button></div></div>
+      <span id="shopping-status" class="shopping-sr-only" aria-live="polite"></span>
     </section>
   </main>
   <main class="app" id="match-mode-screen" hidden aria-label="Word Match のモード選択">
@@ -674,6 +720,7 @@
       const urlOptions=new URLSearchParams(window.location.search), SPEECH_DEBUG=urlOptions.get('debug')==='1', AUTOMATED_TEST=urlOptions.get('automation')==='1';
       const listenStarted={bathroom:false,breakfast:false,living:false,bedroom:false}, speechEvents=[], recoveryEvents=[];
       function isListenSceneVisible(descriptor) { const screen=descriptor?.scene.closest('main'); return Boolean(screen && !screen.hidden && getComputedStyle(screen).display!=='none'); }
+      function isSpeechSceneVisible(name) { if(name==='shopping') return Boolean(shoppingSession && !shoppingScreen.hidden && getComputedStyle(shoppingScreen).display!=='none'); return Boolean(listenStarted[name] && isListenSceneVisible(listenScenes[name])); }
       let speechStartTimer=null, speechWatchTimer=null, speechDebugLog=null, speechDebugLines=[], instructionSpeechActive=false, lastSpokenName='', lastSpokenNameAt=0;
       function appendDebugLine(line) { if(!SPEECH_DEBUG || !speechDebugLog) return; speechDebugLines.push(line); speechDebugLog.textContent=speechDebugLines.join('\n'); speechDebugLog.scrollTop=speechDebugLog.scrollHeight; }
       function logSpeech(...args) { if(!SPEECH_DEBUG) return; console.log('[speech]',...args); appendDebugLine(args.map(value=>typeof value==='object' ? JSON.stringify(value) : String(value)).join(' ')); }
@@ -723,7 +770,7 @@
         logSpeech('cancel before replacement',{scene:u._listenScene || null,text:u.text});
         const fire=(attempt=0)=>{
           if(activeUtterance!==u) return;
-          if(u._listenScene && (!listenStarted[u._listenScene] || !isListenSceneVisible(listenScenes[u._listenScene]))) return;
+          if(u._listenScene && !isSpeechSceneVisible(u._listenScene)) return;
           if(engine.pending || engine.speaking) {
             engine.cancel();
             if(attempt<3) { speechStartTimer=setTimeout(()=>fire(attempt+1),120); return; }
@@ -732,7 +779,7 @@
             return;
           }
           if(IS_SAFARI) engine.resume();
-          const event={scene:u._listenScene || null,text:u.text,visible:u._listenScene ? isListenSceneVisible(listenScenes[u._listenScene]) : true};
+          const event={scene:u._listenScene || null,text:u.text,visible:u._listenScene ? isSpeechSceneVisible(u._listenScene) : true};
           speechEvents.push(event);
           engine.speak(u);
           logSpeech('speak() called',event);
@@ -825,6 +872,81 @@
       const listenInteractionControllers={};
       function resetGame(shouldSpeak=true) { stopSpeech(); listenInteractionControllers.bathroom?.cancelActive('reset'); clearRecentTasks('bathroom'); finishPanel.classList.remove('show'); document.querySelectorAll('.item').forEach(el=>{ el.classList.remove('done','drag'); el.style.left=''; el.style.top=''; el.dataset.listenState='tray'; }); selectTask(); listenStarted.bathroom=true; prompt.textContent='New game — listen carefully!'; if (shouldSpeak && voicesReady) setTimeout(speak, 120); }
       const shuffle = list => { const result=[...list]; for(let index=result.length-1;index>0;index--) { const swapIndex=Math.floor(Math.random()*(index+1)); [result[index],result[swapIndex]]=[result[swapIndex],result[index]]; } return result; };
+      // Shopping question generation is kept separate until the shopping screen is built.
+      const shoppingItemData=Object.freeze({
+        apple:{cardEnglish:'apple',english:'apple',plural:'apples',japanese:'りんご',counter:'こ',image:'breakfast-item-apple-v1.png.webp'},
+        banana:{cardEnglish:'banana',english:'banana',plural:'bananas',japanese:'バナナ',counter:'ぼん',image:'think-say-banana-v1.png.webp'},
+        milk:{cardEnglish:'milk',cardJapanese:'ぎゅうにゅう',english:'carton of milk',plural:'cartons of milk',japanese:'ぎゅうにゅうパック',counter:'こ',image:'breakfast-items-v2.png.webp',sprite:'100% 0'},
+        bread:{cardEnglish:'bread',english:'slice of bread',plural:'slices of bread',japanese:'パン',counter:'まい',image:'breakfast-items-v2.png.webp',sprite:'0 0'},
+        egg:{cardEnglish:'egg',english:'egg',plural:'eggs',japanese:'たまご',counter:'こ',image:'shopping-item-egg-v1a.png.webp'}
+      });
+      const shoppingNumberWords=Object.freeze(['one','two','three','four','five','six','seven','eight','nine','ten']);
+      const shoppingNumberJapanese=Object.freeze(['いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう']);
+      function shoppingInstruction(itemKey,count,patternIndex) {
+        const item=shoppingItemData[itemKey];
+        if(!item || !Number.isInteger(count) || count<1 || count>10 || ![0,1,2].includes(patternIndex)) throw new RangeError('Invalid shopping instruction');
+        const quantity=`${shoppingNumberWords[count-1]} ${count===1 ? item.english : item.plural}`;
+        const japaneseObject=`${item.japanese}を ${count}${item.counter}`;
+        const english=[`Get ${quantity}.`,`Please put ${quantity} in the basket.`,`Can you get ${quantity}, please?`];
+        const japanese=[`${japaneseObject} とって。`,`${japaneseObject} かごに いれてね。`,`${japaneseObject} とってくれる？`];
+        return {english:english[patternIndex],japanese:japanese[patternIndex]};
+      }
+      function buildShoppingQuestions() {
+        const keys=Object.keys(shoppingItemData), numbers=Array.from({length:10},(_,index)=>index+1);
+        return shuffle(keys).map(itemKey=>{
+          const count=shuffle(numbers)[0], patternIndex=shuffle([0,1,2])[0];
+          const instruction=shoppingInstruction(itemKey,count,patternIndex);
+          const itemChoices=shuffle([itemKey,...shuffle(keys.filter(key=>key!==itemKey)).slice(0,3)]);
+          const numberChoices=shuffle([count,...shuffle(numbers.filter(number=>number!==count)).slice(0,3)]);
+          return {itemKey,count,patternIndex,englishInstruction:instruction.english,japaneseInstruction:instruction.japanese,itemChoices,numberChoices};
+        });
+      }
+      function createShoppingSession(questions) {
+        if(!Array.isArray(questions) || questions.length!==5) throw new RangeError('Shopping requires five questions');
+        let index=0,completed=0,phase='ready',slots={item:null,number:null},locked={item:false,number:false},verdict=null;
+        const current=()=>questions[index];
+        const getState=()=>({index,completed,phase,slots:{...slots},locked:{...locked},verdict:verdict ? {...verdict,wrong:[...verdict.wrong]} : null});
+        function drop(cardKind,value,slotKind) {
+          if(phase!=='ready') return {type:'blocked'};
+          if(cardKind!==slotKind || !['item','number'].includes(cardKind)) return {type:'wrong-kind'};
+          const options=cardKind==='item' ? current().itemChoices : current().numberChoices;
+          if(!options.includes(value)) return {type:'invalid-card'};
+          if(locked[slotKind] || slots[slotKind]!==null) return {type:'occupied'};
+          slots[slotKind]=value;
+          if(slots.item===null || slots.number===null) return {type:'placed'};
+          const wrong=[];
+          if(slots.item!==current().itemKey) wrong.push('item');
+          if(slots.number!==current().count) wrong.push('number');
+          verdict={wrong};
+          phase='evaluating';
+          return {type:'evaluate',wrong:[...wrong]};
+        }
+        function settle() {
+          if(phase!=='evaluating' || !verdict) return {type:'blocked'};
+          const wrong=verdict.wrong;
+          verdict=null;
+          if(wrong.length) {
+            for(const kind of ['item','number']) {
+              if(wrong.includes(kind)) slots[kind]=null;
+              else locked[kind]=true;
+            }
+            phase='ready';
+            return {type:'retry',wrong:[...wrong]};
+          }
+          completed++;
+          if(completed===questions.length) {
+            locked={item:true,number:true};
+            phase='finished';
+            return {type:'finished'};
+          }
+          index=completed;
+          slots={item:null,number:null};
+          locked={item:false,number:false};
+          phase='ready';
+          return {type:'next'};
+        }
+        return {current,getState,drop,settle};
+      }
       function setBreakfastSlot(el, slot) { el.dataset.slot=slot; el.style.left=traySlotPosition(slot); el.style.top=''; el.dataset.listenState='tray'; }
       function prepareBreakfastItems() {
         const items=shuffle([...document.querySelectorAll('.breakfast-item')]);
@@ -1006,6 +1128,139 @@
         recover(name,reason='test'){ return listenInteractionControllers[name]?.reconcile(reason) || false; },
         events(){ return {speech:[...speechEvents],recovery:[...recoveryEvents]}; }
       };
+      const shoppingScreen=document.querySelector('#shopping-screen'), shoppingScene=document.querySelector('#shopping-scene');
+      const shoppingColumns={item:document.querySelector('#shopping-items'),number:document.querySelector('#shopping-numbers')};
+      const shoppingSlots={item:document.querySelector('#shopping-item-slot'),number:document.querySelector('#shopping-number-slot')};
+      const shoppingFinish=document.querySelector('#shopping-finish'), shoppingStatus=document.querySelector('#shopping-status');
+      const shoppingHintButton=document.querySelector('#shopping-kana'), shoppingSpeaker=document.querySelector('#shopping-speaker');
+      const shoppingInstructionJapanese=document.querySelector('#shopping-instruction-ja'), shoppingInstructionEnglish=document.querySelector('#shopping-instruction-en');
+      let shoppingSession=null,shoppingDrag=null,shoppingTransitionTimer=null,shoppingSpeechTimer=null,shoppingHintStep=0;
+      function setShoppingHintStep(step) {
+        shoppingHintStep=step;
+        shoppingScreen.dataset.shoppingHintStep=String(step);
+        shoppingHintButton.setAttribute('aria-pressed',String(step!==0));
+        shoppingHintButton.setAttribute('aria-label',['日本語を表示','英語も表示','文字を消す'][step]);
+      }
+      setShoppingHintStep(0);
+      function speakShopping() {
+        if(shoppingScreen.hidden || !shoppingSession || shoppingSession.getState().phase!=='ready' || !('speechSynthesis' in window)) return;
+        const phrase=shoppingSession.current().englishInstruction;
+        const u=new SpeechSynthesisUtterance(phrase),v=voice();
+        u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; u._instructionSpeech=true; u._listenScene='shopping'; if(v) u.voice=v;
+        u.onstart=()=>{ if(isCurrentUtterance(u)) shoppingSpeaker.setAttribute('aria-pressed','true'); };
+        u.onend=u.onerror=()=>{ if(isCurrentUtterance(u)) shoppingSpeaker.setAttribute('aria-pressed','false'); };
+        playSpeech(u);
+      }
+      function scheduleShoppingSpeech(delay=240) {
+        clearTimeout(shoppingSpeechTimer);
+        const session=shoppingSession,index=session?.getState().index;
+        shoppingSpeechTimer=setTimeout(()=>{
+          shoppingSpeechTimer=null;
+          if(session===shoppingSession && !shoppingScreen.hidden && session.getState().index===index) speakShopping();
+        },delay);
+      }
+      function stopShoppingSpeech() { clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; stopSpeech(); shoppingSpeaker.setAttribute('aria-pressed','false'); }
+      function shoppingVisual(kind,value) {
+        if(kind==='number') { const number=document.createElement('span'); number.className='shopping-card-number'; number.textContent=String(value); return number; }
+        const item=shoppingItemData[value];
+        if(item.sprite) { const sprite=document.createElement('span'); sprite.className='shopping-card-art'; sprite.style.backgroundImage=`url("${item.image}")`; sprite.style.backgroundPosition=item.sprite; return sprite; }
+        const image=document.createElement('img'); image.className='shopping-card-art'; image.src=item.image; image.alt=''; return image;
+      }
+      function renderShopping() {
+        if(!shoppingSession) return;
+        const question=shoppingSession.current(),state=shoppingSession.getState();
+        shoppingInstructionJapanese.textContent=question.japaneseInstruction;
+        shoppingInstructionEnglish.textContent=question.englishInstruction;
+        for(const kind of ['item','number']) {
+          const values=kind==='item' ? question.itemChoices : question.numberChoices;
+          const cards=values.map(value=>{
+            const card=document.createElement('button'); card.type='button'; card.className='shopping-card'; card.dataset.shoppingKind=kind; card.dataset.shoppingValue=String(value);
+            card.setAttribute('aria-label',kind==='item' ? shoppingItemData[value].cardEnglish : String(value));
+            card.append(shoppingVisual(kind,value));
+            const hint=document.createElement('span'); hint.className='shopping-card-hint';
+            const japanese=document.createElement('span'); japanese.className='shopping-card-hint-ja'; japanese.textContent=kind==='item' ? (shoppingItemData[value].cardJapanese || shoppingItemData[value].japanese) : shoppingNumberJapanese[value-1];
+            const english=document.createElement('span'); english.className='shopping-card-hint-en'; english.textContent=kind==='item' ? shoppingItemData[value].cardEnglish : shoppingNumberWords[value-1];
+            hint.append(japanese,english); card.append(hint);
+            if(state.slots[kind]===value) { card.classList.add('in-slot'); card.setAttribute('aria-hidden','true'); card.tabIndex=-1; }
+            card.addEventListener('pointerdown',startShoppingDrag);
+            card.addEventListener('pointermove',moveShoppingDrag);
+            card.addEventListener('pointerup',event=>finishShoppingDrag(event));
+            card.addEventListener('pointercancel',event=>finishShoppingDrag(event,true));
+            card.addEventListener('lostpointercapture',event=>finishShoppingDrag(event,true));
+            return card;
+          });
+          shoppingColumns[kind].replaceChildren(...cards);
+          const slot=shoppingSlots[kind];
+          slot.classList.toggle('filled',state.slots[kind]!==null);
+          slot.classList.toggle('locked',state.locked[kind]);
+          slot.classList.remove('wrong');
+          const content=document.createElement('span'); content.className='shopping-slot-content';
+          if(state.slots[kind]!==null) content.append(shoppingVisual(kind,state.slots[kind]));
+          slot.replaceChildren(content);
+        }
+        shoppingFinish.classList.toggle('show',state.phase==='finished');
+        if(state.phase==='finished') shoppingStatus.textContent='おかいものは ここまで できたよ';
+      }
+      function cancelShoppingDrag() {
+        const drag=shoppingDrag; if(!drag) return;
+        shoppingDrag=null;
+        drag.card.style.transform=''; drag.card.classList.remove('dragging');
+        try { if(drag.card.hasPointerCapture(drag.id)) drag.card.releasePointerCapture(drag.id); } catch (_) {}
+      }
+      function resetShopping({clearHint=false,speechDelay=240}={}) {
+        cancelShoppingDrag();
+        clearTimeout(shoppingTransitionTimer); shoppingTransitionTimer=null;
+        stopShoppingSpeech();
+        if(clearHint) setShoppingHintStep(0);
+        shoppingSession=createShoppingSession(buildShoppingQuestions());
+        shoppingStatus.textContent='';
+        renderShopping();
+        scheduleShoppingSpeech(speechDelay);
+      }
+      function startShoppingDrag(event) {
+        if(event.button!==0 || shoppingDrag || !shoppingSession || shoppingSession.getState().phase!=='ready') return;
+        event.preventDefault(); unlockAudio();
+        const card=event.currentTarget;
+        shoppingDrag={card,id:event.pointerId,kind:card.dataset.shoppingKind,value:card.dataset.shoppingKind==='number' ? Number(card.dataset.shoppingValue) : card.dataset.shoppingValue,startX:event.clientX,startY:event.clientY,finalized:false};
+        card.classList.add('dragging');
+        try { card.setPointerCapture(event.pointerId); } catch (_) { cancelShoppingDrag(); }
+      }
+      function moveShoppingDrag(event) {
+        const drag=shoppingDrag; if(!drag || drag.id!==event.pointerId) return;
+        if(event.buttons===0) { cancelShoppingDrag(); return; }
+        drag.card.style.transform=`translate(${event.clientX-drag.startX}px,${event.clientY-drag.startY}px) scale(1.06)`;
+      }
+      function finishShoppingDrag(event,cancelled=false) {
+        const drag=shoppingDrag; if(!drag || drag.id!==event.pointerId || drag.finalized) return;
+        drag.finalized=true;
+        cancelShoppingDrag();
+        if(cancelled || shoppingScreen.hidden || !shoppingSession) return;
+        const slotKind=Object.keys(shoppingSlots).find(kind=>{ const rect=shoppingSlots[kind].getBoundingClientRect(); return event.clientX>=rect.left && event.clientX<=rect.right && event.clientY>=rect.top && event.clientY<=rect.bottom; });
+        if(!slotKind) return;
+        const result=shoppingSession.drop(drag.kind,drag.value,slotKind);
+        if(result.type!=='placed' && result.type!=='evaluate') return;
+        renderShopping();
+        if(result.type==='placed') return;
+        const session=shoppingSession;
+        if(result.wrong.length) {
+          wrongSound();
+          for(const kind of result.wrong) shoppingSlots[kind].classList.add('wrong');
+        } else correctSound();
+        shoppingTransitionTimer=setTimeout(()=>{
+          shoppingTransitionTimer=null;
+          if(shoppingSession!==session || shoppingScreen.hidden) return;
+          const settled=session.settle();
+          if(settled.type==='blocked') return;
+          renderShopping();
+          if(settled.type==='retry') shoppingStatus.textContent='もういちど やってみよう';
+          else if(settled.type==='next') { shoppingStatus.textContent='つぎの おかいもの'; scheduleShoppingSpeech(); }
+          else if(settled.type==='finished') { stopShoppingSpeech(); finishSound(); }
+        },result.wrong.length ? 700 : 600);
+      }
+      window.addEventListener('pointerup',event=>finishShoppingDrag(event),true);
+      window.addEventListener('pointercancel',event=>finishShoppingDrag(event,true),true);
+      window.addEventListener('blur',cancelShoppingDrag);
+      document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelShoppingDrag(); });
       function openPlaces() { homeScreen.hidden=true; placeScreen.hidden=false; }
       function backToGames() { resetHintStages(); placeScreen.hidden=true; homeScreen.hidden=false; }
       function prepareSceneImage(sceneElement) {
@@ -1025,8 +1280,10 @@
       function openBreakfast() { prepareSceneImage(breakfastScene); placeScreen.hidden=true; breakfastScreen.hidden=false; unlockAudio(); resetBreakfast(false); sceneSelectSound(); speakSceneIntro('Let’s have breakfast!',()=>speakBreakfast(),'breakfast'); }
       function openLiving() { prepareSceneImage(livingScene); placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving(),'living'); }
       function openBedroom() { prepareSceneImage(bedroomScene); placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom(),'bedroom'); }
-      function backToPlaces() { stopSpeech(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
-      function returnHome() { stopSpeech(); resetHintStages(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
+      function openShopping() { prepareSceneImage(shoppingScene); placeScreen.hidden=true; shoppingScreen.hidden=false; unlockAudio(); resetShopping({clearHint:true,speechDelay:450}); sceneSelectSound(); }
+      function leaveShopping() { if(shoppingScreen.hidden) return; cancelShoppingDrag(); clearTimeout(shoppingTransitionTimer); shoppingTransitionTimer=null; clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; shoppingSpeaker.setAttribute('aria-pressed','false'); setShoppingHintStep(0); shoppingSession=null; shoppingScreen.hidden=true; }
+      function backToPlaces() { stopSpeech(); leaveShopping(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
+      function returnHome() { stopSpeech(); leaveShopping(); resetHintStages(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
       document.querySelector('#open-word').addEventListener('click', openWord);
       document.querySelector('#open-listen').addEventListener('click', openPlaces);
       document.querySelector('#back-games').addEventListener('click', backToGames);
@@ -1034,6 +1291,13 @@
       document.querySelector('#open-breakfast').addEventListener('click', openBreakfast);
       document.querySelector('#open-living').addEventListener('click', openLiving);
       document.querySelector('#open-bedroom').addEventListener('click', openBedroom);
+      document.querySelector('#open-shopping').addEventListener('click', openShopping);
+      document.querySelector('#shopping-back').addEventListener('click', backToPlaces);
+      document.querySelector('#shopping-home').addEventListener('click', returnHome);
+      document.querySelector('#shopping-reset').addEventListener('click',()=>{ unlockAudio(); resetShopping(); });
+      shoppingHintButton.addEventListener('click',()=>setShoppingHintStep((shoppingHintStep+1)%3));
+      shoppingSpeaker.addEventListener('click',()=>{ unlockAudio(); clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; speakShopping(); });
+      document.querySelector('#shopping-play-again').addEventListener('click',()=>{ unlockAudio(); resetShopping({clearHint:true}); });
       document.querySelector('#breakfast-back').addEventListener('click', backToPlaces);
       document.querySelector('#living-back').addEventListener('click', backToPlaces);
       document.querySelector('#bedroom-back').addEventListener('click', backToPlaces);

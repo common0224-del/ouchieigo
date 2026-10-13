@@ -74,7 +74,7 @@ async function inspect(page,id,kind,width,height) {
       result.zones=[...svg.querySelectorAll('g.target rect,g.breakfast-target rect,g.living-target rect')].map((el,index)=>({name:el.parentElement.id || `${index+1}`,...rect(el)}));
     } else if(kind==='word') result.cards=visible('.word-card:not(.queued)');
     else if(kind==='action') result.cards=visible('.action-card:not(.queued)');
-    else if(kind==='place') result.cards=visible('.place-card');
+    else if(kind==='place') { result.cards=visible('.place-card'); const content=root.querySelector('.home-content'); result.placeScroll={clientHeight:content.clientHeight,scrollHeight:content.scrollHeight,overflowY:getComputedStyle(content).overflowY}; }
     return result;
   },{id,kind});
   const tolerance=1.5;
@@ -86,11 +86,15 @@ async function inspect(page,id,kind,width,height) {
   }
   for(const element of [...(result.cards || []),...(result.items || []),...(result.art || [])]) {
     assert(element.x>=result.root.x-tolerance && element.right<=result.root.right+tolerance,`${id}: ${element.name} is clipped horizontally: ${JSON.stringify(element)}`);
-    assert(element.y>=result.header.bottom-tolerance && element.bottom<=result.root.bottom+tolerance,`${id}: ${element.name} is clipped vertically: ${JSON.stringify(element)}`);
+    if(kind!=='place') assert(element.y>=result.header.bottom-tolerance && element.bottom<=result.root.bottom+tolerance,`${id}: ${element.name} is clipped vertically: ${JSON.stringify(element)}`);
   }
   if(kind==='word') assert.equal(result.cards.length,12,`${id}: expected 12 visible cards`);
   if(kind==='action') assert.equal(result.cards.length,4,`${id}: expected 4 visible cards`);
-  if(kind==='place') assert.equal(result.cards.length,4,`${id}: expected 4 place cards`);
+  if(kind==='place') {
+    assert.equal(result.cards.length,5,`${id}: expected 5 place cards`);
+    assert(['auto','scroll'].includes(result.placeScroll.overflowY),`${id}: place list is not scrollable`);
+    if(result.cards.at(-1).bottom>result.root.bottom+tolerance) assert(result.placeScroll.scrollHeight>result.placeScroll.clientHeight,`${id}: fifth place card is clipped without scrolling`);
+  }
   if(kind==='scene') {
     assert(Math.abs(result.scene.y-result.header.bottom)<tolerance && Math.abs(result.scene.bottom-result.root.bottom)<tolerance,`${id}: header/scene/tray has a gap`);
     assert(result.trayTop>result.header.bottom && result.trayTop<result.root.bottom,`${id}: tray is outside the screen`);
@@ -557,6 +561,56 @@ async function checkPlayAgainHintResets(page,engineName) {
   console.log(`PASS ${label}: Item Match and all four Listen & Do scenes reset on Play again`);
 }
 
+async function checkShoppingHints(page,engineName,width,height) {
+  const label=`${engineName} ${width}×${height} shopping hints`;
+  await page.locator('#open-shopping').click();
+  await page.waitForFunction(()=>!document.querySelector('#shopping-scene').classList.contains('scene-loading'),null,{timeout:12000});
+  const snapshot=()=>page.evaluate(()=>{
+    const root=document.querySelector('#shopping-screen');
+    const rect=element=>{const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
+    const cards=[...root.querySelectorAll('.shopping-card')];
+    const hint=root.querySelector('#shopping-instruction-hint');
+    return {step:root.dataset.shoppingHintStep,pressed:root.querySelector('#shopping-kana').getAttribute('aria-pressed'),
+      scene:rect(root.querySelector('#shopping-scene')),cards:cards.map(card=>rect(card)),art:cards.map(card=>rect(card.querySelector('.shopping-card-art,.shopping-card-number'))),
+      slots:[...root.querySelectorAll('.shopping-slot')].map(rect),hint:rect(hint),hintShown:getComputedStyle(hint).display!=='none',
+      japaneseShown:cards.every(card=>getComputedStyle(card.querySelector('.shopping-card-hint-ja')).display!=='none'),
+      englishShown:cards.every(card=>getComputedStyle(card.querySelector('.shopping-card-hint-en')).display!=='none'),
+      bands:cards.map(card=>{const band=card.querySelector('.shopping-card-hint'); return {rect:rect(band),shown:getComputedStyle(band).display!=='none',overflow:band.scrollWidth>band.clientWidth+1};}),
+      instructionOverflow:hint.scrollHeight>hint.clientHeight+1};
+  });
+  const base=await snapshot();
+  assert.equal(base.step,'0',`${label}: initial stage`);
+  assert.equal(base.cards.length,8,`${label}: expected eight cards`);
+  assert.equal(base.hintShown,false,`${label}: hint visible initially`);
+  for(const slot of base.slots) assert(slot.width>=48 && slot.height>=48,`${label}: slot smaller than 48px`);
+  for(const step of [1,2,0]) {
+    await page.locator('#shopping-kana').click();
+    const state=await snapshot();
+    assert.equal(state.step,String(step),`${label}: hint stage`);
+    assert.equal(state.pressed,String(step!==0),`${label}: pressed state`);
+    assert.deepEqual(state.cards,base.cards,`${label}: card rectangles changed with hints`);
+    assert.deepEqual(state.art,base.art,`${label}: illustration/number rectangles changed with hints`);
+    assert.deepEqual(state.slots,base.slots,`${label}: slot rectangles changed with hints`);
+    assert.equal(state.hintShown,step!==0,`${label}: instruction hint visibility`);
+    if(step!==0) {
+      assert(state.hint.y>=state.scene.y && state.hint.bottom<=state.scene.bottom,`${label}: instruction band leaves scene`);
+      assert.equal(state.instructionOverflow,false,`${label}: instruction text overflows`);
+      for(let i=0;i<state.bands.length;i++) {
+        const band=state.bands[i];
+        assert.equal(band.shown,true,`${label}: card band ${i} is hidden`);
+        assert.equal(band.overflow,false,`${label}: card band ${i} clips text`);
+        assert(band.rect.x>=state.cards[i].x-1 && band.rect.right<=state.cards[i].right+1 && band.rect.bottom<=state.cards[i].bottom+1,`${label}: card band ${i} leaves card`);
+      }
+    }
+    assert.equal(state.englishShown,step===2,`${label}: English stage`);
+  }
+  await page.locator('#shopping-back').click();
+  await page.locator('#open-shopping').click();
+  assert.equal((await snapshot()).step,'0',`${label}: re-entry retained hints`);
+  await page.locator('#shopping-back').click();
+  console.log(`PASS ${label}: fixed card/art/slot geometry, hint cycle, re-entry reset`);
+}
+
 for(const [engineName,engine,launchOptions] of engines) {
   if(engineName==='webkit' && !fs.existsSync(engine.executablePath())) {
     console.log(`SKIP webkit: Playwright WebKit is not installed (${engine.executablePath()}). Chromium and other tests continue.`);
@@ -638,6 +692,8 @@ for(const [engineName,engine,launchOptions] of engines) {
         for(const [name,openId,screenId,backId] of scenes) {
           await page.locator(`#${openId}`).click(); await capture(screenId,'scene'); await page.locator(`#${backId}`).click();
         }
+        current=`${engineName} ${width}×${height} shopping hints`;
+        await checkShoppingHints(page,engineName,width,height);
         if(width===375) { current=`${engineName} 375×667 hint exit`; await checkHintExitResets(page,engineName); current=`${engineName} 375×667 Play again`; await checkPlayAgainHintResets(page,engineName); }
         completed++;
       } catch(error) {
@@ -651,4 +707,4 @@ for(const [engineName,engine,launchOptions] of engines) {
   } finally { await browser.close(); }
 }
 if(failures) process.exitCode=1;
-else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 9 screens, all 18 Action Match images, Play again, and reopening. Screenshots: ${output}`);
+else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 10 screens, all 18 Action Match images, shopping hints, Play again, and reopening. Screenshots: ${output}`);
