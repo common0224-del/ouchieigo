@@ -68,36 +68,53 @@
     .place-top-title { display:flex; align-items:center; gap:10px; font-size:21px; font-weight:900; text-shadow:0 2px 0 #c84451; }
     .back-games { cursor:pointer; }
     .breakfast-scene, .living-scene { position:relative; flex:1; min-height:0; width:100%; overflow:hidden; background:#fff7e2; touch-action:none; user-select:none; }
-    #shopping-screen { --shopping-card-width:68px; --shopping-card-height:62px; --shopping-card-gap:8px; --shopping-slot-width:90px; --shopping-slot-height:80px; --shopping-slot-gap:4px; --shopping-hint-height:58px; --shopping-hint-opacity:.8; }
+    #shopping-screen { --shopping-card-width:68px; --shopping-card-height:74px; --shopping-card-gap:2px; --shopping-card-label-space:24px; --shopping-offset-none:12px; --shopping-offset-english:5px; --shopping-visual-offset:var(--shopping-offset-none); --shopping-column-top:16%; --shopping-slot-width:90px; --shopping-slot-height:80px; --shopping-slot-gap:4px; --shopping-hint-height:48px; --shopping-hint-opacity:.56; }
+    #shopping-screen[data-shopping-hint-step="1"] { --shopping-visual-offset:var(--shopping-offset-english); }
+    #shopping-screen[data-shopping-hint-step="2"] { --shopping-visual-offset:0px; }
     .shopping-scene { position:relative; flex:1; min-height:0; overflow:hidden; background:#f7e8d0; touch-action:none; user-select:none; }
     .shopping-scene > svg { position:absolute; inset:0; display:block; width:100%; height:100%; pointer-events:none; }
-    .shopping-column { position:absolute; z-index:5; top:21%; display:flex; flex-direction:column; gap:var(--shopping-card-gap); width:var(--shopping-card-width); }
+    .shopping-column { position:absolute; z-index:5; top:var(--shopping-column-top); display:flex; flex-direction:column; gap:var(--shopping-card-gap); width:var(--shopping-card-width); }
     .shopping-column.item { left:8px; } .shopping-column.number { right:8px; }
-    .shopping-card { position:relative; display:grid; place-items:center; flex:none; width:var(--shopping-card-width); height:var(--shopping-card-height); padding:2px; border:2px solid #815839; border-radius:13px; background:#fff9eb; box-shadow:0 3px 0 #8052378c; color:#2d3c51; cursor:grab; touch-action:none; -webkit-tap-highlight-color:transparent; }
+    .shopping-card { position:relative; display:grid; grid-template-rows:minmax(0,1fr) var(--shopping-card-label-space); place-items:center; flex:none; width:var(--shopping-card-width); height:var(--shopping-card-height); padding:2px; border:2px solid #815839; border-radius:13px; background:#fff9eb; box-shadow:0 3px 0 #8052378c; color:#2d3c51; cursor:grab; touch-action:none; -webkit-tap-highlight-color:transparent; }
+    .shopping-column.item .shopping-card { border-color:#e6752d; } .shopping-column.number .shopping-card { border-color:#48afd3; }
     .shopping-card.in-slot { visibility:hidden; pointer-events:none; }
     .shopping-card.dragging { z-index:25; cursor:grabbing; box-shadow:0 6px 13px #3d332b80; }
-    .shopping-card-art { display:block; width:min(85%,68px); aspect-ratio:1; object-fit:contain; background-repeat:no-repeat; background-size:300% 200%; pointer-events:none; }
-    .shopping-card-number { font-size:clamp(31px,9vw,41px); font-weight:1000; line-height:1; pointer-events:none; }
-    .shopping-card-hint { position:absolute; z-index:2; right:0; bottom:0; left:0; display:none; flex-direction:column; align-items:center; justify-content:center; min-height:17px; max-height:100%; padding:2px 1px; border-radius:0 0 10px 10px; background:rgba(255,248,231,var(--shopping-hint-opacity)); color:#754c35; text-align:center; line-height:1.1; pointer-events:none; }
-    .shopping-card-hint-ja { display:block; max-width:100%; font-size:9px; font-weight:900; white-space:nowrap; letter-spacing:-.06em; text-shadow:0 1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff; }
-    .shopping-card-hint-en { display:none; max-width:100%; margin-top:1px; color:#26364a; font-size:8px; font-weight:900; white-space:nowrap; letter-spacing:-.045em; text-shadow:0 1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff; }
+    .shopping-card-art { display:block; width:min(85%,calc(var(--shopping-card-height) - 8px),68px); aspect-ratio:1; object-fit:contain; background-repeat:no-repeat; background-size:300% 200%; pointer-events:none; }
+    .shopping-column .shopping-card-art, .shopping-column .shopping-card-number { grid-row:1; transform:translateY(var(--shopping-visual-offset)); transition:transform .15s ease; }
+    .shopping-column .shopping-card-art { width:min(85%,calc(var(--shopping-card-height) - 28px),68px); }
+    .shopping-card-number { color:var(--shopping-number-color); font-family:"Arial Rounded MT Bold","Hiragino Maru Gothic ProN",ui-rounded,system-ui,sans-serif; font-size:clamp(35px,10vw,45px); font-weight:1000; line-height:1; -webkit-text-stroke:1.3px #2f4355; paint-order:stroke fill; text-shadow:0 1px 0 #fff8e7,0 2px 0 #2f435570; pointer-events:none; }
+    .shopping-card-number[data-shopping-number="10"] { font-size:clamp(32px,9vw,41px); }
+    .shopping-card.dragging[data-shopping-drag-hint-step="0"] { --shopping-visual-offset:var(--shopping-offset-none); }
+    .shopping-card.dragging[data-shopping-drag-hint-step="1"] { --shopping-visual-offset:var(--shopping-offset-english); }
+    .shopping-card.dragging[data-shopping-drag-hint-step="2"] { --shopping-visual-offset:0px; }
+    .shopping-card.dragging .shopping-card-art, .shopping-card.dragging .shopping-card-number { transition:none; }
+    @media (prefers-reduced-motion:reduce) { .shopping-column .shopping-card-art, .shopping-column .shopping-card-number { transition:none; } }
+    .shopping-card-hint { position:absolute; z-index:2; right:0; bottom:0; left:0; display:none; flex-direction:column; align-items:center; justify-content:center; min-height:14px; max-height:100%; padding:1px; border-radius:0 0 10px 10px; background:rgba(255,248,231,var(--shopping-hint-opacity)); color:#754c35; text-align:center; line-height:1; pointer-events:none; }
+    .shopping-card-hint-ja { display:none; max-width:100%; margin-top:1px; font-size:9px; font-weight:900; white-space:nowrap; letter-spacing:-.06em; text-shadow:0 1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff; }
+    .shopping-card-hint-en { display:block; max-width:100%; color:#26364a; font-size:12px; font-weight:900; white-space:nowrap; letter-spacing:-.04em; text-shadow:0 1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff; }
+    .shopping-card[data-shopping-value="strawberry"] .shopping-card-hint-en { font-size:11px; letter-spacing:-.035em; }
+    .shopping-card[data-shopping-value="chicken"] .shopping-card-hint-en { font-size:11.5px; }
     #shopping-screen[data-shopping-hint-step="1"] .shopping-card-hint, #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint { display:flex; }
-    #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint-en { display:block; }
-    .shopping-instruction-hint { position:absolute; z-index:8; top:2%; right:12px; left:12px; height:var(--shopping-hint-height); display:none; flex-direction:column; align-items:center; justify-content:center; padding:4px 8px; border-radius:12px; background:rgba(255,248,231,.93); box-shadow:0 2px 8px #55412c2e; text-align:center; pointer-events:none; }
+    #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint { min-height:24px; }
+    #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint-ja { display:block; }
+    .shopping-instruction-hint { position:absolute; z-index:8; top:2%; right:12px; left:12px; height:var(--shopping-hint-height); display:none; flex-direction:column; align-items:center; justify-content:center; padding:2px 8px; border-radius:12px; background:rgba(255,248,231,.93); box-shadow:0 2px 8px #55412c2e; text-align:center; pointer-events:none; }
     #shopping-screen[data-shopping-hint-step="1"] .shopping-instruction-hint, #shopping-screen[data-shopping-hint-step="2"] .shopping-instruction-hint { display:flex; }
-    .shopping-instruction-ja { color:#754c35; font-size:12px; font-weight:900; line-height:1.2; overflow-wrap:anywhere; }
-    .shopping-instruction-en { display:none; margin-top:2px; color:#26364a; font-size:11px; font-weight:800; line-height:1.15; overflow-wrap:anywhere; }
-    #shopping-screen[data-shopping-hint-step="2"] .shopping-instruction-en { display:block; }
+    .shopping-instruction-ja { display:none; margin-top:2px; color:#754c35; font-size:12px; font-weight:900; line-height:1.2; overflow-wrap:anywhere; }
+    .shopping-instruction-en { display:block; color:#26364a; font-size:11px; font-weight:800; line-height:1.15; overflow-wrap:anywhere; }
+    #shopping-screen[data-shopping-hint-step="2"] .shopping-instruction-ja { display:block; }
     .shopping-slot-pair { position:absolute; z-index:6; top:69%; left:50%; display:flex; gap:var(--shopping-slot-gap); transform:translateX(-50%); }
     .shopping-slot { display:grid; place-items:center; width:var(--shopping-slot-width); height:var(--shopping-slot-height); border:3px dashed #9b5b29; border-radius:14px; background:#fff8e2bd; box-shadow:inset 0 2px 5px #49351b33; pointer-events:none; }
-    .shopping-slot.filled { background:#fff9ebed; } .shopping-slot.locked { border-style:solid; border-color:#36855b; }
+    .shopping-slot[data-shopping-slot="item"] { border-color:#e6752d; box-shadow:0 0 12px #e6752d80,inset 0 2px 5px #49351b33; }
+    .shopping-slot[data-shopping-slot="number"] { border-color:#48afd3; box-shadow:0 0 12px #48afd380,inset 0 2px 5px #49351b33; }
+    .shopping-slot.filled { background:#fff9ebed; } .shopping-slot.locked { border-style:solid; }
     .shopping-slot-content { display:grid; place-items:center; width:100%; height:100%; pointer-events:none; }
     .shopping-slot-content .shopping-card-art { width:min(78%,68px); }
     .shopping-slot.wrong { animation:shoppingWrong .34s ease-in-out 2; }
     @keyframes shoppingWrong { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-4px); } 75% { transform:translateX(4px); } }
     .shopping-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-    @media (min-width:380px) { #shopping-screen { --shopping-card-width:74px; --shopping-card-height:70px; --shopping-card-gap:10px; --shopping-slot-width:93px; --shopping-slot-height:96px; --shopping-slot-gap:6px; --shopping-hint-height:62px; } }
-    @media (min-width:410px) { #shopping-screen { --shopping-card-width:82px; --shopping-card-height:78px; --shopping-card-gap:12px; --shopping-slot-width:103px; --shopping-slot-height:106px; --shopping-hint-height:66px; } .shopping-card-hint-ja { font-size:10px; } .shopping-card-hint-en { font-size:9px; } }
+    @media (min-width:380px) { #shopping-screen { --shopping-card-width:74px; --shopping-card-height:80px; --shopping-card-gap:4px; --shopping-column-top:17%; --shopping-slot-width:93px; --shopping-slot-height:96px; --shopping-slot-gap:6px; --shopping-hint-height:52px; } }
+    @media (min-width:410px) { #shopping-screen { --shopping-card-width:82px; --shopping-card-height:88px; --shopping-card-gap:5px; --shopping-card-label-space:25px; --shopping-offset-none:12.5px; --shopping-offset-english:5.5px; --shopping-column-top:17%; --shopping-slot-width:103px; --shopping-slot-height:106px; --shopping-hint-height:55px; } .shopping-card-hint-ja { font-size:10px; } #shopping-screen[data-shopping-hint-step="2"] .shopping-card-hint { min-height:25px; } }
+    @media (max-height:640px) { #shopping-screen { --shopping-card-height:var(--shopping-card-width); --shopping-card-gap:0px; --shopping-column-top:14%; } }
     .breakfast-scene svg, .living-scene svg { position:absolute; top:0; left:0; display:block; width:100%; height:calc(100% - var(--tray-height) - env(safe-area-inset-bottom)); }
     .breakfast-title { position:absolute; z-index:2; left:16px; top:14px; padding:8px 13px; border-radius:999px; background:#ff8c47; box-shadow:0 3px 0 #c76c42; color:#fff; font-size:16px; font-weight:900; }
     .breakfast-controls { display:flex; justify-content:space-between; align-items:center; gap:var(--header-gap); width:100%; min-width:0; }
@@ -271,6 +288,13 @@
     .speech-debug-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; font-weight:800; }
     .speech-debug-actions { display:flex; gap:6px; } .speech-debug button { border:1px solid #fff7; border-radius:5px; padding:3px 6px; background:#fff2; color:#fff; font:inherit; cursor:pointer; pointer-events:auto; }
     .speech-debug-log { overflow:auto; white-space:pre-wrap; word-break:break-word; }
+    .speech-debug.shopping-active { height:86px; max-height:86px; overflow:hidden; padding:4px 8px; }
+    .speech-debug.shopping-active > :first-child { margin-bottom:2px; }
+    .speech-debug:not(.shopping-active) .shopping-drag-copy, .speech-debug.shopping-active .speech-debug-actions button:not(.shopping-drag-copy) { display:none; }
+    .shopping-drag-debug { display:none; min-height:0; }
+    .speech-debug.shopping-active .shopping-drag-debug { display:block; }
+    .shopping-drag-debug-summary { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .shopping-drag-debug-last { max-height:35px; overflow:auto; white-space:pre-wrap; word-break:break-word; }
     @media (max-height:700px) {
       .home-hero { min-height:100px; height:100px; padding:12px 23px; }
       #home-screen .home-hero h2 { font-size:24px; }
@@ -401,13 +425,14 @@
     </section>
   </main>
   <main class="app" id="shopping-screen" hidden aria-label="おかいもののゲーム画面">
-    <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="shopping-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="shopping-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="shopping-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="shopping-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="shopping-kana" type="button" aria-label="日本語を表示" aria-pressed="false">もじ</button><button class="round compact-control" id="shopping-speaker" type="button" aria-label="もう一度聞く" aria-pressed="false">🔊</button></div></div></header>
+    <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="shopping-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="shopping-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="shopping-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="shopping-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="shopping-kana" type="button" aria-label="英語を表示" aria-pressed="false">もじ</button><button class="round compact-control" id="shopping-speaker" type="button" aria-label="もう一度聞く" aria-pressed="false">🔊</button></div></div></header>
     <section class="shopping-scene" id="shopping-scene" aria-label="スーパーのおかいもの">
       <svg viewBox="0 0 900 1200" preserveAspectRatio="none" aria-hidden="true"><image href="shopping-scene-bg-v2a.png.webp" width="900" height="1200"/></svg>
       <div class="shopping-column item" id="shopping-items" aria-label="アイテムのカード"></div>
       <div class="shopping-column number" id="shopping-numbers" aria-label="かずのカード"></div>
       <div class="shopping-slot-pair" aria-label="カートのスロット"><div class="shopping-slot" id="shopping-item-slot" data-shopping-slot="item" aria-label="アイテムをいれる"></div><div class="shopping-slot" id="shopping-number-slot" data-shopping-slot="number" aria-label="かずをいれる"></div></div>
-      <div class="shopping-instruction-hint" id="shopping-instruction-hint" aria-live="polite"><span class="shopping-instruction-ja" id="shopping-instruction-ja"></span><span class="shopping-instruction-en" id="shopping-instruction-en"></span></div>
+      <div class="shopping-instruction-hint" id="shopping-instruction-hint" aria-live="polite"><span class="shopping-instruction-en" id="shopping-instruction-en"></span><span class="shopping-instruction-ja" id="shopping-instruction-ja"></span></div>
+      <div class="living-toast" id="shopping-toast" aria-live="polite"></div>
       <div class="breakfast-finish" id="shopping-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt="よろこんでいる白黒ねこ"><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great shopping!</p><button class="round" id="shopping-play-again" type="button">Play again</button></div></div>
       <span id="shopping-status" class="shopping-sr-only" aria-live="polite"></span>
     </section>
@@ -721,13 +746,23 @@
       const listenStarted={bathroom:false,breakfast:false,living:false,bedroom:false}, speechEvents=[], recoveryEvents=[];
       function isListenSceneVisible(descriptor) { const screen=descriptor?.scene.closest('main'); return Boolean(screen && !screen.hidden && getComputedStyle(screen).display!=='none'); }
       function isSpeechSceneVisible(name) { if(name==='shopping') return Boolean(shoppingSession && !shoppingScreen.hidden && getComputedStyle(shoppingScreen).display!=='none'); return Boolean(listenStarted[name] && isListenSceneVisible(listenScenes[name])); }
-      let speechStartTimer=null, speechWatchTimer=null, speechDebugLog=null, speechDebugLines=[], instructionSpeechActive=false, lastSpokenName='', lastSpokenNameAt=0;
+      let speechStartTimer=null, speechWatchTimer=null, speechDebugLog=null, speechDebugPanel=null, speechDebugLines=[], instructionSpeechActive=false, lastSpokenName='', lastSpokenNameAt=0;
       function appendDebugLine(line) { if(!SPEECH_DEBUG || !speechDebugLog) return; speechDebugLines.push(line); speechDebugLog.textContent=speechDebugLines.join('\n'); speechDebugLog.scrollTop=speechDebugLog.scrollHeight; }
       function logSpeech(...args) { if(!SPEECH_DEBUG) return; console.log('[speech]',...args); appendDebugLine(args.map(value=>typeof value==='object' ? JSON.stringify(value) : String(value)).join(' ')); }
       function logGameRecovery(sceneName,reason,details={}) { const entry={scene:sceneName,reason,...details}; recoveryEvents.push(entry); console.warn('[game recovery]',entry); appendDebugLine(`[game recovery] ${JSON.stringify(entry)}`); }
       function getEnglishVoices() { return !('speechSynthesis' in window) ? [] : (speechSynthesis.getVoices() || []).filter(v=>(v.lang || '').toLowerCase().startsWith('en')); }
       function speechVoiceSummary() { return getEnglishVoices().map(v=>({name:v.name,lang:v.lang,localService:v.localService,default:v.default})); }
-      function initSpeechDebug() { if(!SPEECH_DEBUG || speechDebugLog || AUTOMATED_TEST) return; const panel=document.createElement('aside'), head=document.createElement('div'), actions=document.createElement('div'), clear=document.createElement('button'), copy=document.createElement('button'); panel.className='speech-debug'; panel.setAttribute('aria-label','Speech synthesis diagnostics'); head.className='speech-debug-head'; head.append('Speech diagnostics'); actions.className='speech-debug-actions'; clear.type=copy.type='button'; clear.textContent='クリア'; copy.textContent='全文コピー'; clear.addEventListener('click',()=>{ speechDebugLines=[]; speechDebugLog.textContent=''; }); copy.addEventListener('click',()=>navigator.clipboard?.writeText(speechDebugLines.join('\n')).then(()=>{ copy.textContent='コピー済み'; setTimeout(()=>copy.textContent='全文コピー',1200); }).catch(()=>{ copy.textContent='コピー不可'; })); actions.append(clear,copy); head.append(actions); speechDebugLog=document.createElement('div'); speechDebugLog.className='speech-debug-log'; panel.append(head,speechDebugLog); document.body.append(panel); logSpeech('startup',{iframe:window.self!==window.top,userAgent:navigator.userAgent,englishVoices:speechVoiceSummary()}); }
+      function initSpeechDebug() {
+        if(!SPEECH_DEBUG || speechDebugLog || AUTOMATED_TEST) return;
+        const panel=document.createElement('aside'), head=document.createElement('div'), actions=document.createElement('div'), clear=document.createElement('button'), copy=document.createElement('button');
+        panel.className='speech-debug'; panel.setAttribute('aria-label','Speech synthesis diagnostics'); head.className='speech-debug-head'; head.append('Speech diagnostics'); actions.className='speech-debug-actions';
+        clear.type=copy.type='button'; clear.textContent='クリア'; copy.textContent='全文コピー';
+        clear.addEventListener('click',()=>{ speechDebugLines=[]; speechDebugLog.textContent=''; });
+        copy.addEventListener('click',()=>navigator.clipboard?.writeText(speechDebugLines.join('\n')).then(()=>{ copy.textContent='コピー済み'; setTimeout(()=>copy.textContent='全文コピー',1200); }).catch(()=>{ copy.textContent='コピー不可'; }));
+        actions.append(clear,copy); head.append(actions); speechDebugLog=document.createElement('div'); speechDebugLog.className='speech-debug-log'; panel.append(head,speechDebugLog); document.body.append(panel); speechDebugPanel=panel;
+        initShoppingDragDebug(panel);
+        logSpeech('startup',{iframe:window.self!==window.top,userAgent:navigator.userAgent,englishVoices:speechVoiceSummary()});
+      }
       function primeSpeech() { if (!('speechSynthesis' in window)) return; const count=getEnglishVoices().length; logSpeech('primeSpeech',{englishVoices:count,safari:IS_SAFARI}); if(IS_SAFARI) speechSynthesis.resume(); }
       function unlockAudio() { const Audio=window.AudioContext || window.webkitAudioContext; let ready; if (Audio) { if (!audioContext || audioContext.state==='closed') audioContext=new Audio(); if (audioContext.state!=='running') ready=audioContext.resume().catch(error=>{ console.warn('Sound effects unavailable:',error); }); } primeSpeech(); return ready; }
       function tone(context, frequency, start, length, type='sine') { const oscillator=context.createOscillator(), gain=context.createGain(); oscillator.type=type; oscillator.frequency.setValueAtTime(frequency, start); gain.gain.setValueAtTime(.0001, start); gain.gain.exponentialRampToValueAtTime(.13, start+.015); gain.gain.exponentialRampToValueAtTime(.0001, start+length); oscillator.connect(gain).connect(context.destination); oscillator.start(start); oscillator.stop(start+length+.02); }
@@ -872,16 +907,25 @@
       const listenInteractionControllers={};
       function resetGame(shouldSpeak=true) { stopSpeech(); listenInteractionControllers.bathroom?.cancelActive('reset'); clearRecentTasks('bathroom'); finishPanel.classList.remove('show'); document.querySelectorAll('.item').forEach(el=>{ el.classList.remove('done','drag'); el.style.left=''; el.style.top=''; el.dataset.listenState='tray'; }); selectTask(); listenStarted.bathroom=true; prompt.textContent='New game — listen carefully!'; if (shouldSpeak && voicesReady) setTimeout(speak, 120); }
       const shuffle = list => { const result=[...list]; for(let index=result.length-1;index>0;index--) { const swapIndex=Math.floor(Math.random()*(index+1)); [result[index],result[swapIndex]]=[result[swapIndex],result[index]]; } return result; };
-      // Shopping question generation is kept separate until the shopping screen is built.
+      // Shopping question generation remains separate from the other Listen & Do scenes.
       const shoppingItemData=Object.freeze({
         apple:{cardEnglish:'apple',english:'apple',plural:'apples',japanese:'りんご',counter:'こ',image:'breakfast-item-apple-v1.png.webp'},
         banana:{cardEnglish:'banana',english:'banana',plural:'bananas',japanese:'バナナ',counter:'ぼん',image:'think-say-banana-v1.png.webp'},
         milk:{cardEnglish:'milk',cardJapanese:'ぎゅうにゅう',english:'carton of milk',plural:'cartons of milk',japanese:'ぎゅうにゅうパック',counter:'こ',image:'breakfast-items-v2.png.webp',sprite:'100% 0'},
         bread:{cardEnglish:'bread',english:'slice of bread',plural:'slices of bread',japanese:'パン',counter:'まい',image:'breakfast-items-v2.png.webp',sprite:'0 0'},
-        egg:{cardEnglish:'egg',english:'egg',plural:'eggs',japanese:'たまご',counter:'こ',image:'shopping-item-egg-v1a.png.webp'}
+        egg:{cardEnglish:'egg',english:'egg',plural:'eggs',japanese:'たまご',counter:'こ',image:'shopping-item-egg-v1a.png.webp'},
+        tomato:{cardEnglish:'tomato',english:'tomato',plural:'tomatoes',japanese:'トマト',counter:'こ',image:'shopping-item-tomato-v1a.png.webp'},
+        carrot:{cardEnglish:'carrot',english:'carrot',plural:'carrots',japanese:'にんじん',counter:'ほん',image:'shopping-item-carrot-v1a.png.webp'},
+        potato:{cardEnglish:'potato',english:'potato',plural:'potatoes',japanese:'じゃがいも',counter:'こ',image:'shopping-item-potato-v1b.png.webp'},
+        chicken:{cardEnglish:'chicken',english:'piece of chicken',plural:'pieces of chicken',japanese:'とりにく',counter:'きれ',image:'shopping-item-chicken-v2a.png.webp'},
+        pork:{cardEnglish:'pork',english:'piece of pork',plural:'pieces of pork',japanese:'ぶたにく',counter:'きれ',image:'shopping-item-pork-v2a.png.webp'},
+        beef:{cardEnglish:'beef',english:'piece of beef',plural:'pieces of beef',japanese:'ぎゅうにく',counter:'きれ',image:'shopping-item-beef-v2a.png.webp'},
+        fish:{cardEnglish:'fish',english:'fish',plural:'fish',japanese:'さかな',counter:'ひき',image:'shopping-item-fish-v2b.png.webp'},
+        strawberry:{cardEnglish:'strawberry',english:'strawberry',plural:'strawberries',japanese:'いちご',counter:'こ',image:'shopping-item-strawberry-v1b.png.webp'}
       });
       const shoppingNumberWords=Object.freeze(['one','two','three','four','five','six','seven','eight','nine','ten']);
       const shoppingNumberJapanese=Object.freeze(['いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう']);
+      const shoppingNumberColors=Object.freeze(['#e97036','#549acf','#9b69c9','#36a98a','#d95881','#b67b34','#319db3','#ae61bf','#ca7850','#d66d2d']);
       function shoppingInstruction(itemKey,count,patternIndex) {
         const item=shoppingItemData[itemKey];
         if(!item || !Number.isInteger(count) || count<1 || count>10 || ![0,1,2].includes(patternIndex)) throw new RangeError('Invalid shopping instruction');
@@ -893,11 +937,11 @@
       }
       function buildShoppingQuestions() {
         const keys=Object.keys(shoppingItemData), numbers=Array.from({length:10},(_,index)=>index+1);
-        return shuffle(keys).map(itemKey=>{
+        return shuffle(keys).slice(0,5).map(itemKey=>{
           const count=shuffle(numbers)[0], patternIndex=shuffle([0,1,2])[0];
           const instruction=shoppingInstruction(itemKey,count,patternIndex);
-          const itemChoices=shuffle([itemKey,...shuffle(keys.filter(key=>key!==itemKey)).slice(0,3)]);
-          const numberChoices=shuffle([count,...shuffle(numbers.filter(number=>number!==count)).slice(0,3)]);
+          const itemChoices=shuffle([itemKey,...shuffle(keys.filter(key=>key!==itemKey)).slice(0,4)]);
+          const numberChoices=shuffle([count,...shuffle(numbers.filter(number=>number!==count)).slice(0,4)]);
           return {itemKey,count,patternIndex,englishInstruction:instruction.english,japaneseInstruction:instruction.japanese,itemChoices,numberChoices};
         });
       }
@@ -1134,12 +1178,52 @@
       const shoppingFinish=document.querySelector('#shopping-finish'), shoppingStatus=document.querySelector('#shopping-status');
       const shoppingHintButton=document.querySelector('#shopping-kana'), shoppingSpeaker=document.querySelector('#shopping-speaker');
       const shoppingInstructionJapanese=document.querySelector('#shopping-instruction-ja'), shoppingInstructionEnglish=document.querySelector('#shopping-instruction-en');
-      let shoppingSession=null,shoppingDrag=null,shoppingTransitionTimer=null,shoppingSpeechTimer=null,shoppingHintStep=0;
+      let shoppingSession=null,shoppingDrag=null,shoppingTransitionTimer=null,shoppingSpeechTimer=null,shoppingIntroTimer=null,shoppingIntroInProgress=false,shoppingSpeechGeneration=0,shoppingHintStep=0;
+      const shoppingToast=document.querySelector('#shopping-toast');
+      let shoppingDragDebugSummary=null,shoppingDragDebugLast=null,shoppingDragDebugFailure=null,shoppingDragDebugSequence=0;
+      const shoppingDragDebugEntries=[];
+      function initShoppingDragDebug(panel) {
+        const section=document.createElement('div'), summary=document.createElement('div'), last=document.createElement('div'), copy=document.createElement('button');
+        section.className='shopping-drag-debug'; summary.className='shopping-drag-debug-summary'; last.className='shopping-drag-debug-last';
+        summary.textContent='お買い物ドラッグ: 記録なし'; last.textContent='直近の失敗: なし';
+        copy.type='button'; copy.className='shopping-drag-copy'; copy.textContent='操作ログコピー';
+        copy.addEventListener('click',()=>{
+          const value=shoppingDragDebugEntries.map(entry=>JSON.stringify(entry)).join('\n');
+          const done=success=>{ copy.textContent=success ? 'コピー済み' : 'コピー不可'; setTimeout(()=>copy.textContent='操作ログコピー',1200); };
+          const fallback=()=>{
+            const field=document.createElement('textarea'); field.value=value; field.style.position='fixed'; field.style.left='-9999px'; document.body.append(field); field.select();
+            let success=false; try { success=Boolean(document.execCommand?.('copy')); } catch (_) {} field.remove(); done(success);
+          };
+          if(navigator.clipboard?.writeText) navigator.clipboard.writeText(value).then(()=>done(true)).catch(fallback);
+          else fallback();
+        });
+        section.append(summary,last); panel.insertBefore(section,speechDebugLog); panel.querySelector('.speech-debug-actions').append(copy);
+        shoppingDragDebugSummary=summary; shoppingDragDebugLast=last;
+      }
+      function recordShoppingDrag(stage,drag,details={}) {
+        if(!SPEECH_DEBUG) return;
+        const entry={attempt:drag?.diagnosticId ?? null,stage,kind:drag?.kind ?? null,value:drag?.value ?? null,grab:drag?.grab ?? null,...details};
+        shoppingDragDebugEntries.push(entry); if(shoppingDragDebugEntries.length>80) shoppingDragDebugEntries.shift();
+        if(['outside','state-rejected','cancelled','timed-out','not-judged','start-rejected','other'].includes(entry.outcome)) shoppingDragDebugFailure=entry;
+        if(shoppingDragDebugSummary) shoppingDragDebugSummary.textContent=`最新: ${entry.outcome || stage}${entry.reason ? ` (${entry.reason})` : ''} / 直近失敗: ${shoppingDragDebugFailure?.outcome || 'なし'}`;
+        if(shoppingDragDebugLast) shoppingDragDebugLast.textContent=shoppingDragDebugFailure ? JSON.stringify(shoppingDragDebugFailure) : '直近の失敗: なし';
+        appendDebugLine(`[shopping drag] ${JSON.stringify(entry)}`);
+      }
+      function shoppingDragGeometry(drag,event) {
+        if(!SPEECH_DEBUG) return {};
+        const card=drag.card.getBoundingClientRect(), slot=shoppingSlots[drag.kind]?.getBoundingClientRect();
+        const rounded=value=>Math.round(value*10)/10;
+        const bounds=rect=>rect ? {left:rounded(rect.left),top:rounded(rect.top),right:rounded(rect.right),bottom:rounded(rect.bottom)} : null;
+        const centerX=(card.left+card.right)/2, centerY=(card.top+card.bottom)/2;
+        return {pointer:event && Number.isFinite(event.clientX) ? {x:rounded(event.clientX),y:rounded(event.clientY)} : null,
+          cardCenter:{x:rounded(centerX),y:rounded(centerY)},slotRect:bounds(slot),centerInside:slot ? centerX>=slot.left && centerX<=slot.right && centerY>=slot.top && centerY<=slot.bottom : false};
+      }
+      function showShoppingDragDebug(show) { if(SPEECH_DEBUG && speechDebugPanel) { speechDebugPanel.classList.toggle('shopping-active',show); speechDebugLog.hidden=show; } }
       function setShoppingHintStep(step) {
         shoppingHintStep=step;
         shoppingScreen.dataset.shoppingHintStep=String(step);
         shoppingHintButton.setAttribute('aria-pressed',String(step!==0));
-        shoppingHintButton.setAttribute('aria-label',['日本語を表示','英語も表示','文字を消す'][step]);
+        shoppingHintButton.setAttribute('aria-label',['英語を表示','日本語も表示','文字を消す'][step]);
       }
       setShoppingHintStep(0);
       function speakShopping() {
@@ -1151,17 +1235,59 @@
         u.onend=u.onerror=()=>{ if(isCurrentUtterance(u)) shoppingSpeaker.setAttribute('aria-pressed','false'); };
         playSpeech(u);
       }
+      function speakShoppingCard(kind,value) {
+        if(shoppingScreen.hidden || !('speechSynthesis' in window)) return;
+        const text=kind==='item' ? shoppingItemData[value]?.cardEnglish : shoppingNumberWords[value-1];
+        if(!text) return;
+        stopShoppingSpeech();
+        const u=new SpeechSynthesisUtterance(text),v=voice();
+        u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; u._listenScene='shopping'; if(v) u.voice=v;
+        playSpeech(u);
+      }
       function scheduleShoppingSpeech(delay=240) {
         clearTimeout(shoppingSpeechTimer);
-        const session=shoppingSession,index=session?.getState().index;
+        if(shoppingIntroInProgress) return;
+        const session=shoppingSession,index=session?.getState().index,generation=shoppingSpeechGeneration;
         shoppingSpeechTimer=setTimeout(()=>{
           shoppingSpeechTimer=null;
-          if(session===shoppingSession && !shoppingScreen.hidden && session.getState().index===index) speakShopping();
+          if(generation===shoppingSpeechGeneration && session===shoppingSession && !shoppingScreen.hidden && session.getState().index===index) speakShopping();
         },delay);
       }
-      function stopShoppingSpeech() { clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; stopSpeech(); shoppingSpeaker.setAttribute('aria-pressed','false'); }
+      function scheduleShoppingIntro(delay=240) {
+        clearTimeout(shoppingSpeechTimer);
+        const session=shoppingSession,generation=shoppingSpeechGeneration;
+        shoppingSpeechTimer=setTimeout(()=>{
+          shoppingSpeechTimer=null;
+          if(generation!==shoppingSpeechGeneration || session!==shoppingSession || shoppingScreen.hidden || !('speechSynthesis' in window)) return;
+          const u=new SpeechSynthesisUtterance("Let's go to the grocery store!"),v=voice();
+          u.lang=v?.lang || 'en-US'; u.rate=speechRate; u.pitch=1; u._instructionSpeech=true; u._listenScene='shopping'; if(v) u.voice=v;
+          shoppingIntroInProgress=true;
+          let settled=false;
+          const complete=reason=>{
+            if(settled) return;
+            settled=true; clearTimeout(shoppingIntroTimer); shoppingIntroTimer=null;
+            if(generation!==shoppingSpeechGeneration || session!==shoppingSession || shoppingScreen.hidden) return;
+            if(activeUtterance!==u && !(reason==='timeout' && activeUtterance===null)) return;
+            shoppingIntroInProgress=false;
+            logSpeech('shopping intro complete',{reason});
+            scheduleShoppingSpeech(180);
+          };
+          u.onend=()=>complete('end');
+          u.onerror=()=>complete('error');
+          playSpeech(u);
+          const check=()=>{
+            if(settled || generation!==shoppingSpeechGeneration || session!==shoppingSession || shoppingScreen.hidden) return;
+            if(activeUtterance===u && window.speechSynthesis.speaking) { shoppingIntroTimer=setTimeout(check,400); return; }
+            complete('timeout');
+          };
+          shoppingIntroTimer=setTimeout(check,12500);
+        },delay);
+      }
+      function stopShoppingSpeech() { shoppingSpeechGeneration++; clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; clearTimeout(shoppingIntroTimer); shoppingIntroTimer=null; shoppingIntroInProgress=false; stopSpeech(); shoppingSpeaker.setAttribute('aria-pressed','false'); }
+      function showShoppingCorrectCat() { shoppingToast.textContent='できたね！'; shoppingToast.classList.add('show'); }
+      function hideShoppingCorrectCat() { shoppingToast.classList.remove('show'); shoppingToast.textContent=''; }
       function shoppingVisual(kind,value) {
-        if(kind==='number') { const number=document.createElement('span'); number.className='shopping-card-number'; number.textContent=String(value); return number; }
+        if(kind==='number') { const number=document.createElement('span'); number.className='shopping-card-number'; number.dataset.shoppingNumber=String(value); number.style.setProperty('--shopping-number-color',shoppingNumberColors[value-1]); number.textContent=String(value); return number; }
         const item=shoppingItemData[value];
         if(item.sprite) { const sprite=document.createElement('span'); sprite.className='shopping-card-art'; sprite.style.backgroundImage=`url("${item.image}")`; sprite.style.backgroundPosition=item.sprite; return sprite; }
         const image=document.createElement('img'); image.className='shopping-card-art'; image.src=item.image; image.alt=''; return image;
@@ -1180,13 +1306,13 @@
             const hint=document.createElement('span'); hint.className='shopping-card-hint';
             const japanese=document.createElement('span'); japanese.className='shopping-card-hint-ja'; japanese.textContent=kind==='item' ? (shoppingItemData[value].cardJapanese || shoppingItemData[value].japanese) : shoppingNumberJapanese[value-1];
             const english=document.createElement('span'); english.className='shopping-card-hint-en'; english.textContent=kind==='item' ? shoppingItemData[value].cardEnglish : shoppingNumberWords[value-1];
-            hint.append(japanese,english); card.append(hint);
+            hint.append(english,japanese); card.append(hint);
             if(state.slots[kind]===value) { card.classList.add('in-slot'); card.setAttribute('aria-hidden','true'); card.tabIndex=-1; }
             card.addEventListener('pointerdown',startShoppingDrag);
             card.addEventListener('pointermove',moveShoppingDrag);
             card.addEventListener('pointerup',event=>finishShoppingDrag(event));
             card.addEventListener('pointercancel',event=>finishShoppingDrag(event,true));
-            card.addEventListener('lostpointercapture',event=>finishShoppingDrag(event,true));
+            card.addEventListener('lostpointercapture',handleShoppingLostCapture);
             return card;
           });
           shoppingColumns[kind].replaceChildren(...cards);
@@ -1201,43 +1327,117 @@
         shoppingFinish.classList.toggle('show',state.phase==='finished');
         if(state.phase==='finished') shoppingStatus.textContent='おかいものは ここまで できたよ';
       }
-      function cancelShoppingDrag() {
+      function cancelShoppingDrag(reason='cleanup') {
         const drag=shoppingDrag; if(!drag) return;
+        if(!drag.finalized) recordShoppingDrag('cancel',drag,{event:reason,outcome:reason==='capture-end-timeout' ? 'timed-out' : 'cancelled',reason,...shoppingDragGeometry(drag)});
         shoppingDrag=null;
-        drag.card.style.transform=''; drag.card.classList.remove('dragging');
+        if(drag.captureEndTimer) clearTimeout(drag.captureEndTimer);
+        if(drag.windowTracking) window.removeEventListener('pointermove',moveShoppingDrag,true);
+        drag.card.style.transform=''; drag.card.classList.remove('dragging'); delete drag.card.dataset.shoppingDragHintStep;
         try { if(drag.card.hasPointerCapture(drag.id)) drag.card.releasePointerCapture(drag.id); } catch (_) {}
       }
       function resetShopping({clearHint=false,speechDelay=240}={}) {
-        cancelShoppingDrag();
+        cancelShoppingDrag('reset');
         clearTimeout(shoppingTransitionTimer); shoppingTransitionTimer=null;
         stopShoppingSpeech();
+        hideShoppingCorrectCat();
         if(clearHint) setShoppingHintStep(0);
         shoppingSession=createShoppingSession(buildShoppingQuestions());
         shoppingStatus.textContent='';
         renderShopping();
-        scheduleShoppingSpeech(speechDelay);
+        scheduleShoppingIntro(speechDelay);
       }
       function startShoppingDrag(event) {
-        if(event.button!==0 || shoppingDrag || !shoppingSession || shoppingSession.getState().phase!=='ready') return;
+        if(event.button!==0 || shoppingDrag || !shoppingSession || shoppingSession.getState().phase!=='ready') {
+          if(SPEECH_DEBUG) recordShoppingDrag('start',{kind:event.currentTarget.dataset.shoppingKind,value:event.currentTarget.dataset.shoppingValue},{event:event.type,outcome:'start-rejected',reason:event.button!==0 ? 'non-primary-button' : shoppingDrag ? 'another-drag-active' : !shoppingSession ? 'no-session' : 'session-not-ready'});
+          return;
+        }
         event.preventDefault(); unlockAudio();
         const card=event.currentTarget;
-        shoppingDrag={card,id:event.pointerId,kind:card.dataset.shoppingKind,value:card.dataset.shoppingKind==='number' ? Number(card.dataset.shoppingValue) : card.dataset.shoppingValue,startX:event.clientX,startY:event.clientY,finalized:false};
+        shoppingDrag={card,id:event.pointerId,kind:card.dataset.shoppingKind,value:card.dataset.shoppingKind==='number' ? Number(card.dataset.shoppingValue) : card.dataset.shoppingValue,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,tapCandidate:true,finalized:false,captureLost:false,releaseObserved:false,captureEndTimer:null,windowTracking:false};
+        if(SPEECH_DEBUG) {
+          const rect=card.getBoundingClientRect();
+          shoppingDrag.diagnosticId=++shoppingDragDebugSequence;
+          shoppingDrag.grab={x:Math.round((event.clientX-rect.left)*10)/10,y:Math.round((event.clientY-rect.top)*10)/10};
+          recordShoppingDrag('start',shoppingDrag,{event:event.type,outcome:'in-progress',pointer:{x:event.clientX,y:event.clientY},cardRect:{left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom}});
+        }
+        card.dataset.shoppingDragHintStep=String(shoppingHintStep);
         card.classList.add('dragging');
-        try { card.setPointerCapture(event.pointerId); } catch (_) { cancelShoppingDrag(); }
+        try { card.setPointerCapture(event.pointerId); } catch (_) { cancelShoppingDrag('capture-failed'); }
+      }
+      function updateShoppingDragPosition(drag,event) {
+        if(!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+        drag.lastX=event.clientX; drag.lastY=event.clientY;
+        if(Math.hypot(drag.lastX-drag.startX,drag.lastY-drag.startY)>10) drag.tapCandidate=false;
       }
       function moveShoppingDrag(event) {
         const drag=shoppingDrag; if(!drag || drag.id!==event.pointerId) return;
-        if(event.buttons===0) { cancelShoppingDrag(); return; }
-        drag.card.style.transform=`translate(${event.clientX-drag.startX}px,${event.clientY-drag.startY}px) scale(1.06)`;
+        if(event.buttons===0) {
+          drag.releaseObserved=true;
+          updateShoppingDragPosition(drag,event);
+          drag.card.style.transform=`translate(${drag.lastX-drag.startX}px,${drag.lastY-drag.startY}px) scale(1.06)`;
+          scheduleShoppingCaptureEnd(drag,'pointermove-buttons-zero');
+          return;
+        }
+        if(drag.releaseObserved) { drag.releaseObserved=false; recordShoppingDrag('recovery',drag,{event:event.type,outcome:'continuing',reason:'buttons-still-down'}); }
+        updateShoppingDragPosition(drag,event);
+        drag.card.style.transform=`translate(${drag.lastX-drag.startX}px,${drag.lastY-drag.startY}px) scale(1.06)`;
+        if(drag.captureLost) scheduleShoppingCaptureEnd(drag,'capture-lost-still-active');
+        else if(drag.captureEndTimer) { clearTimeout(drag.captureEndTimer); drag.captureEndTimer=null; }
+      }
+      function scheduleShoppingCaptureEnd(drag,reason) {
+        if(drag.finalized) return;
+        if(drag.captureEndTimer) clearTimeout(drag.captureEndTimer);
+        const delay=drag.releaseObserved ? 120 : 2000;
+        recordShoppingDrag('recovery',drag,{event:reason,outcome:'pending-end',reason,waitMs:delay,...shoppingDragGeometry(drag)});
+        drag.captureEndTimer=setTimeout(()=>{
+          drag.captureEndTimer=null;
+          if(shoppingDrag!==drag || drag.finalized || shoppingScreen.hidden) return;
+          cancelShoppingDrag('capture-end-timeout');
+        },delay);
+      }
+      function handleShoppingLostCapture(event) {
+        const drag=shoppingDrag; if(!drag || drag.id!==event.pointerId || drag.finalized) return;
+        drag.captureLost=true;
+        if(!drag.windowTracking) { drag.windowTracking=true; window.addEventListener('pointermove',moveShoppingDrag,true); }
+        if(event.buttons===0) drag.releaseObserved=true;
+        recordShoppingDrag('capture-lost',drag,{event:event.type,buttons:event.buttons,outcome:'recovering',reason:drag.releaseObserved ? 'buttons-released' : 'pointer-still-active',...shoppingDragGeometry(drag)});
+        scheduleShoppingCaptureEnd(drag,drag.releaseObserved ? 'lostpointercapture-buttons-zero' : 'lostpointercapture-still-active');
+      }
+      function shoppingDropSlotForCard(card,kind) {
+        const cardRect=card.getBoundingClientRect(), slot=shoppingSlots[kind];
+        if(!slot) return null;
+        const centerX=(cardRect.left+cardRect.right)/2, centerY=(cardRect.top+cardRect.bottom)/2;
+        const slotRect=slot.getBoundingClientRect();
+        return centerX>=slotRect.left && centerX<=slotRect.right && centerY>=slotRect.top && centerY<=slotRect.bottom ? kind : null;
       }
       function finishShoppingDrag(event,cancelled=false) {
-        const drag=shoppingDrag; if(!drag || drag.id!==event.pointerId || drag.finalized) return;
+        const drag=shoppingDrag; if(!drag || drag.id!==event.pointerId || drag.finalized) {
+          if(SPEECH_DEBUG && drag && drag.id!==event.pointerId) recordShoppingDrag('finish',drag,{event:event.type,outcome:'ignored',reason:'pointer-id-mismatch'});
+          return;
+        }
         drag.finalized=true;
+        if(!cancelled && event.type==='pointerup' && !shoppingScreen.hidden && shoppingSession) updateShoppingDragPosition(drag,event);
+        const tapped=!cancelled && event.type==='pointerup' && !shoppingScreen.hidden && drag.tapCandidate===true && shoppingSession?.getState().phase==='ready';
+        if(tapped) {
+          recordShoppingDrag('finish',drag,{event:event.type,outcome:'tap',...shoppingDragGeometry(drag,event)});
+          cancelShoppingDrag();
+          speakShoppingCard(drag.kind,drag.value);
+          return;
+        }
+        let slotKind=null;
+        if(!cancelled && event.type==='pointerup' && !shoppingScreen.hidden && shoppingSession) {
+          drag.card.style.transform=`translate(${drag.lastX-drag.startX}px,${drag.lastY-drag.startY}px) scale(1.06)`;
+          slotKind=shoppingDropSlotForCard(drag.card,drag.kind);
+        }
+        const geometry=shoppingDragGeometry(drag,event);
+        const recovery=drag.captureLost ? 'pointerup-after-capture-loss' : drag.releaseObserved ? 'pointerup-after-buttons-zero' : null;
+        if(cancelled || event.type!=='pointerup' || shoppingScreen.hidden || !shoppingSession) recordShoppingDrag('finish',drag,{event:event.type,outcome:'not-judged',reason:cancelled ? event.type : event.type!=='pointerup' ? 'no-confirmed-pointerup' : shoppingScreen.hidden ? 'screen-hidden' : 'no-session',recovery,...geometry});
+        else if(!slotKind) recordShoppingDrag('finish',drag,{event:event.type,outcome:!geometry.slotRect || geometry.centerInside ? 'other' : 'outside',reason:!geometry.slotRect ? 'corresponding-slot-missing' : geometry.centerInside ? 'geometry-disagreement' : 'card-center-outside-corresponding-slot',recovery,...geometry});
         cancelShoppingDrag();
-        if(cancelled || shoppingScreen.hidden || !shoppingSession) return;
-        const slotKind=Object.keys(shoppingSlots).find(kind=>{ const rect=shoppingSlots[kind].getBoundingClientRect(); return event.clientX>=rect.left && event.clientX<=rect.right && event.clientY>=rect.top && event.clientY<=rect.bottom; });
         if(!slotKind) return;
         const result=shoppingSession.drop(drag.kind,drag.value,slotKind);
+        recordShoppingDrag('finish',drag,{event:event.type,outcome:result.type==='placed' || result.type==='evaluate' ? 'accepted' : 'state-rejected',reason:result.type,recovery,...geometry});
         if(result.type!=='placed' && result.type!=='evaluate') return;
         renderShopping();
         if(result.type==='placed') return;
@@ -1245,22 +1445,26 @@
         if(result.wrong.length) {
           wrongSound();
           for(const kind of result.wrong) shoppingSlots[kind].classList.add('wrong');
-        } else correctSound();
+        } else {
+          correctSound();
+          if(session.getState().index<4) showShoppingCorrectCat();
+        }
         shoppingTransitionTimer=setTimeout(()=>{
           shoppingTransitionTimer=null;
           if(shoppingSession!==session || shoppingScreen.hidden) return;
+          hideShoppingCorrectCat();
           const settled=session.settle();
           if(settled.type==='blocked') return;
           renderShopping();
           if(settled.type==='retry') shoppingStatus.textContent='もういちど やってみよう';
           else if(settled.type==='next') { shoppingStatus.textContent='つぎの おかいもの'; scheduleShoppingSpeech(); }
           else if(settled.type==='finished') { stopShoppingSpeech(); finishSound(); }
-        },result.wrong.length ? 700 : 600);
+        },result.wrong.length ? 700 : session.getState().index<4 ? 1300 : 600);
       }
       window.addEventListener('pointerup',event=>finishShoppingDrag(event),true);
       window.addEventListener('pointercancel',event=>finishShoppingDrag(event,true),true);
-      window.addEventListener('blur',cancelShoppingDrag);
-      document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelShoppingDrag(); });
+      window.addEventListener('blur',()=>cancelShoppingDrag('window-blur'));
+      document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelShoppingDrag('document-hidden'); });
       function openPlaces() { homeScreen.hidden=true; placeScreen.hidden=false; }
       function backToGames() { resetHintStages(); placeScreen.hidden=true; homeScreen.hidden=false; }
       function prepareSceneImage(sceneElement) {
@@ -1280,8 +1484,8 @@
       function openBreakfast() { prepareSceneImage(breakfastScene); placeScreen.hidden=true; breakfastScreen.hidden=false; unlockAudio(); resetBreakfast(false); sceneSelectSound(); speakSceneIntro('Let’s have breakfast!',()=>speakBreakfast(),'breakfast'); }
       function openLiving() { prepareSceneImage(livingScene); placeScreen.hidden=true; livingScreen.hidden=false; unlockAudio(); resetLiving(false); sceneSelectSound(); speakSceneIntro('Let’s play in the living room!',()=>speakLiving(),'living'); }
       function openBedroom() { prepareSceneImage(bedroomScene); placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom(),'bedroom'); }
-      function openShopping() { prepareSceneImage(shoppingScene); placeScreen.hidden=true; shoppingScreen.hidden=false; unlockAudio(); resetShopping({clearHint:true,speechDelay:450}); sceneSelectSound(); }
-      function leaveShopping() { if(shoppingScreen.hidden) return; cancelShoppingDrag(); clearTimeout(shoppingTransitionTimer); shoppingTransitionTimer=null; clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; shoppingSpeaker.setAttribute('aria-pressed','false'); setShoppingHintStep(0); shoppingSession=null; shoppingScreen.hidden=true; }
+      function openShopping() { prepareSceneImage(shoppingScene); placeScreen.hidden=true; shoppingScreen.hidden=false; showShoppingDragDebug(true); unlockAudio(); resetShopping({clearHint:true,speechDelay:450}); sceneSelectSound(); }
+      function leaveShopping() { if(shoppingScreen.hidden) return; cancelShoppingDrag('leave-shopping'); clearTimeout(shoppingTransitionTimer); shoppingTransitionTimer=null; stopShoppingSpeech(); hideShoppingCorrectCat(); setShoppingHintStep(0); shoppingSession=null; shoppingScreen.hidden=true; showShoppingDragDebug(false); }
       function backToPlaces() { stopSpeech(); leaveShopping(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
       function returnHome() { stopSpeech(); leaveShopping(); resetHintStages(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
       document.querySelector('#open-word').addEventListener('click', openWord);
@@ -1296,7 +1500,7 @@
       document.querySelector('#shopping-home').addEventListener('click', returnHome);
       document.querySelector('#shopping-reset').addEventListener('click',()=>{ unlockAudio(); resetShopping(); });
       shoppingHintButton.addEventListener('click',()=>setShoppingHintStep((shoppingHintStep+1)%3));
-      shoppingSpeaker.addEventListener('click',()=>{ unlockAudio(); clearTimeout(shoppingSpeechTimer); shoppingSpeechTimer=null; speakShopping(); });
+      shoppingSpeaker.addEventListener('click',()=>{ unlockAudio(); stopShoppingSpeech(); scheduleShoppingSpeech(0); });
       document.querySelector('#shopping-play-again').addEventListener('click',()=>{ unlockAudio(); resetShopping({clearHint:true}); });
       document.querySelector('#breakfast-back').addEventListener('click', backToPlaces);
       document.querySelector('#living-back').addEventListener('click', backToPlaces);

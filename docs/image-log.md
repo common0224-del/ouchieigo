@@ -2,11 +2,30 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
-## 2026-10-13 — Listen & Do「お買い物」採用画像の公開配置（アプリには未組み込み）
+## 2026-10-16 — 「お買い物」追加8種を採用・公開配置
+
+- **採用・接続済み：** `shopping-item-tomato-v1a.png.webp`、`shopping-item-carrot-v1a.png.webp`、`shopping-item-potato-v1b.png.webp`、`shopping-item-chicken-v2a.png.webp`、`shopping-item-pork-v2a.png.webp`、`shopping-item-beef-v2a.png.webp`、`shopping-item-fish-v2b.png.webp`、`shopping-item-strawberry-v1b.png.webp`。いずれも `private-prototypes/` の元候補を保持したまま、同名で公開ルートへバイト単位で一致するコピーを追加した。全8枚は512×512pxの透過WebPで、四隅のアルファ値は0。Listen & Do「お買い物」の `shoppingItemData` から参照する。
+- **選択理由：** 野菜・果物は先に確認した候補から所有者が上記版を指定。肉・魚は食材単体では小さいカードで識別しづらかったため、動物の顔＋食材の組を描いた新候補から chicken v2a、pork v2a、beef v2a、fish v2b を所有者が採用した。対応する v1a／v1b および v2 の不採用候補は `private-prototypes/` にそのまま残す。
+- **共用方針：** 棚・カート・文字を含まない単体アイコンとして作った。公開側の同じファイルを将来 Item Match からも参照できるが、今回 Item Match の出題・画像参照・画面は変更しない。数字は引き続きCSS描画で、数字画像は追加しない。
+- **既存v1候補の実際の生成プロンプト全文：** `private-prototypes/shopping-item-icon-prompts-v1.txt` の各 `shopping-item-...-v1a/v1b` 項に保存済み。参考画像は `breakfast-item-apple-v1.png.webp`、`think-say-banana-v1.png.webp`、`breakfast-items-v2.png.webp`、`shopping-item-egg-v1a.png.webp`（tomato v1a は apple・banana・egg の3枚）。今回これらは再生成していない。
+- **v2候補の作り方：** 画像生成AIで緑単色背景の新しい組み合わせ画像を生成し、背景の緑を領域抽出でアルファ透過した。v2a／v2b の比較では顔と食材の大きさ・前後関係を変えた。採用4枚の参考画像はそれぞれ `private-prototypes/shopping-item-chicken-v1b-check.png`、`shopping-item-pork-v1a-check.png`、`shopping-item-beef-v1b-check.png`、`shopping-item-fish-v1a-check.png`。いずれもタッチ・食材形の参考で、完成画像の編集対象ではない。
+
+採用したv2画像の生成時には、次の共通プロンプトに各画像の `Subject and composition:` 行を続けて送信した（この2部分の連結が実際の全文）。
+
+```text
+Use case: illustration-story. Create a NEW single transparent-ready educational icon for ages 4-6, shared by shopping and Item Match. Clean dark brown outlines, gently shaded polished painted color, simple recognizable shapes like the existing item reference. Centered square composition, generous transparent-ready margin, readable at 50 pixels. BACKGROUND MUST BE PERFECTLY UNIFORM SOLID CHROMA-KEY GREEN #00FF00 across entire canvas, not transparent, not checkerboard, no gradients or shadows. It will be removed mechanically. No text, labels, arrows, bubbles, frames, tray, shelf, blood, gore, or extra subjects. The reference image is STYLE/food-shape only; create a new two-part icon.
+```
+
+- **chicken v2a — Subject and composition:** `A friendly unmistakable WHITE CHICKEN HEAD at upper left with prominent red comb and wattle and orange beak, paired with a golden cooked chicken drumstick with visible bone at lower right. Variant A: face slightly larger than drumstick, both substantial, slightly touching, distinct silhouettes.`
+- **pork v2a — Subject and composition:** `A friendly unmistakable PINK PIG FACE at upper left, large rounded snout with two nostrils and triangular ears, paired with a single pale-pink pork chop cut at lower right. Variant A: face slightly larger, pork chop smaller but clearly a separate food cut, natural close grouping. No beef-red meat.`
+- **beef v2a — Subject and composition:** `A friendly unmistakable BROWN COW FACE at upper left, visible small horns, broad muzzle and contrasting lighter nose, paired with one deep-red beef steak cut with modest creamy marbling at lower right. Variant A: cow face slightly larger, steak substantial and separate, close grouping. No pig snout.`
+- **fish v2b — Subject and composition:** `One friendly recognizable SILVERY-BLUE WHOLE FISH at upper left with visible eye, fin and tail, paired with one matching pale pink fish fillet cut at lower right, faint blue-gray skin edge to show both are fish. Variant B: fillet slightly larger and forward, whole fish behind but fully recognizable; close grouping. Not a second whole fish.`
+
+## 2026-10-13 — Listen & Do「お買い物」採用画像の公開配置（後にアプリへ接続）
 
 ### 場面背景 `shopping-scene-bg-v2a.png.webp`
 
-- **状態・置き場所：** 所有者が Listen & Do「お買い物」の場面背景として採用。元画像 `private-prototypes/shopping-scene-bg-v2a.png.webp` を残し、同名で公開ルートへ再圧縮・編集せずコピーした。アプリ本体には未組み込み。コピー元・先のSHA-256はともに `7ebc637f8fb5ede33c36430b57b2cfdc4f8e923fa3c2c996a8c3a0ad288345ff`。
+- **状態・置き場所：** 所有者が Listen & Do「お買い物」の場面背景として採用。元画像 `private-prototypes/shopping-scene-bg-v2a.png.webp` を残し、同名で公開ルートへ再圧縮・編集せずコピーした。後の工程でアプリ本体に接続済み。コピー元・先のSHA-256はともに `7ebc637f8fb5ede33c36430b57b2cfdc4f8e923fa3c2c996a8c3a0ad288345ff`。
 - **寸法・形式：** 900×1200px、不透明WebP（復号時 RGB）。公開画像は90,914 bytes。
 - **採用理由と構図：** 比較候補の `private-prototypes/shopping-scene-bg-v1a.png.webp` を基準に、母親の頭上にアプリ側の指示文ヒント用の余白を確保した。母親は正面を向いて笑顔で、正面向きのショッピングカートを保持する。店内背景を含む。カート内には画像に描き込まず、アプリ側でアイテム用・数字用の2スロットを重ねる。
 - **比較候補：** `private-prototypes/shopping-scene-bg-v1a.png.webp`、`private-prototypes/shopping-scene-bg-v1b.png.webp`。両方とも現在の保存先に存在する。採用版は v2a。
@@ -15,7 +34,7 @@
 
 ### 卵 `shopping-item-egg-v1a.png.webp`
 
-- **状態・置き場所：** 所有者が「お買い物」の卵として採用。元画像 `private-prototypes/shopping-item-egg-v1a.png.webp` を残し、同名で公開ルートへ再圧縮・編集せずコピーした。アプリ本体には未組み込み。コピー元・先のSHA-256はともに `4fe657ab9800726c5d2cb1090675da417791725cb37b6c19a84554fe3ccbf52e`。
+- **状態・置き場所：** 所有者が「お買い物」の卵として採用。元画像 `private-prototypes/shopping-item-egg-v1a.png.webp` を残し、同名で公開ルートへ再圧縮・編集せずコピーした。後の工程でアプリ本体に接続済み。コピー元・先のSHA-256はともに `4fe657ab9800726c5d2cb1090675da417791725cb37b6c19a84554fe3ccbf52e`。
 - **寸法・透過：** 512×468px、透過WebP（復号時 RGBA）。公開画像は13,676 bytes。四隅のアルファ値はすべて0。
 - **採用理由：** 白い殻に濃い茶〜灰色の輪郭を付け、小さな表示でも卵の形を判別しやすく、クリーム色のカード背景と区別できる。1個だけを描いた素材。
 - **不採用候補：** `private-prototypes/shopping-item-egg-v1b.png.webp`（現在の保存先に存在）。不採用の個別理由は未確認。

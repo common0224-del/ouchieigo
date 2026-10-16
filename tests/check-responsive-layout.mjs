@@ -570,39 +570,137 @@ async function checkShoppingHints(page,engineName,width,height) {
     const rect=element=>{const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};};
     const cards=[...root.querySelectorAll('.shopping-card')];
     const hint=root.querySelector('#shopping-instruction-hint');
+    const shown=(element,parent)=>getComputedStyle(parent).display!=='none' && getComputedStyle(element).display!=='none';
     return {step:root.dataset.shoppingHintStep,pressed:root.querySelector('#shopping-kana').getAttribute('aria-pressed'),
-      scene:rect(root.querySelector('#shopping-scene')),cards:cards.map(card=>rect(card)),art:cards.map(card=>rect(card.querySelector('.shopping-card-art,.shopping-card-number'))),
+      scene:rect(root.querySelector('#shopping-scene')),header:rect(root.querySelector('.screen-header')),
+      cards:cards.map(card=>rect(card)),kinds:cards.map(card=>card.dataset.shoppingKind),values:cards.map(card=>card.dataset.shoppingValue),art:cards.map(card=>rect(card.querySelector('.shopping-card-art,.shopping-card-number'))),
       slots:[...root.querySelectorAll('.shopping-slot')].map(rect),hint:rect(hint),hintShown:getComputedStyle(hint).display!=='none',
-      japaneseShown:cards.every(card=>getComputedStyle(card.querySelector('.shopping-card-hint-ja')).display!=='none'),
-      englishShown:cards.every(card=>getComputedStyle(card.querySelector('.shopping-card-hint-en')).display!=='none'),
+      japaneseShown:cards.every(card=>shown(card.querySelector('.shopping-card-hint-ja'),card.querySelector('.shopping-card-hint'))),
+      englishShown:cards.every(card=>shown(card.querySelector('.shopping-card-hint-en'),card.querySelector('.shopping-card-hint'))),
+      instructionJapaneseShown:shown(hint.querySelector('.shopping-instruction-ja'),hint),
+      instructionEnglishShown:shown(hint.querySelector('.shopping-instruction-en'),hint),
       bands:cards.map(card=>{const band=card.querySelector('.shopping-card-hint'); return {rect:rect(band),shown:getComputedStyle(band).display!=='none',overflow:band.scrollWidth>band.clientWidth+1};}),
-      instructionOverflow:hint.scrollHeight>hint.clientHeight+1};
+      labels:cards.map(card=>{const en=card.querySelector('.shopping-card-hint-en'),ja=card.querySelector('.shopping-card-hint-ja'); return {en:rect(en),ja:rect(ja),enOverflow:en.scrollWidth>en.clientWidth+1,jaOverflow:ja.scrollWidth>ja.clientWidth+1,enSize:getComputedStyle(en).fontSize,jaSize:getComputedStyle(ja).fontSize};}),
+      instructionOverflow:hint.scrollHeight>hint.clientHeight+1 || hint.scrollWidth>hint.clientWidth+1};
   });
   const base=await snapshot();
   assert.equal(base.step,'0',`${label}: initial stage`);
-  assert.equal(base.cards.length,8,`${label}: expected eight cards`);
+  assert.equal(base.cards.length,10,`${label}: expected ten cards`);
+  assert.equal(base.kinds.filter(kind=>kind==='item').length,5,`${label}: expected five item cards`);
+  assert.equal(base.kinds.filter(kind=>kind==='number').length,5,`${label}: expected five number cards`);
+  const itemKeys=new Set(['apple','banana','milk','bread','egg','tomato','carrot','potato','chicken','pork','beef','fish','strawberry']);
+  assert.equal(new Set(base.values.slice(0,5)).size,5,`${label}: repeated item choice`);
+  assert(base.values.slice(0,5).every(key=>itemKeys.has(key)),`${label}: unknown item choice`);
+  assert.equal(new Set(base.values.slice(5)).size,5,`${label}: repeated number choice`);
   assert.equal(base.hintShown,false,`${label}: hint visible initially`);
+  assert.equal(base.englishShown,false,`${label}: card English visible initially`);
+  assert.equal(base.japaneseShown,false,`${label}: card Japanese visible initially`);
+  assert.equal(base.instructionEnglishShown,false,`${label}: instruction English visible initially`);
+  assert.equal(base.instructionJapaneseShown,false,`${label}: instruction Japanese visible initially`);
+  const expected=width<380 ? {width:68,height:74,gap:2,artWidth:46,slotWidth:90,slotHeight:80}
+    : width<410 ? {width:74,height:80,gap:4,artWidth:52,slotWidth:93,slotHeight:96}
+    : {width:82,height:88,gap:5,artWidth:60,slotWidth:103,slotHeight:106};
+  const expectedHintHeight=width<380 ? 48 : width<410 ? 52 : 55;
+  const intersects=(a,b)=>a.x<b.right && a.right>b.x && a.y<b.bottom && a.bottom>b.y;
+  for(let index=0;index<base.cards.length;index++) {
+    const card=base.cards[index];
+    assert(Math.abs(card.width-expected.width)<1 && Math.abs(card.height-expected.height)<1,`${label}: card ${index} has the wrong dimensions`);
+    assert(card.height>=card.width,`${label}: card ${index} is not square or portrait`);
+    assert(card.width>=48 && card.height>=48,`${label}: card ${index} is smaller than 48px`);
+    assert(card.y>=base.scene.y && card.bottom<=base.scene.bottom,`${label}: card ${index} leaves the scene`);
+    assert(!intersects(card,base.header),`${label}: card ${index} overlaps the top bar`);
+    for(const slot of base.slots) assert(!intersects(card,slot),`${label}: card ${index} overlaps a slot`);
+    if(index%5) assert(Math.abs(card.y-base.cards[index-1].bottom-expected.gap)<1,`${label}: card ${index} has the wrong vertical gap`);
+    if(base.kinds[index]==='item') assert(base.art[index].width>=expected.artWidth-1,`${label}: card ${index} illustration became too small`);
+    assert(Math.abs((base.art[index].y+base.art[index].height/2)-(card.y+card.height/2))<1,`${label}: card ${index} visual is not centered without hints`);
+  }
   for(const slot of base.slots) assert(slot.width>=48 && slot.height>=48,`${label}: slot smaller than 48px`);
+  for(const slot of base.slots) {
+    assert(Math.abs(slot.width-expected.slotWidth)<1 && Math.abs(slot.height-expected.slotHeight)<1,`${label}: slot dimensions changed`);
+    assert(slot.y>=base.scene.y && slot.bottom<=base.scene.bottom,`${label}: slot leaves the scene`);
+  }
+  assert(!intersects(base.slots[0],base.slots[1]),`${label}: the two slots overlap`);
+  const tenFits=await page.evaluate(()=>{
+    const column=document.querySelector('#shopping-numbers'),sample=column.querySelector('.shopping-card').cloneNode(true);
+    const number=sample.querySelector('.shopping-card-number'); number.textContent='10'; number.dataset.shoppingNumber='10';
+    column.append(sample);
+    const cardRect=sample.getBoundingClientRect(),numberRect=number.getBoundingClientRect(); sample.remove();
+    return numberRect.left>=cardRect.left+2 && numberRect.right<=cardRect.right-2;
+  });
+  assert(tenFits,`${label}: two-digit 10 does not fit in the number card`);
   for(const step of [1,2,0]) {
     await page.locator('#shopping-kana').click();
+    await page.waitForTimeout(180);
     const state=await snapshot();
     assert.equal(state.step,String(step),`${label}: hint stage`);
     assert.equal(state.pressed,String(step!==0),`${label}: pressed state`);
     assert.deepEqual(state.cards,base.cards,`${label}: card rectangles changed with hints`);
-    assert.deepEqual(state.art,base.art,`${label}: illustration/number rectangles changed with hints`);
+    for(let i=0;i<state.art.length;i++) {
+      const visual=state.art[i],card=state.cards[i],original=base.art[i];
+      const expectedRise=step===0 ? 0 : step===1 ? 7 : width>=410 ? 12.5 : 12;
+      assert(Math.abs(visual.width-original.width)<.1 && Math.abs(visual.height-original.height)<.1,`${label}: card ${i} visual size changed with hints`);
+      assert(Math.abs(visual.x-original.x)<.1,`${label}: card ${i} visual moved horizontally`);
+      assert(Math.abs((card.y+card.height/2)-(visual.y+visual.height/2)-expectedRise)<1,`${label}: card ${i} visual is at the wrong hint-stage height`);
+    }
     assert.deepEqual(state.slots,base.slots,`${label}: slot rectangles changed with hints`);
     assert.equal(state.hintShown,step!==0,`${label}: instruction hint visibility`);
+    assert.equal(state.englishShown,step!==0,`${label}: card English visibility`);
+    assert.equal(state.japaneseShown,step===2,`${label}: card Japanese visibility`);
+    assert.equal(state.instructionEnglishShown,step!==0,`${label}: instruction English visibility`);
+    assert.equal(state.instructionJapaneseShown,step===2,`${label}: instruction Japanese visibility`);
     if(step!==0) {
+      assert(Math.abs(state.hint.height-expectedHintHeight)<1,`${label}: instruction band height changed`);
       assert(state.hint.y>=state.scene.y && state.hint.bottom<=state.scene.bottom,`${label}: instruction band leaves scene`);
+      assert(!intersects(state.hint,state.header),`${label}: instruction band overlaps the top bar`);
       assert.equal(state.instructionOverflow,false,`${label}: instruction text overflows`);
       for(let i=0;i<state.bands.length;i++) {
         const band=state.bands[i];
         assert.equal(band.shown,true,`${label}: card band ${i} is hidden`);
         assert.equal(band.overflow,false,`${label}: card band ${i} clips text`);
         assert(band.rect.x>=state.cards[i].x-1 && band.rect.right<=state.cards[i].right+1 && band.rect.bottom<=state.cards[i].bottom+1,`${label}: card band ${i} leaves card`);
+        assert(band.rect.y>=state.cards[i].y+state.cards[i].height*.65,`${label}: card band ${i} covers too much art or number`);
+        assert(state.art[i].bottom<=band.rect.y+1,`${label}: card ${i} art or number overlaps the label area`);
+        assert.equal(state.labels[i].enOverflow,false,`${label}: card ${i} English is clipped`);
+        assert(state.labels[i].en.x>=state.cards[i].x+1 && state.labels[i].en.right<=state.cards[i].right-1,`${label}: card ${i} English leaves the card`);
+        const expectedEnglishSize=state.values[i]==='strawberry' ? 11 : state.values[i]==='chicken' ? 11.5 : 12;
+        assert(Math.abs(parseFloat(state.labels[i].enSize)-expectedEnglishSize)<.1,`${label}: card ${i} English font size`);
+        if(step===2) {
+          assert(band.rect.height>=24 && band.rect.height<=26,`${label}: card band ${i} is not 24–26px tall`);
+          assert.equal(state.labels[i].jaOverflow,false,`${label}: card ${i} Japanese is clipped`);
+          assert(state.labels[i].ja.x>=state.cards[i].x+1 && state.labels[i].ja.right<=state.cards[i].right-1,`${label}: card ${i} Japanese leaves the card`);
+          assert(state.labels[i].en.bottom<=state.labels[i].ja.y+1,`${label}: card ${i} English and Japanese overlap`);
+          assert(Math.abs(parseFloat(state.labels[i].jaSize)-(width>=410 ? 10 : 9))<.1,`${label}: card ${i} Japanese font size`);
+        }
+      }
+      if(step===2) {
+        const edgeCases=await page.evaluate(()=>{
+          const itemColumn=document.querySelector('#shopping-items'),numberColumn=document.querySelector('#shopping-numbers');
+          const test=(column,value,english,japanese)=>{
+            const sample=column.querySelector('.shopping-card').cloneNode(true);
+            sample.dataset.shoppingValue=value;
+            sample.style.position='absolute'; sample.style.top='0'; sample.style.left='0';
+            sample.querySelector('.shopping-card-hint-en').textContent=english;
+            sample.querySelector('.shopping-card-hint-ja').textContent=japanese;
+            if(value==='10') { const digit=sample.querySelector('.shopping-card-number'); digit.textContent='10'; digit.dataset.shoppingNumber='10'; }
+            column.append(sample);
+            const card=sample.getBoundingClientRect(),en=sample.querySelector('.shopping-card-hint-en'),ja=sample.querySelector('.shopping-card-hint-ja');
+            const enRect=en.getBoundingClientRect(),jaRect=ja.getBoundingClientRect(),band=sample.querySelector('.shopping-card-hint').getBoundingClientRect();
+            const digit=value==='10' ? sample.querySelector('.shopping-card-number').getBoundingClientRect() : null;
+            const result={enFits:en.scrollWidth<=en.clientWidth+1 && enRect.left>=card.left+1 && enRect.right<=card.right-1,
+              jaFits:ja.scrollWidth<=ja.clientWidth+1,labelsSeparate:enRect.bottom<=jaRect.top+1,
+              digitVisible:!digit || digit.bottom<=band.top+1};
+            sample.remove(); return result;
+          };
+          return {strawberry:test(itemColumn,'strawberry','strawberry','いちご'),chicken:test(itemColumn,'chicken','chicken','とりにく'),
+            potato:test(itemColumn,'potato','potato','じゃがいも'),banana:test(itemColumn,'banana','banana','バナナ'),ten:test(numberColumn,'10','ten','じゅう')};
+        });
+        for(const [name,result] of Object.entries(edgeCases)) {
+          assert(result.enFits && result.jaFits && result.labelsSeparate,`${label}: ${name} labels clip or overlap`);
+          assert(result.digitVisible,`${label}: number 10 is hidden too much by its band`);
+        }
       }
     }
-    assert.equal(state.englishShown,step===2,`${label}: English stage`);
+    if(step===0) assert(state.bands.every(band=>!band.shown),`${label}: card bands remain visible after the third press`);
   }
   await page.locator('#shopping-back').click();
   await page.locator('#open-shopping').click();
