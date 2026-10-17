@@ -191,6 +191,48 @@ async function inspectWordCaption(page,width,height) {
   console.log(`PASS ${label}: stages 0/1/2 preserve card and artwork rectangles; labels stay inside cards without text overflow`);
 }
 
+async function inspectWordFoodCards(page,width,height) {
+  const foods=['apple','banana','milk','bread','egg','tomato','carrot','potato','chicken','pork','beef','fish','strawberry'];
+  const measured=await page.evaluate(async keys=>{
+    const cards=[...document.querySelectorAll('#word-board .word-card')];
+    const queued=new Map(cards.map(card=>[card,card.classList.contains('queued')]));
+    const result=[];
+    try {
+      for(let start=0;start<keys.length;start+=12) {
+        const batch=keys.slice(start,start+12);
+        cards.forEach(card=>card.classList.add('queued'));
+        const shown=batch.map(key=>cards.find(card=>card.dataset.word===key));
+        shown.forEach(card=>card?.classList.remove('queued'));
+        await Promise.all(shown.map(card=>card?.querySelector('img')?.decode().catch(()=>{})));
+        for(const card of shown) {
+          if(!card) { result.push(null); continue; }
+          const art=card.querySelector('img,.word-sprite');
+          const outer=card.getBoundingClientRect(),inner=art?.getBoundingClientRect();
+          result.push({key:card.dataset.word,source:art?.tagName==='IMG' ? art.getAttribute('src') : getComputedStyle(art).backgroundImage,
+            loaded:art?.tagName!=='IMG' || art.naturalWidth>0,fit:art?.tagName==='IMG' ? getComputedStyle(art).objectFit : getComputedStyle(art).backgroundSize,
+            inside:Boolean(inner && inner.left>=outer.left-1 && inner.right<=outer.right+1 && inner.top>=outer.top-1 && inner.bottom<=outer.bottom+1),
+            cardWidth:outer.width,cardHeight:outer.height});
+        }
+      }
+    } finally {
+      cards.forEach(card=>card.classList.toggle('queued',queued.get(card)));
+    }
+    return result;
+  },foods);
+  assert.equal(measured.length,13);
+  for(let index=0;index<foods.length;index++) {
+    const entry=measured[index],name=foods[index];
+    assert(entry && entry.key===name,`${width}×${height}: ${name} card is missing`);
+    assert(entry.loaded,`${width}×${height}: ${name} image did not load`);
+    assert(entry.inside,`${width}×${height}: ${name} artwork leaves its card`);
+    assert(entry.cardWidth>=48 && entry.cardHeight>=48,`${width}×${height}: ${name} card is too small`);
+    if(entry.source.endsWith('.webp')) assert.equal(entry.fit,'contain',`${name} image may stretch or crop`);
+    if(name==='banana') assert(entry.source.includes('think-say-banana-v1.png.webp') && entry.fit==='contain','Banana does not use the shared image without cropping');
+    if(name==='milk' || name==='bread') assert(entry.source.includes('breakfast-items-v2.png.webp') && entry.fit==='300% 200%',`${name} sprite is not using the shared sheet`);
+  }
+  console.log(`PASS ${width}×${height} Item Match: all 13 food cards load and their artwork stays inside the card`);
+}
+
 async function inspectActionSelection(page,engineName,width,height,fixture,opening) {
   const cards=await page.evaluate(()=>[...document.querySelectorAll('#action-screen .action-card:not(.queued)')].map(card=>{
     const rect=card.getBoundingClientRect();
@@ -735,6 +777,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         await page.locator('#open-word').click(); await capture('match-mode-screen','mode');
         await page.locator('#open-item-match').click(); await capture('word-screen','word');
         await inspectWordCaption(page,width,height);
+        await inspectWordFoodCards(page,width,height);
         await page.locator('#word-home').click();
         const selectedWords=new Set();
         for(const fixture of actionFixtures) {
