@@ -111,6 +111,136 @@ async function inspect(page,id,kind,width,height) {
   console.log(`PASS ${width}×${height} ${id}: controls ${result.controls.length}, ${kind==='scene' ? `tray items ${result.items.length}, zones ${result.zones.length}` : `cards ${(result.cards || []).length}`}`);
 }
 
+async function inspectLivingLabels(page,width,height) {
+  const label=`${width}×${height} Living labels`;
+  const ids=['mom','toybox','bin','table'];
+  const hidden=()=>page.evaluate(ids=>ids.every(id=>getComputedStyle(document.getElementById(`living-label-${id}`)).display==='none'),ids);
+  assert(await hidden(),`${label}: labels are visible without hints`);
+  const zonesBefore=await page.evaluate(()=>[...document.querySelectorAll('#living-scene g.living-target rect')].map(element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};}));
+  await page.locator('#living-kana').click();
+  const englishMomBottom=await page.locator('#living-label-mom').evaluate(element=>element.getBoundingClientRect().bottom);
+  await page.locator('#living-kana').click();
+  const layout=await page.evaluate(ids=>{
+    const scene=document.getElementById('living-scene'),svg=scene.querySelector('svg');
+    const box=element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};};
+    const labels=Object.fromEntries(ids.map(id=>{const element=document.getElementById(`living-label-${id}`);return [id,{...box(element),display:getComputedStyle(element).display,pointerEvents:getComputedStyle(element).pointerEvents}];}));
+    return {svg:box(svg),labels,zones:[...svg.querySelectorAll('g.living-target rect')].map(box)};
+  },ids);
+  const {svg,labels}=layout;
+  const overlap=(a,b)=>Math.min(a.right,b.right)>Math.max(a.left,b.left) && Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top);
+  const imageRegion=(left,top,right,bottom)=>({left:svg.left+(svg.right-svg.left)*left,top:svg.top+(svg.bottom-svg.top)*top,right:svg.left+(svg.right-svg.left)*right,bottom:svg.top+(svg.bottom-svg.top)*bottom});
+  for(const id of ids) {
+    const rect=labels[id];
+    assert.notEqual(rect.display,'none',`${label}: ${id} is hidden with bilingual hints`);
+    assert.equal(rect.pointerEvents,'none',`${label}: ${id} intercepts dragging`);
+    assert(rect.left>=svg.left && rect.top>=svg.top && rect.right<=svg.right && rect.bottom<=svg.bottom,`${label}: ${id} extends outside the living image`);
+  }
+  const momGap=svg.top+(svg.bottom-svg.top)*.117-labels.mom.bottom;
+  assert(momGap>=4.5 && momGap<=10.5,`${label}: Mom label is ${momGap.toFixed(1)}px from the top of her hair`);
+  assert(Math.abs((labels.mom.left+labels.mom.right)/2-(svg.left+(svg.right-svg.left)*.86))<=1,`${label}: Mom label is not centered over her face`);
+  assert(Math.abs(labels.mom.bottom-englishMomBottom)<=1,`${label}: Mom label shifts vertically between hint stages`);
+  assert(!overlap(labels.mom,imageRegion(.78,.12,.96,.29)),`${label}: Mom label covers her face`);
+  assert(!overlap(labels.toybox,imageRegion(0,.59,.21,.78)),`${label}: Toy box label covers the cat`);
+  assert(!overlap(labels.bin,imageRegion(0,.59,.21,.78)),`${label}: Trash can label covers the cat`);
+  assert(overlap(labels.table,imageRegion(.16,.54,.98,.78)),`${label}: Table label is not on the tabletop`);
+  assert.deepEqual(layout.zones,zonesBefore,`${label}: displaying labels moved the drop zones`);
+  await page.locator('#living-kana').click();
+  assert(await hidden(),`${label}: labels remained visible after hints were hidden`);
+  console.log(`PASS ${label}: four labels stay in the scene and clear of Mom's face and the cat`);
+}
+
+async function inspectBreakfastLabels(page,width,height) {
+  const label=`${width}×${height} Breakfast labels`;
+  const ids=['girl','table'];
+  const hidden=()=>page.evaluate(ids=>ids.every(id=>getComputedStyle(document.getElementById(`breakfast-label-${id}`)).display==='none'),ids);
+  assert(await hidden(),`${label}: labels are visible without hints`);
+  const zonesBefore=await page.evaluate(()=>[...document.querySelectorAll('#breakfast-scene g.breakfast-target rect')].map(element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};}));
+  await page.locator('#breakfast-kana').click();
+  const englishGirlBottom=await page.locator('#breakfast-label-girl').evaluate(element=>element.getBoundingClientRect().bottom);
+  await page.locator('#breakfast-kana').click();
+  const layout=await page.evaluate(ids=>{
+    const scene=document.getElementById('breakfast-scene'),svg=scene.querySelector('svg');
+    const box=element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};};
+    return {svg:box(svg),caption:box(scene.querySelector('.breakfast-instruction-caption')),labels:Object.fromEntries(ids.map(id=>{const element=document.getElementById(`breakfast-label-${id}`);return [id,{...box(element),pointerEvents:getComputedStyle(element).pointerEvents}];})),zones:[...svg.querySelectorAll('g.breakfast-target rect')].map(box)};
+  },ids);
+  const {svg,labels}=layout;
+  const overlap=(a,b)=>Math.min(a.right,b.right)>Math.max(a.left,b.left) && Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top);
+  for(const id of ids) {
+    const rect=labels[id];
+    assert.equal(rect.pointerEvents,'none',`${label}: ${id} intercepts dragging`);
+    assert(rect.left>=svg.left && rect.top>=svg.top && rect.right<=svg.right && rect.bottom<=svg.bottom,`${label}: ${id} extends outside the breakfast image`);
+    assert(!overlap(rect,layout.caption),`${label}: ${id} overlaps the instruction`);
+  }
+  const hairTop=svg.top+(svg.bottom-svg.top)*.167;
+  const girlGap=hairTop-labels.girl.bottom;
+  assert(girlGap>=4.5 && girlGap<=11,`${label}: Girl label is ${girlGap.toFixed(1)}px above her hair`);
+  assert(Math.abs((labels.girl.left+labels.girl.right)/2-(svg.left+(svg.right-svg.left)*.8))<=1,`${label}: Girl label is not centered over her head`);
+  assert(Math.abs(labels.girl.bottom-englishGirlBottom)<=1,`${label}: Girl label shifts vertically between hint stages`);
+  const tableX=(labels.table.left-svg.left)/(svg.right-svg.left),tableY=(labels.table.top-svg.top)/(svg.bottom-svg.top);
+  assert(tableX>=.19 && tableX<=.21 && tableY>=.41 && tableY<=.47,`${label}: Table label is not near the tabletop's upper-left corner`);
+  assert.deepEqual(layout.zones,zonesBefore,`${label}: displaying labels moved the drop zones`);
+  await page.locator('#breakfast-kana').click();
+  assert(await hidden(),`${label}: labels remained visible after hints were hidden`);
+  console.log(`PASS ${label}: Girl and Table labels stay near their subjects without covering them`);
+}
+
+async function inspectBedroomLabels(page,width,height) {
+  const label=`${width}×${height} Bedroom labels`;
+  const ids=['bookshelf','bed','dad','drawer','night-table','boy','basket'];
+  const snapshot=()=>page.evaluate(ids=>{
+    const scene=document.getElementById('bedroom-scene'),svg=scene.querySelector('svg');
+    const box=element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};};
+    return {svg:box(svg),imageHref:svg.querySelector('image').getAttribute('href'),caption:box(scene.querySelector('.living-instruction-caption')),
+      labels:Object.fromEntries(ids.map(id=>{const element=document.getElementById(`bedroom-label-${id}`);return [id,{...box(element),display:getComputedStyle(element).display,pointerEvents:getComputedStyle(element).pointerEvents}];})),
+      zones:[...svg.querySelectorAll('g.living-target rect')].map(element=>({target:element.parentElement.dataset.target,...box(element)})),
+      nightNumber:box(svg.querySelector('g.living-target[data-target="night-table"] circle'))};
+  },ids);
+  const overlap=(a,b)=>Math.min(a.right,b.right)>Math.max(a.left,b.left) && Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top);
+  const initial=await snapshot();
+  assert.equal(initial.imageHref,'bedroom-stage-v4a.png.webp',`${label}: the bedroom did not switch to its new background`);
+  assert(ids.every(id=>initial.labels[id].display==='none'),`${label}: labels are visible without hints`);
+  for(const step of [1,2]) {
+    await page.locator('#bedroom-kana').click();
+    const {svg,caption,labels,zones,nightNumber}=await snapshot();
+    assert.deepEqual(zones,initial.zones,`${label}: hint stage ${step} moved the drop zones`);
+    const imageRegion=(left,top,right,bottom)=>({left:svg.left+(svg.right-svg.left)*left,top:svg.top+(svg.bottom-svg.top)*top,right:svg.left+(svg.right-svg.left)*right,bottom:svg.top+(svg.bottom-svg.top)*bottom});
+    for(const [index,id] of ids.entries()) {
+      const rect=labels[id];
+      assert.notEqual(rect.display,'none',`${label}: ${id} is hidden at hint stage ${step}`);
+      assert.equal(rect.pointerEvents,'none',`${label}: ${id} intercepts dragging`);
+      assert(rect.left>=svg.left-1 && rect.top>=svg.top-1 && rect.right<=svg.right+1 && rect.bottom<=svg.bottom+1,`${label}: ${id} extends outside the image`);
+      assert(!overlap(rect,caption),`${label}: ${id} overlaps the instruction`);
+      for(const other of ids.slice(index+1)) assert(!overlap(rect,labels[other]),`${label}: ${id} overlaps ${other}`);
+    }
+    const dadGap=svg.top+(svg.bottom-svg.top)*.125-labels.dad.bottom;
+    assert(dadGap>=7 && dadGap<=9,`${label}: Dad label is ${dadGap.toFixed(1)}px above his hair`);
+    assert(!overlap(labels.dad,imageRegion(.77,.13,.96,.32)),`${label}: Dad label covers his face`);
+    assert(!overlap(labels.boy,imageRegion(.69,.39,.88,.52)),`${label}: Boy label covers his face`);
+    assert(!overlap(labels.bed,imageRegion(.22,.31,.39,.39)),`${label}: Bed label covers the cat`);
+    const relativeTop=id=>(labels[id].top-svg.top)/(svg.bottom-svg.top);
+    assert(relativeTop('bed')>=.20 && relativeTop('bed')<=.22,`${label}: Bed label is not above the pillow`);
+    assert(relativeTop('night-table')>=.15 && relativeTop('night-table')<=.17,`${label}: Night table label is not above the table`);
+    assert(!overlap(labels['night-table'],nightNumber),`${label}: Night table label overlaps number 5`);
+    assert(relativeTop('drawer')>=.35 && relativeTop('drawer')<=.37,`${label}: Drawer label is not on the upper drawer`);
+    assert(relativeTop('boy')>=.55 && relativeTop('boy')<=.57,`${label}: Boy label is not on his torso`);
+    assert(relativeTop('basket')>=.68 && relativeTop('basket')<=.70,`${label}: Laundry basket label is not on its lower front`);
+    const expectedZones={bookshelf:[15,90,205,525],bed:[210,390,610,740],dad:[800,180,1070,540],drawer:[15,555,205,820],'night-table':[620,340,780,535],boy:[675,545,990,1080],basket:[60,830,310,1060]};
+    assert.equal(zones.length,ids.length,`${label}: expected seven bedroom drop zones`);
+    for(const zone of zones) {
+      const expected=expectedZones[zone.target];
+      assert(expected,`${label}: unexpected zone ${zone.target}`);
+      const actual=[(zone.left-svg.left)/(svg.right-svg.left),(zone.top-svg.top)/(svg.bottom-svg.top),(zone.right-svg.left)/(svg.right-svg.left),(zone.bottom-svg.top)/(svg.bottom-svg.top)];
+      assert(actual.every((value,index)=>Math.abs(value-expected[index]/(index%2 ? 1448 : 1086))<.005),`${label}: ${zone.target} drop zone no longer matches the new scene`);
+      assert(zone.right-zone.left>=48 && zone.bottom-zone.top>=48,`${label}: ${zone.target} drop zone is smaller than 48px`);
+      for(const other of zones) if(other!==zone) assert(!overlap(zone,other),`${label}: ${zone.target} and ${other.target} drop zones overlap`);
+    }
+  }
+  await page.locator('#bedroom-kana').click();
+  const reset=await snapshot();
+  assert(ids.every(id=>reset.labels[id].display==='none'),`${label}: labels remained visible after hints were hidden`);
+  console.log(`PASS ${label}: seven labels stay in the scene, clear of faces, lamp, cat, and caption`);
+}
+
 async function inspectWordCaption(page,width,height) {
   const getStep=()=>page.evaluate(()=>document.body.classList.contains('text-bilingual') ? 2 : document.body.classList.contains('text-english') ? 1 : 0);
   const originalStep=await getStep();
@@ -491,11 +621,17 @@ async function checkHintExitResets(page,engineName) {
 
   await page.locator('#open-listen').click(); await page.locator('#open-bathroom').click();
   await page.locator('#kana').click(); await checkShared(1,'bathroom hint enabled');
-  await page.locator('#bathroom-back').click(); await checkShared(1,'bathroom to place selection');
-  await page.locator('#open-breakfast').click(); await checkShared(1,'breakfast keeps the scene hint');
-  await page.locator('#breakfast-back').click();
-  await page.locator('#open-bedroom').click(); await checkShared(1,'bedroom keeps the scene hint');
-  await page.locator('#bedroom-back').click();
+  await page.locator('#bathroom-back').click(); await checkShared(0,'bathroom to place selection');
+  await page.locator('#open-breakfast').click(); await checkShared(0,'breakfast starts without hints');
+  await page.locator('#breakfast-kana').click(); await page.locator('#breakfast-kana').click(); await checkShared(2,'breakfast bilingual hint enabled');
+  await page.locator('#breakfast-back').click(); await checkShared(0,'breakfast to place selection');
+  await page.locator('#open-bedroom').click(); await checkShared(0,'bedroom starts without hints');
+  await page.locator('#bedroom-kana').click(); await checkShared(1,'bedroom hint enabled');
+  await page.locator('#bedroom-back').click(); await checkShared(0,'bedroom to place selection');
+  await page.locator('#open-shopping').click();
+  await page.locator('#shopping-kana').click();
+  await page.locator('#shopping-back').click(); await checkShared(0,'shopping to place selection');
+  assert.equal(await page.locator('#shopping-screen').getAttribute('data-shopping-hint-step'),'0',`${label}: shopping hint persisted after leaving`);
   await page.locator('#back-games').click(); await checkShared(0,'place selection to home');
   await page.locator('#open-listen').click(); await page.locator('#open-living').click(); await checkShared(0,'living reentry after home');
   await page.locator('#living-kana').click(); await page.locator('#living-kana').click();
@@ -504,14 +640,14 @@ async function checkHintExitResets(page,engineName) {
   await page.locator('#open-listen').click(); await page.locator('#open-living').click(); await checkShared(0,'living reentry after home');
   await page.locator('#living-home').click();
 
-  await page.locator('#open-think').click(); await page.locator('#think-start').click();
+  await page.locator('#open-think').click();
   await page.locator('#think-hint').click(); await checkThink(true,'Think & Say hint enabled');
   await page.locator('#think-proto-back').click(); await checkThink(false,'Think & Say back');
-  await page.locator('#open-think').click(); await page.locator('#think-start').click(); await checkThink(false,'Think & Say reentry after back');
+  await page.locator('#open-think').click(); await checkThink(false,'Think & Say reentry after back');
   await page.locator('#think-hint').click(); await page.locator('#think-proto-home').click(); await checkThink(false,'Think & Say home');
-  await page.locator('#open-think').click(); await page.locator('#think-start').click(); await checkThink(false,'Think & Say reentry after home');
+  await page.locator('#open-think').click(); await checkThink(false,'Think & Say reentry after home');
   await page.locator('#think-proto-home').click();
-  console.log(`PASS ${label}: return/home resets; Listen & Do scene changes retain hints; legacy saved text step is ignored`);
+  console.log(`PASS ${label}: return/home and Listen & Do scene changes reset hints; legacy saved text step is ignored`);
 }
 
 async function finishWordForHintReset(page) {
@@ -831,7 +967,11 @@ for(const [engineName,engine,launchOptions] of engines) {
         await page.evaluate(()=>window.__restoreActionTestRandom());
         await page.locator('#open-listen').click(); await capture('place-screen','place');
         for(const [name,openId,screenId,backId] of scenes) {
-          await page.locator(`#${openId}`).click(); await capture(screenId,'scene'); await page.locator(`#${backId}`).click();
+          await page.locator(`#${openId}`).click(); await capture(screenId,'scene');
+          if(name==='breakfast') await inspectBreakfastLabels(page,width,height);
+          if(name==='living') await inspectLivingLabels(page,width,height);
+          if(name==='bedroom') await inspectBedroomLabels(page,width,height);
+          await page.locator(`#${backId}`).click();
         }
         current=`${engineName} ${width}×${height} shopping hints`;
         await checkShoppingHints(page,engineName,width,height);

@@ -262,9 +262,11 @@
     .breakfast-instruction-caption .english, .living-instruction-caption .english { display:block; color:#30445a; font-weight:800; font-size:14px; line-height:1.25; } .breakfast-instruction-caption .kana-text, .living-instruction-caption .kana-text { display:block; margin-top:2px; color:#a25372; font-size:12px; font-weight:700; line-height:1.25; }
     .text-english .breakfast-instruction-caption, .text-bilingual .breakfast-instruction-caption, .text-english .living-instruction-caption, .text-bilingual .living-instruction-caption { display:block; }
     .text-english .breakfast-instruction-caption .kana-text, .text-english .living-instruction-caption .kana-text { display:none; }
-    #breakfast-label-sink { left:5%; top:11%; } #breakfast-label-girl { left:77%; top:18%; } #breakfast-label-table { left:28%; top:48%; } #breakfast-label-plate { left:28%; top:63%; } #breakfast-label-bowl { left:59%; top:50%; } #breakfast-label-cup { left:82%; top:64%; }
-    #living-label-bookshelf { left:4%; top:11%; } #living-label-table { left:50%; top:65%; } #living-label-mom { left:77%; top:18%; } #living-label-sofa { left:43%; top:31%; } #living-label-toybox { left:2%; top:48%; } #living-label-bin { left:28%; top:48%; }
-    #bedroom-label-bookshelf { left:4%; top:11%; } #bedroom-label-bed { left:27%; top:45%; } #bedroom-label-dad { left:78%; top:18%; } #bedroom-label-drawer { left:86%; top:55%; } #bedroom-label-night-table { left:59%; top:27%; } #bedroom-label-boy { left:56%; top:60%; } #bedroom-label-basket { left:69%; top:80%; }
+    #breakfast-label-sink { left:5%; top:11%; } #breakfast-label-girl { left:80%; top:calc(16.7% - 29px - min(6px, env(safe-area-inset-bottom))); transform:translate(-50%,-100%); } #breakfast-label-table { left:20%; top:calc(35% - min(12px, env(safe-area-inset-bottom))); } #breakfast-label-plate { left:28%; top:63%; } #breakfast-label-bowl { left:59%; top:50%; } #breakfast-label-cup { left:82%; top:64%; }
+    #living-label-bookshelf { left:4%; top:11%; } #living-label-table { left:56%; top:58%; } #living-label-mom { left:86%; top:calc(11.7% - 22px - min(4px, env(safe-area-inset-bottom))); transform:translate(-50%,-100%); } #living-label-sofa { left:43%; top:31%; } #living-label-toybox { left:5%; top:40%; } #living-label-bin { left:37%; top:40%; }
+    /* Bedroom labels share the background image's coordinate space, not the tray's. */
+    #bedroom-label-layer { position:absolute; z-index:8; inset:0 0 auto; height:calc(100% - var(--tray-height) - env(safe-area-inset-bottom)); pointer-events:none; }
+    #bedroom-label-bookshelf { left:2%; top:17%; } #bedroom-label-bed { left:28%; top:21%; } #bedroom-label-dad { left:85%; top:calc(12.5% - 8px); transform:translate(-50%,-100%); } #bedroom-label-drawer { left:2%; top:36%; } #bedroom-label-night-table { left:55%; top:16%; } #bedroom-label-boy { left:68%; top:56%; } #bedroom-label-basket { left:9%; top:69%; }
     .toast, .breakfast-toast, .living-toast { position:absolute; z-index:30; left:50%; top:42%; display:flex; align-items:center; justify-content:center; gap:8px; transform:translate(-50%,-50%) scale(.9); width:75%; min-height:64px; padding:9px 13px; border:3px solid #fff; border-radius:18px; text-align:center; font-weight:900; color:#fff; background:#2f8e6a; box-shadow:0 4px 0 #1f6e51; opacity:0; pointer-events:none; transition:.18s; }
     .toast::before, .breakfast-toast::before, .living-toast::before { content:""; flex:0 0 46px; width:46px; height:46px; background:url('cat-mascot-v2-small.png.webp') 50% 38% / 118% auto no-repeat; }
     .toast.wrong, .breakfast-toast.wrong, .living-toast.wrong { background:#e36f78; box-shadow:0 4px 0 #b84c58; }
@@ -365,7 +367,7 @@
     #think-screen #think-left-bank::before { color:var(--blue); } #think-screen #think-right-bank::before { color:var(--orange); }
     #think-screen .think-home { flex:none; min-height:58px; width:100%; display:grid; place-items:center; border-radius:15px; }
     #think-screen .think-home.empty { border:2px dotted #cfc3ae; pointer-events:none; }
-    #think-screen .card { width:100%; min-height:58px; padding:5px 7px; display:grid; place-items:center; text-align:center; background:#fff; border:3px solid white; border-radius:16px; font-size:clamp(.78rem,3.3vw,1rem); font-weight:900; line-height:1.1; box-shadow:0 5px 0 #b7a89b; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+    #think-screen .card { width:100%; min-height:58px; padding:5px 7px; display:grid; place-items:center; text-align:center; background:#fff; border:3px solid white; border-radius:16px; font-family:system-ui,-apple-system,sans-serif; font-size:clamp(.78rem,3.3vw,1rem); font-weight:900; line-height:1.1; box-shadow:0 5px 0 #b7a89b; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
     #think-screen .card-copy { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; width:100%; min-width:0; }
     #think-screen .card-en { display:block; max-width:100%; }
     #think-screen .card-ja { display:block; max-width:100%; color:#654d3c; font-size:clamp(9px,2.4vw,10.5px); font-weight:800; line-height:1.1; white-space:nowrap; }
@@ -384,9 +386,6 @@
     #think-screen .toast.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
     #think-screen .status { height:18px; font-size:.78rem; font-weight:800; line-height:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     #think-screen #think-restart { min-height:48px; }
-    #think-screen .start-screen { position:absolute; inset:calc(var(--header-height) + env(safe-area-inset-top)) 0 0; z-index:60; display:grid; place-items:center; background:#fff4df; }
-    #think-screen .start-screen[hidden] { display:none; }
-    #think-screen .start-button { min-width:180px; min-height:72px; padding:12px 28px; border:4px solid #fff; border-radius:24px; background:#f9ac8c; color:var(--ink); box-shadow:0 6px 0 #c4755d; font-size:1.5rem; font-weight:900; cursor:pointer; }
     @media (max-height:700px) { #think-screen .thought { min-height:0; padding-top:12px; } #think-screen .visuals, #think-screen .slots { width:min(100%, calc(40svh + 12px)); margin-inline:auto; } #think-screen .playfield { min-height:215px; } #think-screen .think-home, #think-screen .card { min-height:54px; } }
   </style>
 </head>
@@ -483,9 +482,9 @@
   <main class="app" id="bedroom-screen" hidden aria-label="寝室のゲーム画面">
     <header class="screen-header"><div class="breakfast-controls"><button class="stage-back" id="bedroom-back" type="button" aria-label="場所選択へ戻る">‹</button><label class="speech-speed" aria-label="音声の速さ"><span class="speed-animal" aria-hidden="true"><img src="living-item-turtle-v1b.png.webp" alt=""></span><input class="speech-speed-input" id="bedroom-speed" type="range" min="0.7" max="1.2" step="0.05" value="0.95"><span class="speed-animal" aria-hidden="true"><img src="living-item-rabbit-v1a.png.webp" alt=""></span></label><div class="controls"><button class="round compact-control" id="bedroom-home" type="button" aria-label="ホームへ戻る">🏠</button><button class="round compact-control" id="bedroom-reset" type="button" aria-label="リセット">↻</button><button class="round compact-control" id="bedroom-kana" type="button" aria-pressed="false">もじ</button><button class="round compact-control" id="bedroom-speaker" type="button" aria-label="もう一度聞く">🔊</button></div></div></header>
     <section class="living-scene" id="bedroom-scene" aria-label="寝室のゲーム">
-      <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true"><image href="bedroom-stage-v2.png.webp" width="1086" height="1448"/></svg>
+      <svg viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true"><image href="bedroom-stage-v4a.png.webp" width="1086" height="1448"/></svg>
       <button class="living-item bedroom-item" data-bedroom-item="pajamas" data-label="Pajamas" data-jp="パジャマ" aria-label="Pajamas" type="button"><img class="breakfast-item-art" src="bedroom-item-pajamas-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="book" data-label="Book" data-jp="ほん" aria-label="Book" type="button"><img class="breakfast-item-art" src="living-item-book-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="pillow" data-label="Pillow" data-jp="まくら" aria-label="Pillow" type="button"><img class="breakfast-item-art" src="bedroom-item-pillow-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="socks" data-label="Socks" data-jp="くつした" aria-label="Socks" type="button"><img class="breakfast-item-art" src="bedroom-item-socks-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="alarm-clock" data-label="Alarm clock" data-jp="めざましどけい" aria-label="Alarm clock" type="button"><img class="breakfast-item-art" src="bedroom-item-alarm-clock-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="nightcap" data-label="Nightcap" data-jp="ナイトキャップ" aria-label="Nightcap" type="button"><img class="breakfast-item-art" src="bedroom-item-nightcap-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="blanket" data-label="Blanket" data-jp="もうふ" aria-label="Blanket" type="button"><img class="breakfast-item-art" src="living-item-blanket-v1.png.webp" alt=""></button><button class="living-item bedroom-item" data-bedroom-item="doll-toy" data-label="Doll and stuffed toy" data-jp="おにんぎょうと ぬいぐるみ" aria-label="Doll and stuffed toy" type="button"><img class="breakfast-item-art" src="living-item-doll-and-teddy-v2.png.webp" alt=""></button>
-      <span class="living-place-label" id="bedroom-label-bookshelf" data-jp="ほんだな">Bookshelf</span><span class="living-place-label" id="bedroom-label-bed" data-jp="ベッド">Bed</span><span class="living-place-label" id="bedroom-label-dad" data-jp="パパ">Dad</span><span class="living-place-label" id="bedroom-label-drawer" data-jp="ドロアー">Drawer</span><span class="living-place-label" id="bedroom-label-night-table" data-jp="ナイトテーブル">Night table</span><span class="living-place-label" id="bedroom-label-boy" data-jp="おとこのこ">Boy</span><span class="living-place-label" id="bedroom-label-basket" data-jp="せんたくかご">Laundry basket</span>
+      <div id="bedroom-label-layer"><span class="living-place-label" id="bedroom-label-bookshelf" data-jp="ほんだな">Bookshelf</span><span class="living-place-label" id="bedroom-label-bed" data-jp="ベッド">Bed</span><span class="living-place-label" id="bedroom-label-dad" data-jp="パパ">Dad</span><span class="living-place-label" id="bedroom-label-drawer" data-jp="ドロアー">Drawer</span><span class="living-place-label" id="bedroom-label-night-table" data-jp="ナイトテーブル">Night table</span><span class="living-place-label" id="bedroom-label-boy" data-jp="おとこのこ">Boy</span><span class="living-place-label" id="bedroom-label-basket" data-jp="せんたくかご">Laundry basket</span></div>
       <div class="living-instruction-caption" aria-live="polite"><span class="english" id="bedroom-caption-english"></span><span class="kana-text" id="bedroom-caption-kana"></span></div><div class="living-toast" id="bedroom-toast" aria-live="assertive"></div><div class="breakfast-finish" id="bedroom-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt=""><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Good night!</p><button class="round" id="bedroom-play-again" type="button">Play again</button></div></div>
     </section>
   </main>
@@ -525,7 +524,6 @@
     <div class="toast" id="think-toast" aria-live="polite">できたね！</div>
     <div class="finish" id="think-finish" aria-live="assertive"><div class="finish-card"><img class="popup-cat" src="cat-mascot-v2-small.png.webp" alt=""><div class="stars">⭐ 🌟 ⭐</div><h2>All done!</h2><p>Great sentences!</p><button class="round" id="think-restart" type="button">Play again</button></div></div>
   </section>
-<div class="start-screen" id="think-start-screen"><button class="start-button" id="think-start" type="button">はじめる</button></div>
 </main>
   <script>
     (() => {
@@ -654,7 +652,7 @@
         {item:'blanket',target:'dad',caption:'パパに もうふを もっていこう。',phrases:['Bring the blanket to Dad.','Please bring the blanket to Dad.','Can you bring the blanket to Dad?']},
         {item:'doll-toy',target:'night-table',caption:'おにんぎょうと ぬいぐるみを ナイトテーブルに おいて。',phrases:['Put the doll and stuffed toy on the night table.','Please put the doll and stuffed toy on the night table.','Can you put the doll and stuffed toy on the night table?']}
       ];
-      const bedroomTaskData=withTaskMeta('bedroom',bedroomTasks), bedroomZones={bookshelf:[15,100,270,410],bed:[70,445,550,865],dad:[815,185,1080,625],drawer:[930,650,1080,1015],'night-table':[635,350,790,610],boy:[585,640,760,1005],basket:[765,940,905,1140]}, bedroomItemNames={pajamas:'Pajamas',book:'Book',pillow:'Pillow',socks:'Socks','alarm-clock':'Alarm clock',nightcap:'Nightcap',blanket:'Blanket','doll-toy':'Doll and stuffed toy'}, bedroomTargetNames={bookshelf:'Bookshelf',bed:'Bed',dad:'Dad',drawer:'Drawer','night-table':'Night table',boy:'Boy',basket:'Laundry basket'};
+      const bedroomTaskData=withTaskMeta('bedroom',bedroomTasks), bedroomZones={bookshelf:[15,90,205,525],bed:[210,390,610,740],dad:[800,180,1070,540],drawer:[15,555,205,820],'night-table':[620,340,780,535],boy:[675,545,990,1080],basket:[60,830,310,1060]}, bedroomItemNames={pajamas:'Pajamas',book:'Book',pillow:'Pillow',socks:'Socks','alarm-clock':'Alarm clock',nightcap:'Nightcap',blanket:'Blanket','doll-toy':'Doll and stuffed toy'}, bedroomTargetNames={bookshelf:'Bookshelf',bed:'Bed',dad:'Dad',drawer:'Drawer','night-table':'Night table',boy:'Boy',basket:'Laundry basket'};
       const listenContent=Object.freeze({bathroom:{tasks:bathroomTasks,zones,itemNames,targetNames},breakfast:{tasks:breakfastTaskData,zones:breakfastZones,itemNames:breakfastItemNames,targetNames:breakfastTargetNames},living:{tasks:livingTaskData,zones:livingZones,itemNames:livingItemNames,targetNames:livingTargetNames},bedroom:{tasks:bedroomTaskData,zones:bedroomZones,itemNames:bedroomItemNames,targetNames:bedroomTargetNames}});
       const breakfastScene = document.querySelector('#breakfast-scene'), breakfastSpeaker = document.querySelector('#breakfast-speaker'), breakfastToast = document.querySelector('#breakfast-toast'), breakfastFinish = document.querySelector('#breakfast-finish'), breakfastCaptionEnglish = document.querySelector('#breakfast-caption-english'), breakfastCaptionKana = document.querySelector('#breakfast-caption-kana');
       let breakfastCurrent, breakfastPhrase, breakfastDrag, breakfastStarted = false, breakfastQueue = [];
@@ -1052,6 +1050,45 @@
         const sceneItems=()=>[...sceneElement.querySelectorAll(itemSelector)];
         const restore=(el,slot)=>{ if(tray) setSlot(el,Number.isFinite(slot) ? slot : 0); else { el.style.left=''; el.style.top=''; el.dataset.listenState='tray'; } };
         let recoveryTimer=null, transitioning=false;
+        const clearDragTracking=active=>{
+          if(active.endTimer) clearTimeout(active.endTimer);
+          active.endTimer=null;
+          if(active.windowTracking) window.removeEventListener('pointermove',trackLostPointer,true);
+          active.windowTracking=false;
+        };
+        const scheduleDragEnd=active=>{
+          if(active.endTimer) clearTimeout(active.endTimer);
+          if(active.releaseObserved && !active.releaseDeadline) active.releaseDeadline=Date.now()+120;
+          const delay=active.releaseObserved ? Math.max(0,active.releaseDeadline-Date.now()) : 2000;
+          active.endTimer=setTimeout(()=>{
+            if(getDrag()===active) finishActive(null,true,'pointerup-timeout');
+          },delay);
+        };
+        const positionDrag=(active,event)=>{
+          if(!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+          active.lastX=event.clientX; active.lastY=event.clientY;
+          if(!active.moved && Math.hypot(event.clientX-active.startX,event.clientY-active.startY)<9) return;
+          if(!active.moved) { active.moved=true; active.el.classList.add('drag'); sceneElement.classList.add(dragClass); }
+          const rect=sceneElement.getBoundingClientRect(), x=event.clientX-rect.left-(tray?0:24), y=event.clientY-rect.top-27;
+          active.el.style.left=`${Math.max(tray?24:-5,Math.min(rect.width-(tray?24:43),x))}px`;
+          active.el.style.top=`${Math.max(-5,Math.min(rect.height-49,y))}px`;
+        };
+        const moveActive=event=>{
+          const active=getDrag(); if(!active || active.id!==event.pointerId || active.finalized) return;
+          positionDrag(active,event);
+          if(event.buttons===0) {
+            active.releaseObserved=true;
+            scheduleDragEnd(active);
+          } else if(active.releaseObserved) {
+            active.releaseObserved=false;
+            active.releaseDeadline=null;
+            if(active.captureLost) scheduleDragEnd(active);
+            else { clearTimeout(active.endTimer); active.endTimer=null; }
+          } else if(active.captureLost) scheduleDragEnd(active);
+        };
+        function trackLostPointer(event) {
+          if(event.target!==getDrag()?.el) moveActive(event);
+        }
         const reconcile=(reason='watchdog')=>{
           if(!listenStarted[sceneName] || !isListenSceneVisible(descriptor) || document.hidden || getDrag() || transitioning || descriptor.finish.classList.contains('show')) return false;
           const items=sceneItems(), unfinished=items.filter(el=>!el.classList.contains('done'));
@@ -1090,22 +1127,24 @@
           if(!active || (event?.pointerId!=null && active.id!==event.pointerId)) return false;
           if(active.finalized) return false;
           active.finalized=true;
-          const el=active.el, moved=active.moved, slot=Number(active.slot), task=descriptor.getCurrent();
+          const el=active.el, slot=Number(active.slot), task=descriptor.getCurrent();
+          if(!cancelled && event?.type==='pointerup' && isListenSceneVisible(descriptor)) positionDrag(active,event);
+          const artwork=el.querySelector('img') || el, artRect=artwork.getBoundingClientRect();
+          const artCenter={clientX:artRect.left+artRect.width/2,clientY:artRect.top+artRect.height/2};
+          clearDragTracking(active);
           setDrag(null);
           el.classList.remove('drag');
           sceneElement.classList.remove(dragClass);
           try { if(el.hasPointerCapture?.(active.id)) el.releasePointerCapture(active.id); } catch (_) {}
-          if(cancelled || !task || !moved || !event) {
+          if(cancelled || !task || !active.moved || event?.type!=='pointerup' || !isListenSceneVisible(descriptor)) {
             restore(el,slot);
             scheduleReconcile(reason,100);
             return true;
           }
-          const artwork=el.querySelector('img') || el, artRect=artwork.getBoundingClientRect();
-          const artCenter={clientX:artRect.left+artRect.width/2,clientY:artRect.top+artRect.height/2};
           const point=toPoint(artCenter), item=el.dataset[itemDataKey];
           const correct=item===task.item && inZone(point,sceneZones[task.target]);
           showDropDebugPoint(sceneElement,point,correct);
-          logSpeech('drop verdict',{scene:sceneName,item,expectedItem:task.item,target:task.target,point,pointer:toPoint(event),zone:sceneZones[task.target],correct,cancelled,moved});
+          logSpeech('drop verdict',{scene:sceneName,item,expectedItem:task.item,target:task.target,point,pointer:toPoint(event),zone:sceneZones[task.target],correct,cancelled,moved:active.moved,recovery:active.captureLost?'pointerup-after-capture-loss':active.releaseObserved?'pointerup-after-buttons-zero':null});
           if(correct) {
             transitioning=true;
             recordTaskSuccess(task);
@@ -1122,7 +1161,18 @@
           }
           return true;
         };
-        const cancelActive=reason=>finishActive(null,true,reason);
+        const cancelActive=reason=>{
+          const finished=finishActive(null,true,reason);
+          clearTimeout(recoveryTimer); recoveryTimer=null;
+          return finished;
+        };
+        const lostCapture=event=>{
+          const active=getDrag(); if(!active || active.id!==event.pointerId || active.finalized) return;
+          active.captureLost=true;
+          if(!active.windowTracking) { active.windowTracking=true; window.addEventListener('pointermove',trackLostPointer,true); }
+          if(event.buttons===0) active.releaseObserved=true;
+          scheduleDragEnd(active);
+        };
         sceneElement.addEventListener('pointerdown',event=>{
           if(getDrag() || event.target.closest?.(itemSelector)) return;
           const point=toPoint(event);
@@ -1132,24 +1182,17 @@
           el.addEventListener('pointerdown',event=>{
             unlockAudio(); speakName(itemName(el),sceneName);
             const task=descriptor.getCurrent();
-            if(!task || !isReady() || el.classList.contains('done') || el.classList.contains('queued')) return;
+            if(!task || !isReady() || getDrag() || transitioning || event.button!==0 || event.isPrimary===false || el.classList.contains('done') || el.classList.contains('queued')) return;
             event.preventDefault();
             const slot=Number(el.dataset.slot);
-            setDrag({el,id:event.pointerId,startX:event.clientX,startY:event.clientY,moved:false,slot:Number.isFinite(slot)?slot:0,finalized:false});
+            setDrag({el,id:event.pointerId,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,moved:false,slot:Number.isFinite(slot)?slot:0,finalized:false,captureLost:false,releaseObserved:false,releaseDeadline:null,endTimer:null,windowTracking:false});
             el.dataset.listenState='dragging';
-            try { el.setPointerCapture(event.pointerId); } catch (error) { logGameRecovery(sceneName,'pointer-capture-failed',{message:String(error)}); }
+            try { el.setPointerCapture(event.pointerId); } catch (error) { logGameRecovery(sceneName,'pointer-capture-failed',{message:String(error)}); cancelActive('pointer-capture-failed'); }
           });
-          el.addEventListener('pointermove',event=>{
-            const active=getDrag(); if(!active || active.id!==event.pointerId) return;
-            if(!active.moved && Math.hypot(event.clientX-active.startX,event.clientY-active.startY)<9) return;
-            if(!active.moved) { active.moved=true; el.classList.add('drag'); sceneElement.classList.add(dragClass); }
-            const rect=sceneElement.getBoundingClientRect(), x=event.clientX-rect.left-(tray?0:24), y=event.clientY-rect.top-27;
-            el.style.left=`${Math.max(tray?24:-5,Math.min(rect.width-(tray?24:43),x))}px`;
-            el.style.top=`${Math.max(-5,Math.min(rect.height-49,y))}px`;
-          });
+          el.addEventListener('pointermove',moveActive);
           el.addEventListener('pointerup',event=>finishActive(event,false,'pointerup'));
           el.addEventListener('pointercancel',event=>finishActive(event,true,'pointercancel'));
-          el.addEventListener('lostpointercapture',event=>finishActive(event,true,'lostpointercapture'));
+          el.addEventListener('lostpointercapture',lostCapture);
         });
         window.addEventListener('pointerup',event=>finishActive(event,false,'window-pointerup'),true);
         window.addEventListener('pointercancel',event=>finishActive(event,true,'window-pointercancel'),true);
@@ -1157,7 +1200,7 @@
         document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelActive('page-hidden'); else reconcile('page-visible'); });
         window.addEventListener('pageshow',event=>{ if(event.persisted) reconcile('pageshow-restored'); });
         setInterval(()=>reconcile('watchdog'),2500);
-        const controller={cancelActive,reconcile,endTransition:()=>{ transitioning=false; },getState:()=>{ const items=sceneItems(), unfinished=items.filter(el=>!el.classList.contains('done')); return {scene:sceneName,sceneId:sceneElement.id,current:descriptor.getCurrent()?.id || null,item:descriptor.getCurrent()?.item || null,target:descriptor.getCurrent()?.target || null,started:listenStarted[sceneName],visible:isListenSceneVisible(descriptor),active:Boolean(getDrag()),transitioning,finish:descriptor.finish.classList.contains('show'),done:items.length-unfinished.length,total:items.length,grabbable:unfinished.filter(el=>!el.classList.contains('queued')&&el.dataset.listenState==='tray').length,queued:unfinished.filter(el=>el.classList.contains('queued')).length}; }};
+        const controller={cancelActive,reconcile,endTransition:()=>{ transitioning=false; },getState:()=>{ const items=sceneItems(), unfinished=items.filter(el=>!el.classList.contains('done')); return {scene:sceneName,sceneId:sceneElement.id,current:descriptor.getCurrent()?.id || null,item:descriptor.getCurrent()?.item || null,target:descriptor.getCurrent()?.target || null,started:listenStarted[sceneName],visible:isListenSceneVisible(descriptor),active:Boolean(getDrag()),captureLost:Boolean(getDrag()?.captureLost),releaseObserved:Boolean(getDrag()?.releaseObserved),transitioning,finish:descriptor.finish.classList.contains('show'),done:items.length-unfinished.length,total:items.length,grabbable:unfinished.filter(el=>!el.classList.contains('queued')&&el.dataset.listenState==='tray').length,queued:unfinished.filter(el=>el.classList.contains('queued')).length}; }};
         listenInteractionControllers[sceneName]=controller;
         return controller;
       }
@@ -1489,8 +1532,9 @@
       function openBedroom() { prepareSceneImage(bedroomScene); placeScreen.hidden=true; bedroomScreen.hidden=false; unlockAudio(); resetBedroom(false); sceneSelectSound(); speakSceneIntro('Let’s get ready for bed!',()=>speakBedroom(),'bedroom'); }
       function openShopping() { prepareSceneImage(shoppingScene); placeScreen.hidden=true; shoppingScreen.hidden=false; showShoppingDragDebug(true); unlockAudio(); resetShopping({clearHint:true,speechDelay:450}); sceneSelectSound(); }
       function leaveShopping() { if(shoppingScreen.hidden) return; cancelShoppingDrag('leave-shopping'); clearTimeout(shoppingTransitionTimer); shoppingTransitionTimer=null; stopShoppingSpeech(); hideShoppingCorrectCat(); setShoppingHintStep(0); shoppingSession=null; shoppingScreen.hidden=true; showShoppingDragDebug(false); }
-      function backToPlaces() { stopSpeech(); leaveShopping(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
-      function returnHome() { stopSpeech(); leaveShopping(); resetHintStages(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
+      function cancelListenDrags(reason) { for(const name of ['bathroom','breakfast','living','bedroom']) listenInteractionControllers[name]?.cancelActive(reason); }
+      function backToPlaces() { stopSpeech(); leaveShopping(); cancelListenDrags('back-to-places'); resetHintStages(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; placeScreen.hidden=false; }
+      function returnHome() { stopSpeech(); leaveShopping(); cancelListenDrags('return-home'); resetHintStages(); thinkSay.close(); gameScreen.hidden=true; breakfastScreen.hidden=true; livingScreen.hidden=true; bedroomScreen.hidden=true; wordScreen.hidden=true; actionScreen.hidden=true; matchModeScreen.hidden=true; placeScreen.hidden=true; homeScreen.hidden=false; }
       document.querySelector('#open-word').addEventListener('click', openWord);
       document.querySelector('#open-listen').addEventListener('click', openPlaces);
       document.querySelector('#back-games').addEventListener('click', backToGames);
@@ -1731,6 +1775,7 @@
     return picked;
   }
   function startGame() {
+    cancelThinkDrag();
     gameQuestions = chooseGameQuestions(); index = 0;
     if (gameQuestions.length) renderQuestion();
     else { phase = 'finished'; $('finish').classList.add('show'); setStatus('もんだいを だせなかったよ'); }
@@ -1749,8 +1794,9 @@
     wrongTimer = speechTimer = speechStartCheckTimer = nextTimer = correctTimer = speechGapTimer = toastTimer = 0;
   }
   function renderQuestion() {
+    cancelThinkDrag();
     clearTimers();
-    phase = 'choosing'; drag = null; pendingCardWord = null; pendingHintWord = null; pendingCorrect = false;
+    phase = 'choosing'; pendingCardWord = null; pendingHintWord = null; pendingCorrect = false;
     thinkBody.classList.remove('show-correct-copy');
     setHintsVisible(false);
     const q = gameQuestions[index];
@@ -1849,23 +1895,48 @@
     ghost.style.width = `${rect.width}px`; ghost.style.height = `${rect.height}px`;
     ghost.style.position = 'fixed'; ghost.style.left = `${rect.left}px`; ghost.style.top = `${rect.top}px`;
     thinkScreen.append(ghost); card.style.opacity = '0';
-    drag = { card, ghost, origin, pointerId:event.pointerId, offsetX:event.clientX-rect.left, offsetY:event.clientY-rect.top, lastX:event.clientX, lastY:event.clientY };
+    drag = { card, ghost, origin, pointerId:event.pointerId, offsetX:event.clientX-rect.left, offsetY:event.clientY-rect.top, lastX:event.clientX, lastY:event.clientY, captureLost:false, releaseObserved:false, releaseDeadline:null, endTimer:null, windowTracking:false };
     card.addEventListener('pointermove', moveDrag);
     card.addEventListener('pointerup', endDrag);
     card.addEventListener('pointercancel', cancelDrag);
     card.addEventListener('lostpointercapture', lostDragCapture);
+    window.addEventListener('pointerup', endDrag, true);
+    window.addEventListener('pointercancel', cancelDrag, true);
     updateHighlight(event.clientX,event.clientY,card.dataset.side);
+  }
+  function scheduleThinkDragEnd(active) {
+    if (active.endTimer) clearTimeout(active.endTimer);
+    if (active.releaseObserved && !active.releaseDeadline) active.releaseDeadline=Date.now()+120;
+    const delay=active.releaseObserved ? Math.max(0,active.releaseDeadline-Date.now()) : 2000;
+    active.endTimer=setTimeout(() => {
+      if (drag===active) finishDrag(active.pointerId,active.lastX,active.lastY,true);
+    },delay);
   }
   function moveDrag(event) {
     if (!drag || event.pointerId !== drag.pointerId) return;
     drag.lastX = event.clientX; drag.lastY = event.clientY;
-    if (event.buttons === 0) { finishDrag(event.pointerId,event.clientX,event.clientY); return; }
     drag.ghost.style.left = `${event.clientX-drag.offsetX}px`;
     drag.ghost.style.top = `${event.clientY-drag.offsetY}px`;
     updateHighlight(event.clientX,event.clientY,drag.card.dataset.side);
+    if (event.buttons === 0) {
+      drag.releaseObserved=true;
+      scheduleThinkDragEnd(drag);
+    } else if (drag.releaseObserved) {
+      drag.releaseObserved=false;
+      drag.releaseDeadline=null;
+      if (drag.captureLost) scheduleThinkDragEnd(drag);
+      else { clearTimeout(drag.endTimer); drag.endTimer=null; }
+    } else if (drag.captureLost) scheduleThinkDragEnd(drag);
+  }
+  function trackThinkPointer(event) {
+    if (event.target!==drag?.card) moveDrag(event);
   }
   function stopFloating(active) {
     const card = active.card;
+    if (active.endTimer) clearTimeout(active.endTimer);
+    if (active.windowTracking) window.removeEventListener('pointermove',trackThinkPointer,true);
+    window.removeEventListener('pointerup',endDrag,true);
+    window.removeEventListener('pointercancel',cancelDrag,true);
     active.ghost.remove(); card.style.opacity = '';
     card.removeEventListener('pointermove',moveDrag);
     card.removeEventListener('pointerup',endDrag);
@@ -1885,11 +1956,20 @@
   }
   function lostDragCapture(event) {
     if (!drag || event.pointerId !== drag.pointerId) return;
-    finishDrag(event.pointerId,drag.lastX,drag.lastY);
+    drag.captureLost=true;
+    if (!drag.windowTracking) { drag.windowTracking=true; window.addEventListener('pointermove',trackThinkPointer,true); }
+    if (event.buttons===0) drag.releaseObserved=true;
+    scheduleThinkDragEnd(drag);
   }
-  function endDrag(event) { finishDrag(event.pointerId,event.clientX,event.clientY); }
-  function finishDrag(pointerId,x,y,cancelled = false) {
-    if (!drag || pointerId !== drag.pointerId) return;
+  function endDrag(event) {
+    if (event.type!=='pointerup' || thinkScreen.hidden) { if (thinkScreen.hidden) cancelThinkDrag(); return; }
+    finishDrag(event.pointerId,event.clientX,event.clientY,false,true);
+  }
+  function cancelThinkDrag() {
+    if (drag) finishDrag(drag.pointerId,drag.lastX,drag.lastY,true);
+  }
+  function finishDrag(pointerId,x,y,cancelled = false,confirmedUp = false) {
+    if (!drag || pointerId !== drag.pointerId || (!cancelled && !confirmedUp)) return;
     const active = drag;
     drag = null; // pointerup・pointercancel・lostpointercapture が続いても1回だけ処理する
     const {card,origin} = active;
@@ -1909,6 +1989,8 @@
       restoreOrigin(active);
     }
   }
+  window.addEventListener('blur',cancelThinkDrag);
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelThinkDrag(); });
   const IS_IOS_WEBKIT=/iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
   function celebrateThink() { celebrate('できたね！','right',$('toast')); }
   function judgeIfReady() {
@@ -2099,19 +2181,22 @@
     continueSpeech();
   }
   $('hint').addEventListener('click', () => { if (phase === 'choosing' || phase === 'rejecting') setHintsVisible(!hintVisible); });
-  // 試作にはホーム画面がないため、共通ヘッダーの戻る・ホームは開始画面へ戻す。
+  // 共通ヘッダーの戻る・ホームはホーム画面へ戻す。
   $('proto-back').addEventListener('click', returnHome);
   $('proto-home').addEventListener('click', returnHome);
   $('boy').addEventListener('error', () => { const fallback = document.createElement('span'); fallback.className = 'fallback'; fallback.textContent = '👦'; $('boy').replaceWith(fallback); });
   $('restart').addEventListener('click', () => { setHintsVisible(false); unlockAudio(); startGame(); });
-  $('start').addEventListener('click', async () => {
+  getEnglishVoices(); // 入場前から声一覧の読み込みを促し、イントロの待ちを短くする
+  logThink('ready',navigator.userAgent);
+  async function openThink() {
     const currentRun = ++runToken;
-    $('start').disabled=true;
-    unlockAudio(); // タップ内でWeb Audioをresumeする
+    homeScreen.hidden = true;
+    thinkScreen.hidden = false;
+    $('finish').classList.remove('show');
+    unlockAudio(); // ゲーム選択のタップ内でWeb Audioをresumeする
     const voicesReady=waitForEnglishVoice();
-    const silentPrime=primeSpeechSilently(); // タップ内で無音の発話を開始する
+    const silentPrime=primeSpeechSilently(); // 同じタップ内で無音の発話を開始する
     speechBusy=true; // イントロ中のカード音声は最後に触れた1枚だけ後へ送る
-    $('start-screen').hidden=true;
     startGame(); // 声の準備やLet's play!の終了を待たず、直ちに1問目を表示する
     const cancelledPrime=await silentPrime;
     await voicesReady;
@@ -2124,21 +2209,11 @@
         else continueSpeech();
       });
     },cancelledPrime ? 600 : 150); // cancel直後にはspeakしない
-  });
-  getEnglishVoices(); // 開始前から声一覧の読み込みを促し、イントロの待ちを短くする
-  logThink('ready',navigator.userAgent);
-  function openThink() {
-    homeScreen.hidden = true;
-    thinkScreen.hidden = false;
-    $('start-screen').hidden = false;
-    $('start').disabled = false;
-    $('finish').classList.remove('show');
-    unlockAudio();
   }
   function closeThink() {
     runToken++;
     clearTimers();
-    if (drag) { const active = drag; drag = null; stopFloating(active); restoreOrigin(active); }
+    cancelThinkDrag();
     pendingCardWord = pendingHintWord = null;
     pendingCorrect = false;
     speechBusy = false;

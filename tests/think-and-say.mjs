@@ -38,6 +38,8 @@ function checkData() {
     for(const image of [q.leftImage,q.rightImage]) assert(image && fs.existsSync(path.join(root,image)),`${q.sentence}: image missing: ${image}`);
   }
   assert(!/じゅんび中/.test(html.match(/id="open-think"[\s\S]*?<\/button>/)?.[0] || ''),'Think & Say is still marked as coming soon');
+  assert(!html.includes('id="think-start-screen"') && !html.includes('id="think-start"'),'Think & Say still has a start-only screen');
+  assert(/#think-screen \.card \{[^}]*font-family:system-ui,-apple-system,sans-serif;/.test(html),'source and drag-copy cards must use the same explicit font family');
   console.log('PASS Think & Say static data: 8 left cards, 18 right cards, 24 complete questions and images, punctuation, Japanese without kanji');
 }
 
@@ -162,7 +164,7 @@ async function checkBoard(page,q) {
 async function checkLayout(page,width,height) {
   const result=await page.evaluate(()=>{
     const root=document.querySelector('#think-screen'),r=root.getBoundingClientRect();
-    const targets=[...root.querySelectorAll('.card,.slot-speaker:not([hidden]),.screen-header button,#think-hint,#think-start:not([disabled])')]
+    const targets=[...root.querySelectorAll('.card,.slot-speaker:not([hidden]),.screen-header button,#think-hint')]
       .filter(e=>getComputedStyle(e).display!=='none' && getComputedStyle(e).visibility!=='hidden')
       .map(e=>({name:e.id || e.dataset.word || e.className,w:e.getBoundingClientRect().width,h:e.getBoundingClientRect().height}));
     return {screen:{x:r.x,right:r.right,width:r.width},scrollWidth:document.documentElement.scrollWidth,targets};
@@ -257,8 +259,8 @@ async function runGame(page,width,height,seed) {
   assert(await tile.isEnabled(),'home Think & Say tile is disabled');
   assert(!/じゅんび中/.test(await tile.innerText()));
   await tile.click();
-  await page.locator('#think-start').waitFor({state:'visible'});
-  await page.locator('#think-start').click();
+  assert.equal(await page.locator('#think-start-screen').count(),0,'start-only screen was not removed');
+  assert(await page.locator('#think-screen').isVisible(),'Think & Say did not open directly');
   await page.waitForFunction(()=>document.querySelector('#think-count').textContent.trim()==='1 / 5');
   await waitForSpeech(page,"Let's play!");
   await waitForSpeechIdle(page);
@@ -302,10 +304,121 @@ async function checkDebug(browser) {
   const page=await newPage(browser,375,667,0.41,'?debug=1');
   try {
     await page.locator('#open-think').click();
-    await page.locator('#think-start').click();
     await page.waitForFunction(()=>document.querySelector('.speech-debug-log')?.textContent.includes('左ダミー'),null,{timeout:5000});
     const log=await page.locator('.speech-debug-log').innerText();
     assert(log.includes('右ダミー') && log.includes('左の除外') && log.includes('右の除外'),'debug panel omitted dummy selection or exclusions');
+  } finally { await page.close(); }
+}
+
+async function checkDragEndEvents(browser) {
+  const page=await newPage(browser,375,667,0.41);
+  const slot=side=>page.locator(`#think-${side}-slot`);
+  const reset=async()=>{
+    await page.evaluate(()=>document.querySelector('#think-restart').click());
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),0,'restart left a ghost card');
+    assert.equal(await page.locator('#think-screen .card[style*="opacity: 0"]').count(),0,'restart left an invisible source card');
+  };
+  const begin=async(side='left',destinationSide=side,grabAtEdge=false)=>{
+    const source=page.locator(`#think-${side}-bank .card`).first();
+    const from=await source.boundingBox(),to=await slot(destinationSide).boundingBox();
+    assert(from && to,'a source card or drop slot is missing');
+    const start={x:from.x+(grabAtEdge?5:from.width/2),y:from.y+(grabAtEdge?5:from.height/2)};
+    const end={x:grabAtEdge?to.x+to.width-4:to.x+to.width/2,y:to.y+to.height/2};
+    await page.mouse.move(start.x,start.y);
+    await page.mouse.down();
+    await page.mouse.move(end.x,end.y,{steps:5});
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),1,'pointerdown did not create one ghost');
+    const cardFonts=await page.evaluate(side=>{
+      const source=document.querySelector(`#think-${side}-bank .card`),ghost=document.querySelector('#think-screen .card.dragging');
+      const font=element=>{ const style=getComputedStyle(element); return {family:style.fontFamily,size:style.fontSize,weight:style.fontWeight,lineHeight:style.lineHeight}; };
+      return {source:font(source),ghost:font(ghost),sourceEnglish:font(source.querySelector('.card-en')),ghostEnglish:font(ghost.querySelector('.card-en'))};
+    },side);
+    assert.deepEqual(cardFonts.ghost,cardFonts.source,'drag copy changed the card font');
+    assert.deepEqual(cardFonts.ghostEnglish,cardFonts.sourceEnglish,'drag copy changed the English text font');
+    return {source,end,to};
+  };
+  const dispatch=(source,type,end,buttons)=>source.dispatchEvent(type,{pointerId:1,pointerType:'mouse',button:0,buttons,clientX:end.x,clientY:end.y});
+  const dispatchWindow=(type,end,buttons)=>page.evaluate(({type,end,buttons})=>window.dispatchEvent(new PointerEvent(type,{bubbles:true,pointerId:1,pointerType:'mouse',button:0,buttons,clientX:end.x,clientY:end.y})),{type,end,buttons});
+  const empty=async()=>{
+    assert.equal(await slot('left').locator('.card').count(),0,'an unconfirmed release filled the left slot');
+    assert.equal(await slot('right').locator('.card').count(),0,'an unconfirmed release filled the right slot');
+  };
+  try {
+    await page.locator('#open-think').click();
+    await page.waitForFunction(()=>document.querySelector('#think-count').textContent.trim()==='1 / 5');
+
+    let attempt=await begin();
+    await dispatch(attempt.source,'lostpointercapture',attempt.end,1);
+    await empty();
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),1,'capture loss should wait for pointerup');
+    await dispatch(attempt.source,'pointercancel',attempt.end,0);
+    await page.mouse.up();
+    await empty();
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),0,'cancel left a ghost');
+    assert.equal(await attempt.source.evaluate(card=>card.style.opacity),'','cancel left the source card hidden');
+
+    attempt=await begin();
+    await dispatch(attempt.source,'lostpointercapture',attempt.end,1);
+    await dispatchWindow('pointermove',{x:attempt.to.x+10,y:attempt.to.y+10},1);
+    await dispatchWindow('pointerup',{x:attempt.to.x+10,y:attempt.to.y+10},0);
+    await page.mouse.up();
+    assert.equal(await slot('left').locator('.card').count(),1,'pointerup after capture loss was not accepted');
+    await dispatchWindow('pointerup',attempt.end,0);
+    assert.equal(await slot('left').locator('.card').count(),1,'duplicate pointerup placed a second card');
+    await reset();
+
+    attempt=await begin('right');
+    await dispatch(attempt.source,'pointermove',attempt.end,0);
+    await empty();
+    await page.mouse.up();
+    assert.equal(await slot('right').locator('.card').count(),1,'pointerup after buttons===0 was not accepted');
+    await reset();
+
+    attempt=await begin();
+    await dispatch(attempt.source,'pointermove',attempt.end,0);
+    await dispatch(attempt.source,'pointercancel',attempt.end,0);
+    await page.mouse.up();
+    await empty();
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),0,'buttons===0 → cancel left a ghost');
+
+    attempt=await begin();
+    await dispatch(attempt.source,'lostpointercapture',attempt.end,0);
+    await page.waitForTimeout(180);
+    await empty();
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),0,'missing pointerup did not time out');
+    await page.mouse.up();
+
+    attempt=await begin();
+    await dispatch(attempt.source,'lostpointercapture',attempt.end,1);
+    await page.waitForTimeout(2080);
+    await empty();
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),0,'active capture loss did not time out');
+    await page.mouse.up();
+
+    attempt=await begin('left','right');
+    await page.mouse.up();
+    await empty();
+    assert.equal(await attempt.source.evaluate(card=>card.style.opacity),'','wrong-side drop did not restore source');
+
+    attempt=await begin('left','left',true);
+    const ghost=await page.locator('#think-screen .card.dragging').boundingBox();
+    assert(ghost.x+ghost.width/2>attempt.to.x+attempt.to.width,'test must place the ghost center outside the slot');
+    await page.mouse.up();
+    assert.equal(await slot('left').locator('.card').count(),1,'drop incorrectly used the ghost center instead of the pointer');
+    await reset();
+
+    attempt=await begin();
+    await reset();
+    await page.mouse.up();
+    await empty();
+
+    attempt=await begin();
+    await page.evaluate(()=>document.querySelector('#think-proto-home').click());
+    await page.mouse.up();
+    assert.equal(await page.locator('#think-screen .card.dragging').count(),0,'home left a ghost card');
+    assert.equal(await attempt.source.evaluate(card=>card.style.opacity),'','home left the source card hidden');
+    assert(await page.locator('#home-screen').isVisible(),'home did not leave Think & Say');
+    console.log('PASS Think & Say drag ending: confirmed pointerup, capture loss, buttons===0, cancel, timeout, pointer/ghost offset, wrong side, reset, home');
   } finally { await page.close(); }
 }
 
@@ -318,6 +431,7 @@ for(const [engineName,engine,options] of engines) {
       try { await runGame(page,width,height,seeds[i]); }
       finally { await page.close(); }
     }
+    await checkDragEndEvents(browser);
     await checkDebug(browser);
     console.log(`PASS Think & Say ${engineName}: 3 deterministic draws and debug-only panel`);
   } finally { await browser.close(); }

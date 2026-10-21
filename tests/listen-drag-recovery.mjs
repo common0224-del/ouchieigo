@@ -28,10 +28,11 @@ async function assertNoUnexpectedActivity(page,phase) {
 
 async function pointFor(page,sceneName,kind,position='center') {
   const snapshot=await state(page,sceneName);
-  return page.evaluate(({sceneId,name,target,outside,position})=>{
+  return page.evaluate(({sceneId,name,target,outside,position,wrongTarget})=>{
     const scene=document.getElementById(sceneId),svg=scene.querySelector('svg');
     if(outside) { const stage=scene.getBoundingClientRect(),art=svg.getBoundingClientRect(); return {x:art.left+art.width/2,y:Math.min(stage.bottom-25,art.bottom+65)}; }
-    const rect=svg.querySelector(`g[data-target="${target}"] rect`);
+    const other=wrongTarget ? [...svg.querySelectorAll('g[data-target]')].find(group=>group.dataset.target!==target) : null;
+    const rect=(other || svg.querySelector(`g[data-target="${target}"]`))?.querySelector('rect');
     if(!rect) throw new Error(`${name}: rendered target ${target} not found`);
     const box=rect.getBoundingClientRect(), stage=scene.getBoundingClientRect();
     // A full item remains on screen during dragging, so use the reachable part
@@ -42,7 +43,7 @@ async function pointFor(page,sceneName,kind,position='center') {
     const fractions={center:[.5,.5],left:[.15,.5],right:[.85,.5],top:[.5,.15],bottom:[.5,.85]};
     const [fx,fy]=fractions[position];
     return {x:left+(right-left)*fx,y:top+(bottom-top)*fy};
-  },{sceneId:snapshot.sceneId,name:sceneName,target:snapshot.target,outside:kind==='outside',position});
+  },{sceneId:snapshot.sceneId,name:sceneName,target:snapshot.target,outside:kind==='outside',wrongTarget:kind==='wrong-target',position});
 }
 
 async function itemLocator(page,sceneName,item) {
@@ -75,14 +76,21 @@ async function alignArtworkCenter(page,item,destination) {
 async function dragCurrent(page,sceneName,kind='correct',position='center') {
   const before=await state(page,sceneName), item=await itemLocator(page,sceneName,before.item), itemBox=await item.boundingBox();
   assert(itemBox,`${sceneName}: current item ${before.item} is not visible`);
-  const destination=await pointFor(page,sceneName,kind==='correct' ? 'correct' : 'outside',position);
+  const destination=await pointFor(page,sceneName,kind==='correct' ? 'correct' : kind==='wrong-target' ? 'wrong-target' : 'outside',position);
   await page.mouse.move(itemBox.x+itemBox.width/2,itemBox.y+itemBox.height/2);
   await page.mouse.down();
   const started=await state(page,sceneName);
   assert.equal(started.active,true,`${sceneName}: pointerdown did not start drag; item may be covered by another element`);
-  if(kind==='correct') await alignArtworkCenter(page,item,destination);
-  else await page.mouse.move(destination.x,destination.y,{steps:5});
+  const visibleCenter=kind==='correct' ? await alignArtworkCenter(page,item,destination) : null;
+  if(!visibleCenter) await page.mouse.move(destination.x,destination.y,{steps:5});
   await page.mouse.up();
+  if(visibleCenter) {
+    const judgedCenter=await page.locator(`#${before.sceneId} .drop-debug-point`).evaluate(marker=>{
+      const rect=marker.getBoundingClientRect(); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+    });
+    assert(Math.hypot(judgedCenter.x-visibleCenter.x,judgedCenter.y-visibleCenter.y)<=3,
+      `${sceneName}: drop verdict did not use the visibly enlarged artwork center`);
+  }
   return before;
 }
 
@@ -127,6 +135,98 @@ async function interruptDrag(page,sceneName,eventType) {
   assert(after.grabbable>0,`${sceneName}: ${eventType} did not restore the item`);
 }
 
+async function checkEventOrders(page,sceneName) {
+  const begin=async()=>{
+    const before=await state(page,sceneName), item=await itemLocator(page,sceneName,before.item), box=await item.boundingBox();
+    assert(box,`${sceneName}: current item is not visible`);
+    await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+    await page.mouse.down();
+    return {before,item,box};
+  };
+  const dispatch=async(item,type,point,buttons)=>item.dispatchEvent(type,{pointerId:1,pointerType:'mouse',button:0,buttons,clientX:point.x,clientY:point.y});
+  const unchanged=async(before,reason)=>{
+    const after=await state(page,sceneName);
+    assert.equal(after.active,false,`${sceneName}: ${reason} left a drag active`);
+    assert.equal(after.done,before.done,`${sceneName}: ${reason} incorrectly accepted a drop`);
+  };
+  let attempt=await begin();
+  let destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await dispatch(attempt.item,'lostpointercapture',destination,1);
+  assert.equal((await state(page,sceneName)).captureLost,true,`${sceneName}: capture loss was not tracked`);
+  await page.mouse.up();
+  assert.equal((await state(page,sceneName)).done,attempt.before.done+1,`${sceneName}: pointerup after capture loss was not accepted`);
+  await dispatch(attempt.item,'pointerup',destination,0);
+  assert.equal((await state(page,sceneName)).done,attempt.before.done+1,`${sceneName}: duplicate pointerup advanced twice`);
+  await waitForCorrectProgress(page,sceneName,attempt.before,'capture-loss');
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await dispatch(attempt.item,'pointermove',destination,0);
+  assert.equal((await state(page,sceneName)).releaseObserved,true,`${sceneName}: buttons===0 was not observed`);
+  assert.equal((await state(page,sceneName)).done,attempt.before.done,`${sceneName}: buttons===0 accepted without pointerup`);
+  await page.mouse.up();
+  assert.equal((await state(page,sceneName)).done,attempt.before.done+1,`${sceneName}: pointerup after buttons===0 was not accepted`);
+  await waitForCorrectProgress(page,sceneName,attempt.before,'buttons-zero');
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await dispatch(attempt.item,'pointermove',destination,0);
+  await dispatch(attempt.item,'lostpointercapture',destination,0);
+  assert.equal((await state(page,sceneName)).captureLost,true,`${sceneName}: buttons===0 before capture loss was not tracked`);
+  await page.mouse.up();
+  assert.equal((await state(page,sceneName)).done,attempt.before.done+1,`${sceneName}: buttons===0 → capture loss → pointerup failed`);
+  await waitForCorrectProgress(page,sceneName,attempt.before,'buttons-zero-before-capture-loss');
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await dispatch(attempt.item,'lostpointercapture',destination,0);
+  await dispatch(attempt.item,'pointercancel',destination,0);
+  await page.mouse.up();
+  await unchanged(attempt.before,'pointercancel while awaiting pointerup');
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await dispatch(attempt.item,'lostpointercapture',destination,0);
+  await delay(180);
+  assert.equal((await state(page,sceneName)).active,false,`${sceneName}: missing pointerup did not time out`);
+  await page.mouse.up();
+  await unchanged(attempt.before,'pointerup timeout');
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await dispatch(attempt.item,'lostpointercapture',destination,1);
+  await delay(2080);
+  assert.equal((await state(page,sceneName)).active,false,`${sceneName}: active capture loss did not time out`);
+  await page.mouse.up();
+  await unchanged(attempt.before,'active capture-loss timeout');
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  const outside=await pointFor(page,sceneName,'outside');
+  await page.mouse.move(outside.x,outside.y,{steps:5});
+  await dispatch(attempt.item,'pointerup',destination,0);
+  assert.equal((await state(page,sceneName)).done,attempt.before.done+1,`${sceneName}: pointerup final coordinates were not applied`);
+  await page.mouse.up();
+  assert.equal((await state(page,sceneName)).done,attempt.before.done+1,`${sceneName}: delayed pointerup advanced twice`);
+  await waitForCorrectProgress(page,sceneName,attempt.before,'final-coordinate');
+
+  attempt=await begin();
+  await page.mouse.move(attempt.box.x+attempt.box.width/2-40,attempt.box.y-65,{steps:3});
+  await page.evaluate(name=>window.__ouchieigoTest.resetScene(name),sceneName);
+  await page.mouse.up();
+  const resetState=await state(page,sceneName);
+  assert.equal(resetState.active,false,`${sceneName}: reset left a drag active`);
+  assert.equal(resetState.done,0,`${sceneName}: reset did not start a fresh round`);
+
+  attempt=await begin(); destination=await pointFor(page,sceneName,'correct');
+  await alignArtworkCenter(page,attempt.item,destination);
+  await page.evaluate(name=>document.querySelector(`#${name}-back`).click(),sceneName);
+  assert.equal((await state(page,sceneName)).active,false,`${sceneName}: leaving kept an active drag`);
+  await page.mouse.up();
+  await page.evaluate(name=>window.__ouchieigoTest.showScene(name),sceneName);
+  assert.equal((await state(page,sceneName)).active,false,`${sceneName}: reentry kept an active drag`);
+}
+
 async function waitForCorrectProgress(page,sceneName,before,round) {
   const deadline=Date.now()+6000;
   let actual=await state(page,sceneName);
@@ -149,6 +249,8 @@ async function runScene(page,sceneName) {
   await interruptDrag(page,sceneName,'pointercancel');
   currentOperation.action='lostpointercapture recovery';
   await interruptDrag(page,sceneName,'lostpointercapture');
+  currentOperation.action='capture-loss and release event orders';
+  await checkEventOrders(page,sceneName);
   let rounds=0, incorrectDrops=0, outsideDrops=0;
   while(!(await state(page,sceneName)).finish) {
     const before=await state(page,sceneName);
@@ -164,6 +266,13 @@ async function runScene(page,sceneName) {
       assert.equal(restored.current,outsideBefore.current,`${sceneName}: outside drop advanced the task`);
       assert.equal(restored.done,outsideBefore.done,`${sceneName}: outside drop completed an item`);
       assert.equal(restored.active,false,`${sceneName}: outside drop left an active drag`);
+    }
+    if(rounds===0) {
+      currentOperation.action='wrong target';
+      const wrongTargetBefore=await dragCurrent(page,sceneName,'wrong-target');
+      const afterWrongTarget=await state(page,sceneName);
+      assert.equal(afterWrongTarget.done,wrongTargetBefore.done,`${sceneName}: wrong target completed an item`);
+      assert.equal(afterWrongTarget.active,false,`${sceneName}: wrong target left an active drag`);
     }
     currentOperation.action='correct drop and advance';
     const edgePositions=['center','left','right','top','bottom'];

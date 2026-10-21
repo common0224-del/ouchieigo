@@ -5,7 +5,7 @@ import os from 'node:os';
 import {execFileSync} from 'node:child_process';
 
 const root=path.resolve(import.meta.dirname,'..');
-// The five opaque stage backgrounds are deliberately exempt. Every other
+// Opaque stage backgrounds are deliberately exempt. Every other
 // root-level WebP is an illustration/sprite expected to have clear corners.
 const opaqueStageImages=new Set([
   'bathroom-stage-v4.jpg.webp',
@@ -13,6 +13,9 @@ const opaqueStageImages=new Set([
   'breakfast-stage-v7.jpg.webp',
   'living-stage-v2.png.webp',
   'bedroom-stage-v2.png.webp',
+  'bedroom-stage-v3.png.webp',
+  'bedroom-stage-v4a.png.webp',
+  'shopping-scene-bg-v2a.png.webp',
 ]);
 const allWebp=fs.readdirSync(root).filter(name=>name.endsWith('.webp'));
 for(const name of opaqueStageImages) assert(allWebp.includes(name),`除外対象の背景画像が存在しません: ${name}`);
