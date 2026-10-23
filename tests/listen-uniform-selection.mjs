@@ -28,6 +28,67 @@ const tasks=Object.fromEntries(Object.entries(taskLists).map(([scene,name])=>{
   assert(match,`${scene} task data is missing`);
   return [scene,vm.runInNewContext(match[1],{}, {timeout:1000}).map((task,index)=>({...task,id:`${scene}-${index}`}))];
 }));
+assert.deepEqual(Object.fromEntries(Object.entries(tasks).map(([scene,list])=>[scene,list.length])),
+  {bathroom:16,breakfast:32,living:30,bedroom:21},'Only the approved Listen & Do task additions and removals are allowed');
+assert.equal(Object.values(tasks).reduce((total,list)=>total+list.flatMap(task=>task.phrases).length,0),297);
+for(const [scene,list] of Object.entries(tasks)) {
+  assert(list.every(task=>task.phrases.length===3 && task.phrases.every(Boolean)),`${scene}: every task needs three phrases`);
+  assert.equal(new Set(list.map(task=>task.id)).size,list.length,`${scene}: task IDs must be unique`);
+}
+const expectedItemCounts={
+  bathroom:{toothbrush:3,cup:3,towel:4,soap:2,toothpaste:2,comb:2},
+  breakfast:{toast:2,banana:3,milk:4,cereal:3,spoon:3,napkin:2,plate:2,mug:3,fork:3,chopsticks:3,apple:4},
+  living:{book:3,remote:3,blanket:2,blocks:3,car:3,cup:2,tissue:3,crayons:2,doll:3,'cookie-wrapper':3,'cat-drawing':3},
+};
+for(const [scene,expected] of Object.entries(expectedItemCounts)) {
+  const actual=Object.fromEntries([...new Set(tasks[scene].map(task=>task.item))].map(item=>[
+    item,tasks[scene].filter(task=>task.item===item).length]));
+  assert.deepEqual(actual,expected,`${scene}: an existing item lost a task or gained an unapproved one`);
+}
+assert.match(html,/\.living-instruction-caption \.kana-text \{ white-space:pre-line; \}/,
+  'Two-line Japanese instructions must retain their line break in the hint caption');
+const taskFor=(scene,item,target)=>tasks[scene].filter(task=>task.item===item && task.target===target);
+const soleTask=(scene,item,target)=>{
+  const found=taskFor(scene,item,target);
+  assert.equal(found.length,1,`${scene}: expected exactly one ${item} → ${target} task`);
+  return found[0];
+};
+assert.deepEqual(Array.from(soleTask('bathroom','cup','boy').phrases),[
+  'Use your cup to rinse your mouth.','Rinse your mouth with water from your cup.','Take your cup and rinse your mouth.']);
+assert.equal(soleTask('bathroom','cup','boy').caption,'コップを つかって くちを ゆすごう。');
+assert.deepEqual(Array.from(soleTask('bathroom','cup','organizer').phrases),[
+  'Put your cup back on the tray.','Please put your cup back on the tray.','Can you put your cup back on the tray?']);
+assert.equal(soleTask('bathroom','cup','organizer').caption,'コップを トレーに もどしてね。');
+assert.deepEqual(Array.from(soleTask('bathroom','towel','boy').phrases),[
+  'Wipe your face with the towel.','Please wipe your face with the towel.','Can you wipe your face with the towel?']);
+assert.equal(soleTask('bathroom','towel','boy').caption,'タオルで かおを ふいてね。');
+assert.equal(soleTask('bathroom','soap','boy').phrases[1],"It's time to wash your hands with soap.");
+assert.equal(taskFor('breakfast','spoon','bowl').length,0);
+assert.equal(taskFor('breakfast','chopsticks','bowl').length,0);
+for(const item of ['spoon','chopsticks']) for(const target of ['table','sink','girl']) soleTask('breakfast',item,target);
+assert.deepEqual(Array.from(soleTask('breakfast','milk','girl').phrases),[
+  'Drink your milk.','It’s time to drink your milk.','Please have some milk.']);
+assert.deepEqual(Array.from(soleTask('living','book','mom').phrases),[
+  "Bring me the book. Let's read it together.",'Please bring me the book so we can read it together.',"Can you bring me the book? Let's read it together."]);
+assert.equal(soleTask('living','book','mom').caption,'ほんを ママに もってきて。\nいっしょに よもう。');
+assert.equal(soleTask('living','blanket','sofa').caption,'ブランケットを ソファに おいて。');
+for(const [item,noun,japanese] of [['blocks','blocks','つみき'],['car','toy car','ミニカー']]) {
+  const task=soleTask('living',item,'mom');
+  assert.deepEqual(Array.from(task.phrases),[
+    `Bring me the ${noun}. Let's play together.`,
+    `Please bring me the ${noun} so we can play together.`,
+    `Can you bring me the ${noun}? Let's play together.`]);
+  assert.equal(task.caption,`${japanese}を ママに もってきて。\nいっしょに あそぼう。`);
+}
+assert.deepEqual(Array.from(soleTask('living','doll','mom').phrases),[
+  'Bring me the {noun} so we can play together.',"Please bring me the {noun}. Let's play together.",
+  'Can you bring me the {noun} so we can play together?']);
+assert.equal(soleTask('living','doll','mom').caption,'{nounJp}を ママに もってきて。\nいっしょに あそぼう。');
+assert.deepEqual(Array.from(soleTask('living','cookie-wrapper','mom').phrases),[
+  "I'm hungry. Can you bring me a cookie?","I'd like a cookie. Please bring me one.",
+  "Can you bring me a cookie? I'd like to eat one."]);
+assert.equal(soleTask('living','cookie-wrapper','mom').caption,'ママに クッキーを もってきて。\nママは クッキーが たべたいんだ。');
+soleTask('living','cookie-wrapper','table');
 
 const originalBedroomPairs=[
   'pajamas:boy','book:night-table','pillow:bed','pillow:dad','socks:boy',
@@ -45,7 +106,7 @@ const addedBedroomTasks=[
   ['doll-toy','bed','おにんぎょうと ぬいぐるみを ベッドに おいて。','Put the doll and stuffed toy on the bed.'],
   ['nightcap','drawer','ナイトキャップを ひきだしに しまって。','Put the nightcap in the drawer.'],
 ];
-assert.equal(tasks.bedroom.length,20,'Bedroom must contain the original 10 plus 10 new tasks');
+assert.equal(tasks.bedroom.length,21,'Bedroom must contain the original 20 plus the approved Nightcap → Boy task');
 assert.deepEqual(Array.from(tasks.bedroom.slice(0,10),task=>`${task.item}:${task.target}`),originalBedroomPairs,
   'Keep the original Bedroom tasks and their stable IDs');
 for(const [index,[item,target,caption,base]] of addedBedroomTasks.entries()) {
@@ -59,7 +120,13 @@ for(const [index,[item,target,caption,base]] of addedBedroomTasks.entries()) {
     `Bedroom addition ${index+1} must have three equivalent English instructions`);
 }
 const bedroomPairs=tasks.bedroom.map(task=>`${task.item}:${task.target}`);
-assert.equal(new Set(bedroomPairs).size,20,'Bedroom must not duplicate an item/target pair');
+assert.equal(new Set(bedroomPairs).size,21,'Bedroom must not duplicate an item/target pair');
+assert.deepEqual(Array.from(soleTask('bedroom','nightcap','boy').phrases),[
+  'Put on your nightcap.','Please put on your nightcap.','Can you put on your nightcap?']);
+assert.equal(soleTask('bedroom','nightcap','boy').caption,'ナイトキャップを かぶってね。');
+soleTask('bedroom','nightcap','basket');
+soleTask('bedroom','blanket','dad');
+soleTask('bedroom','blanket','bed');
 assert.deepEqual(new Set(tasks.bedroom.map(task=>task.target)),
   new Set(['bookshelf','bed','dad','drawer','night-table','boy','basket']),
   'All seven Bedroom destinations must be correct answers');
@@ -67,7 +134,7 @@ for(const item of ['pajamas','socks']) {
   assert.deepEqual(new Set(tasks.bedroom.filter(task=>task.item===item).map(task=>task.target)),
     new Set(['boy','basket','drawer']),`${item} must have three destinations`);
 }
-console.log('PASS bedroom additions: 20 unique tasks, 7 destinations, 10 exact captions and 3 English variants each');
+console.log('PASS Listen & Do approved content: 99 tasks, 297 phrases, exact additions/edits/removals');
 
 function runtime() {
   let random=0;
