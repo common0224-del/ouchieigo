@@ -14,11 +14,14 @@ const names=literal('wordNames'), japanese=literal('wordJapanese');
 const original='toothbrush cup towel soap toothpaste comb toast banana milk cereal spoon plate mug fork chopsticks apple bowl napkin sink tray rack basket table boy girl book remote blanket blocks car tissue crayons doll teddy-bear cat turtle rabbit cookie-wrapper cat-drawing bookshelf mom sofa toybox bin pajamas pillow socks alarm-clock nightcap bed dad drawer night-table'.split(' ');
 const food='apple banana milk bread egg tomato carrot potato chicken pork beef fish strawberry'.split(' ');
 const added='bread egg tomato carrot potato chicken pork beef fish strawberry'.split(' ');
+const vocabulary=[...food,'house'];
 assert.equal(original.length,53);
 assert.equal(new Set(original).size,53);
-assert.deepEqual(Object.keys(names),[...original,...added],'existing vocabulary or registration order changed');
-assert.deepEqual(Object.keys(japanese),[...original,...added],'Japanese vocabulary is missing or duplicated');
-assert.equal(Object.keys(names).length,63);
+assert.deepEqual(Object.keys(names),[...original,...added,'house'],'existing vocabulary or registration order changed');
+assert.deepEqual(Object.keys(japanese),[...original,...added,'house'],'Japanese vocabulary is missing or duplicated');
+assert.equal(Object.keys(names).length,64);
+assert.equal(names.house,'House');
+assert.equal(japanese.house,'いえ');
 assert.deepEqual(food.filter(key=>original.includes(key)),['apple','banana','milk']);
 for(const key of food) {
   assert.equal(names[key],key[0].toUpperCase()+key.slice(1),`${key}: Item Match must speak one word`);
@@ -38,10 +41,20 @@ const staticCards=[...board.matchAll(/<button class="word-card" data-word="([^"]
 const dynamicLists=[...html.matchAll(/^\s*(\[\['[^\n]+\]\])\.forEach\(\(\[word,src\]\)=>/gm)]
   .map(match=>JSON.parse(JSON.stringify(vm.runInNewContext(match[1]))));
 const dynamicCards=dynamicLists.flat().map(([key])=>key);
+assert.equal([...html.matchAll(/card\.innerHTML=`<img src="\$\{src\}" alt="" draggable="false">`/g)].length,2,'both dynamic Item Match HTML image builders must disable native dragging');
+assert.match(html,/const art=document\.createElement\('img'\); art\.src=src; art\.alt=''; art\.draggable=false; card\.append\(art\);/,'dynamic Item Match food images must disable native dragging');
+assert.match(html,/:is\([^\n]*#word-screen[^\n]*\) \* \{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent; \}/,'Item Match cards must retain selection and tap-highlight protection');
+assert.match(html,/:is\([^\n]*#word-screen[^\n]*\) :is\(img,image\) \{ -webkit-user-drag:none; \}/,'Item Match images must retain native-drag protection');
 const allCards=[...staticCards,...dynamicCards];
-assert.equal(allCards.length,63,'each vocabulary entry needs exactly one card');
-assert.equal(new Set(allCards).size,63,'duplicate Item Match cards');
+assert.equal(allCards.length,64,'each vocabulary entry needs exactly one card');
+assert.equal(new Set(allCards).size,64,'duplicate Item Match cards');
 assert.deepEqual(new Set(allCards),new Set(Object.keys(names)),'word tables and cards differ');
+assert.match(board,/<button class="word-card" data-word="house" type="button" aria-label="House"><img src="word-item-house-v2\.png\.webp" alt=""><\/button>/,'House card must use the shared illustration');
+assert(fs.existsSync(path.join(root,'word-item-house-v2.png.webp')),'Shared House illustration is missing');
+assert.match(html,/\.word-card img, \.word-card \.word-sprite \{ width:91%; height:91%; object-fit:contain;/,'House art must use existing card image sizing');
+assert.match(html,/\.screen-header \.home-icon \{ display:block; width:30px; height:30px; object-fit:contain;/,'Home art must fit inside the existing button');
+assert.equal([...html.matchAll(/class="home-icon" src="word-item-house-v2\.png\.webp"/g)].length,9,'Every home button must share the Item Match House asset');
+assert.doesNotMatch(html,/home-icon-art|word-item-house-v1\.png\.webp/,'Old or rejected House art must not be referenced');
 assert.equal(dynamicLists.at(-1).length,10,'only the ten unregistered foods should be added');
 assert.deepEqual(dynamicLists.at(-1).map(([key])=>key),added);
 
@@ -67,7 +80,7 @@ assert.match(html, /\.word-sprite \{ background:url\('breakfast-items-v2\.png\.w
 const chooseSource=html.match(/^      function chooseWordCards\(cards\) \{[^\n]+$/m)?.[0];
 assert(chooseSource,'Word Match round selector not found');
 const choose=vm.runInNewContext(`${chooseSource}\nchooseWordCards`);
-for(const first of food) {
+for(const first of vocabulary) {
   const order=[first,...allCards.filter(key=>key!==first)].map(word=>({dataset:{word}}));
   const selected=[...choose(order)].map(card=>card.dataset.word);
   assert.equal(selected.length,12,`${first}: round must still show twelve cards`);
@@ -112,7 +125,7 @@ const speechContext={
   playSpeech:utterance=>spoken.push(utterance.text)
 };
 const speak=vm.runInNewContext(`${speechSource}\nspeakWord`,speechContext);
-for(const key of food) { speechContext.wordCurrent={dataset:{word:key}}; speak(); }
-assert.deepEqual(spoken,food.map(key=>names[key]),'food speech must use the Item Match single-word labels');
+for(const key of vocabulary) { speechContext.wordCurrent={dataset:{word:key}}; speak(); }
+assert.deepEqual(spoken,vocabulary.map(key=>names[key]),'Item Match speech must use the single-word labels');
 
-console.log('PASS Item Match: 53 existing + 10 new = 63 unique words, 13 shared foods, 12-card rounds, image references, speech and answer paths');
+console.log('PASS Item Match: 63 existing + house = 64 unique words, 12-card rounds, shared house art, image references, speech and answer paths');

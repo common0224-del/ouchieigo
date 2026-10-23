@@ -44,6 +44,9 @@ assert.match(html, /id="shopping-play-again"/);
 assert.match(html, /shoppingFinish\.classList\.toggle\('show',state\.phase==='finished'\)/);
 assert.match(html, /else if\(settled\.type==='finished'\) \{ stopShoppingSpeech\(\); finishSound\(\); \}/);
 assert.match(html, /#shopping-screen\[data-shopping-hint-step="1"\] \.shopping-card-hint/);
+assert.match(html,/\.shopping-card \{[^}]*-webkit-tap-highlight-color:transparent;/,'Shopping cards must suppress tap highlighting');
+assert.match(html,/\.shopping-card, \.shopping-card \* \{ -webkit-user-select:none; user-select:none; \}/,'Shopping card images, numbers, and both hint labels must resist selection');
+assert.match(html,/\.shopping-card-art \{[^}]*-webkit-user-drag:none;/,'Shopping card images must resist native WebKit dragging');
 assert.match(html, /\.shopping-card-hint \{ position:absolute;/);
 assert.match(html, /\.shopping-instruction-hint \{ position:absolute;/);
 assert.match(html, /\.shopping-card-hint-en \{ display:block;/);
@@ -139,6 +142,7 @@ assert.match(html, /\.shopping-card-number \{[^}]*-webkit-text-stroke:1\.3px #2f
     } else {
       assert.equal(element.tagName,'img');
       assert.equal(element.src,item.image);
+      assert.equal(element.draggable,false,`${key}: dynamic Shopping image must not be natively draggable`);
       assert(fs.existsSync(path.resolve(element.src)),`missing public icon for ${key}`);
     }
   }

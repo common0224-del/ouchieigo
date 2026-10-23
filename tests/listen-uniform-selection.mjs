@@ -81,9 +81,19 @@ for(const [item,noun,japanese] of [['blocks','blocks','つみき'],['car','toy c
   assert.equal(task.caption,`${japanese}を ママに もってきて。\nいっしょに あそぼう。`);
 }
 assert.deepEqual(Array.from(soleTask('living','doll','mom').phrases),[
-  'Bring me the {noun} so we can play together.',"Please bring me the {noun}. Let's play together.",
-  'Can you bring me the {noun} so we can play together?']);
-assert.equal(soleTask('living','doll','mom').caption,'{nounJp}を ママに もってきて。\nいっしょに あそぼう。');
+  'Bring me the doll so we can play together.',"Please bring me the doll. Let's play together.",
+  'Can you bring me the doll so we can play together?']);
+assert.equal(soleTask('living','doll','mom').caption,'おにんぎょうを ママに もってきて。\nいっしょに あそぼう。');
+for(const target of ['toybox','sofa','mom']) {
+  const task=soleTask('living','doll',target);
+  assert.equal(task.randomNouns,undefined,'Living room must not alternate doll and stuffed toy');
+  assert(task.phrases.every(phrase=>phrase.includes('doll')&&!phrase.includes('stuffed toy')&&!phrase.includes('{noun}')));
+  assert(task.caption.includes('おにんぎょう')&&!task.caption.includes('ぬいぐるみ'));
+}
+assert.match(html,/<button class="living-item" data-living-item="doll" data-label="Doll" data-jp="おにんぎょう" aria-label="Doll"[^>]*><img class="breakfast-item-art" src="living-item-doll-v1\.png\.webp"/);
+assert.doesNotMatch(html,/document\.querySelector\('\[data-living-item="doll"\] img'\)\.src=/);
+assert.match(html,/\['doll','living-item-doll-v1\.png\.webp'\]/,'Item Match must share the doll image');
+assert(fs.existsSync(path.resolve('living-item-doll-v1.png.webp')));
 assert.deepEqual(Array.from(soleTask('living','cookie-wrapper','mom').phrases),[
   "I'm hungry. Can you bring me a cookie?","I'd like a cookie. Please bring me one.",
   "Can you bring me a cookie? I'd like to eat one."]);
@@ -92,7 +102,7 @@ soleTask('living','cookie-wrapper','table');
 
 const originalBedroomPairs=[
   'pajamas:boy','book:night-table','pillow:bed','pillow:dad','socks:boy',
-  'alarm-clock:night-table','alarm-clock:dad','nightcap:basket','blanket:dad','doll-toy:night-table',
+  'alarm-clock:night-table','alarm-clock:dad','nightcap:basket','blanket:dad','stuffed-toy:night-table',
 ];
 const addedBedroomTasks=[
   ['pajamas','basket','パジャマを せんたくかごに いれて。','Put your pajamas in the laundry basket.'],
@@ -103,7 +113,7 @@ const addedBedroomTasks=[
   ['book','bed','ほんを ベッドに おいて。','Put the book on the bed.'],
   ['pillow','boy','まくらを もって。','Hold your pillow.'],
   ['blanket','bed','もうふを ベッドに おいて。','Put the blanket on the bed.'],
-  ['doll-toy','bed','おにんぎょうと ぬいぐるみを ベッドに おいて。','Put the doll and stuffed toy on the bed.'],
+  ['stuffed-toy','bed','ぬいぐるみを ベッドに おいて。','Put the stuffed toy on the bed.'],
   ['nightcap','drawer','ナイトキャップを ひきだしに しまって。','Put the nightcap in the drawer.'],
 ];
 assert.equal(tasks.bedroom.length,21,'Bedroom must contain the original 20 plus the approved Nightcap → Boy task');
@@ -121,6 +131,15 @@ for(const [index,[item,target,caption,base]] of addedBedroomTasks.entries()) {
 }
 const bedroomPairs=tasks.bedroom.map(task=>`${task.item}:${task.target}`);
 assert.equal(new Set(bedroomPairs).size,21,'Bedroom must not duplicate an item/target pair');
+for(const target of ['night-table','bed']) {
+  const task=soleTask('bedroom','stuffed-toy',target);
+  assert(task.phrases.every(phrase=>phrase.includes('stuffed toy')&&!phrase.includes('doll')));
+  assert(task.caption.includes('ぬいぐるみ')&&!task.caption.includes('おにんぎょう'));
+}
+assert.match(html,/data-bedroom-item="stuffed-toy" data-label="Stuffed toy" data-jp="ぬいぐるみ" aria-label="Stuffed toy"[^>]*><img class="breakfast-item-art" src="think-say-teddy-bear-v1\.png\.webp"/);
+assert.match(html,/\['teddy-bear','think-say-teddy-bear-v1\.png\.webp'\]/,'Item Match must share the teddy bear image');
+assert(fs.existsSync(path.resolve('think-say-teddy-bear-v1.png.webp')));
+assert.doesNotMatch(html,/data-bedroom-item="doll-toy"|item:'doll-toy'/);
 assert.deepEqual(Array.from(soleTask('bedroom','nightcap','boy').phrases),[
   'Put on your nightcap.','Please put on your nightcap.','Can you put on your nightcap?']);
 assert.equal(soleTask('bedroom','nightcap','boy').caption,'ナイトキャップを かぶってね。');

@@ -2,6 +2,25 @@
 
 このファイルは `docs/image-prompts.md` に基づく制作の記録。**候補と採用済みを区別する。** 新しい画像を採用した場合は、実際に使ったプロンプト全文、添付した基準画像、透過・サイズ検査、所有者の承認を追記する。
 
+## 2026-10-24 — ホームボタンとItem Match共通の家
+
+- **接続済み：** `word-item-house-v2.png.webp`。ホームボタン9箇所とItem Matchの `House` カードで同一ファイルを参照する。512×512px、透過WebP、quality 84。原画はGit管理対象外の `source-images/word-item-house-v2.png`。前の立体的な試案 `word-item-house-v1` は採用せず、公開ルートに置かない。
+- **参考として目視した既存画像：** `living-item-turtle-v1b.png.webp`、`living-item-rabbit-v1a.png.webp`。画像生成時にファイル自体は添付せず、シンプルな輪郭・温かい塗り・小さくても読める形を文章で指定した。
+- **重ね表示・利用サイズ：** ホームボタンは既存の丸い背景と枠の内側に30pxで表示し、Item Matchカードは既存画像と同じ91%の表示領域に収める。画像内に文字・枠・背景は描かない。
+- **制作方法：** imagegenの標準ツールで透過PNGを生成し、`scripts/optimize-images.sh` のquality 84・長辺512pxの設定でWebP化した。
+- **生成プロンプト全文：**
+
+```text
+Use case: illustration-story
+Asset type: one shared transparent house illustration used both in a tiny home navigation button and on an Item Match vocabulary card in a Japanese children's English-learning app.
+Primary request: a single cute small HOUSE, straight-on to very slightly three-quarter view, with a simple red-orange pitched roof, one clear front door, and two clearly visible windows. Make it instantly recognizable as a house even when displayed at about 27 pixels.
+Scene/backdrop: genuinely transparent background; isolated house only, no landscape or background.
+Style/medium: warm polished 2D children's-book illustration, comparable in visual language to isolated turtle and rabbit drawings used by the app: soft dark-brown outlines, rounded welcoming shapes, hand-painted color fills with only gentle simple highlights and shadows. Slightly flat, pictorial illustration; not a symbol or line-only icon.
+Composition/framing: single compact centered house, large within square canvas with balanced transparent margin, complete silhouette and roof not cropped. Keep details few and bold.
+Constraints: same exact art must work at navigation-icon and flashcard sizes. No text, labels, logo, watermark, scenery, tree, road, fence, people, faces, animals, extra objects, thick cast shadow, opaque background or vignette.
+Avoid: 3D render, clay render, photorealism, realistic architecture, shiny plastic, isometric toy house, excessive texture, dense roof tiles, tiny decorative details, pure flat vector pictogram.
+```
+
 ## 2026-10-16 — 「お買い物」追加8種を採用・公開配置
 
 - **採用・接続済み：** `shopping-item-tomato-v1a.png.webp`、`shopping-item-carrot-v1a.png.webp`、`shopping-item-potato-v1b.png.webp`、`shopping-item-chicken-v2a.png.webp`、`shopping-item-pork-v2a.png.webp`、`shopping-item-beef-v2a.png.webp`、`shopping-item-fish-v2b.png.webp`、`shopping-item-strawberry-v1b.png.webp`。いずれも `private-prototypes/` の元候補を保持したまま、同名で公開ルートへバイト単位で一致するコピーを追加した。全8枚は512×512pxの透過WebPで、四隅のアルファ値は0。Listen & Do「お買い物」の `shoppingItemData` から参照する。
