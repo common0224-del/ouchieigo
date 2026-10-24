@@ -53,7 +53,7 @@ assert.match(board,/<button class="word-card" data-word="house" type="button" ar
 assert(fs.existsSync(path.join(root,'word-item-house-v2.png.webp')),'Shared House illustration is missing');
 assert.match(html,/\.word-card img, \.word-card \.word-sprite \{ width:91%; height:91%; object-fit:contain;/,'House art must use existing card image sizing');
 assert.match(html,/\.screen-header \.home-icon \{ display:block; width:30px; height:30px; object-fit:contain;/,'Home art must fit inside the existing button');
-assert.equal([...html.matchAll(/class="home-icon" src="word-item-house-v2\.png\.webp"/g)].length,9,'Every home button must share the Item Match House asset');
+assert.equal([...html.matchAll(/class="home-icon" src="word-item-house-v2\.png\.webp"/g)].length,10,'Every home button must share the Item Match House asset');
 assert.doesNotMatch(html,/home-icon-art|word-item-house-v1\.png\.webp/,'Old or rejected House art must not be referenced');
 assert.equal(dynamicLists.at(-1).length,10,'only the ten unregistered foods should be added');
 assert.deepEqual(dynamicLists.at(-1).map(([key])=>key),added);

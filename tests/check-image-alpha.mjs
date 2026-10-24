@@ -15,6 +15,7 @@ const opaqueStageImages=new Set([
   'bedroom-stage-v2.png.webp',
   'bedroom-stage-v3.png.webp',
   'bedroom-stage-v4a.png.webp',
+  'entrance-stage-v1e.png.webp',
   'shopping-scene-bg-v2a.png.webp',
 ]);
 const allWebp=fs.readdirSync(root).filter(name=>name.endsWith('.webp'));

@@ -5,15 +5,15 @@ import path from 'node:path';
 const html=fs.readFileSync(path.resolve(import.meta.dirname,'../index.html'),'utf8');
 const houseAsset='word-item-house-v2.png.webp';
 assert(fs.existsSync(path.resolve(import.meta.dirname,'..',houseAsset)),'Shared House artwork is missing');
-for(const id of ['home','breakfast-home','living-home','bedroom-home','shopping-home','match-mode-home','word-home','action-home','think-proto-home']) {
+for(const id of ['home','breakfast-home','living-home','bedroom-home','entrance-home','shopping-home','match-mode-home','word-home','action-home','think-proto-home']) {
   assert.match(html,new RegExp(`<button[^>]+id="${id}"[^>]*><img class="home-icon" src="${houseAsset.replaceAll('.','\\.')}" alt="" aria-hidden="true"></button>`),`${id} must use the shared house illustration`);
 }
 assert.doesNotMatch(html,/home-icon-art|word-item-house-v1\.png\.webp/,'Older House artwork must not remain in the app');
 assert.doesNotMatch(html,/🏠/,'No home button should retain the old emoji');
-for(const id of ['home','breakfast-home','living-home','bedroom-home','shopping-home','match-mode-home','word-home','action-home'])
+for(const id of ['home','breakfast-home','living-home','bedroom-home','entrance-home','shopping-home','match-mode-home','word-home','action-home'])
   assert.match(html,new RegExp(`document\\.querySelector\\('#${id}'\\)\\.addEventListener\\('click',\\s*returnHome\\)`),`${id} must retain its home destination`);
 assert.match(html,/\$\('proto-home'\)\.addEventListener\('click', returnHome\)/,'Think & Say must retain its home destination');
-const resetIds=['reset','breakfast-reset','living-reset','bedroom-reset','shopping-reset','word-reset'];
+const resetIds=['reset','breakfast-reset','living-reset','bedroom-reset','entrance-reset','shopping-reset','word-reset'];
 const resetRule=html.match(/    (\.app > header #reset::after[^\n]+)\n/)?.[1];
 assert(resetRule,'Shared reset-arrow rule is missing');
 for(const id of resetIds) {
@@ -22,11 +22,11 @@ for(const id of resetIds) {
 }
 assert.match(resetRule,/content:"↻"; font-size:21px; display:block; line-height:1; transform:translate\(0,-1px\);/,'Reset arrow must be visually centered');
 assert.doesNotMatch(html,/\.app > header #shopping-reset::after \{/,'Shopping must not have a separate reset-arrow rule');
-const gameIds=['game-screen','breakfast-screen','living-screen','bedroom-screen','shopping-screen','word-screen','action-screen','think-screen'];
+const gameIds=['game-screen','breakfast-screen','living-screen','bedroom-screen','entrance-screen','shopping-screen','word-screen','action-screen','think-screen'];
 const gameSelector=`:is(${gameIds.map(id=>`#${id}`).join(',')})`;
 const gameSelectionRule=html.match(/    (:is\(#[^\n]+\)),\n    (:is\(#[^\n]+\)) \* \{ ([^}]+) \}/);
 assert(gameSelectionRule,'Game-wide long-press protection is missing');
-assert.equal(gameSelectionRule[1],gameSelector,'All eight game screens must be protected');
+assert.equal(gameSelectionRule[1],gameSelector,'All nine game screens must be protected');
 assert.equal(gameSelectionRule[2],gameSelector,'Descendants, including buttons, labels, and slots, must be protected');
 for(const declaration of ['-webkit-user-select:none;','user-select:none;','-webkit-touch-callout:none;','-webkit-tap-highlight-color:transparent;'])
   assert(gameSelectionRule[3].includes(declaration),`Missing game-wide ${declaration}`);

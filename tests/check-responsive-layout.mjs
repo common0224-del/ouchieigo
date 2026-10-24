@@ -49,7 +49,7 @@ const actionFixtures=[
   {name:'half',draws:[0.5],expected:['action-put-boy-v5.png.webp','action-close-boy-v1a.png.webp','action-take-off-boy-v1b.png.webp','action-get-boy-v4.png.webp']},
 ];
 assert.deepEqual(new Set(actionFixtures.flatMap(fixture=>fixture.expected.map(name=>Object.entries(actionDefinitions).find(([,definition])=>definition.images.includes(name))?.[0]))),new Set(actionKeys),'Seeded fixtures must cover all nine action words');
-const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene']];
+const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene'],['entrance','open-entrance','entrance-screen','entrance-back','scene']];
 const engines=[
   ['chromium',chromium,{...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}),args:['--mute-audio']}],
   ['webkit',webkit,{}],
@@ -91,9 +91,9 @@ async function inspect(page,id,kind,width,height) {
   if(kind==='word') assert.equal(result.cards.length,12,`${id}: expected 12 visible cards`);
   if(kind==='action') assert.equal(result.cards.length,4,`${id}: expected 4 visible cards`);
   if(kind==='place') {
-    assert.equal(result.cards.length,5,`${id}: expected 5 place cards`);
+    assert.equal(result.cards.length,6,`${id}: expected 6 place cards`);
     assert(['auto','scroll'].includes(result.placeScroll.overflowY),`${id}: place list is not scrollable`);
-    if(result.cards.at(-1).bottom>result.root.bottom+tolerance) assert(result.placeScroll.scrollHeight>result.placeScroll.clientHeight,`${id}: fifth place card is clipped without scrolling`);
+    if(result.cards.at(-1).bottom>result.root.bottom+tolerance) assert(result.placeScroll.scrollHeight>result.placeScroll.clientHeight,`${id}: sixth place card is clipped without scrolling`);
   }
   if(kind==='scene') {
     assert(Math.abs(result.scene.y-result.header.bottom)<tolerance && Math.abs(result.scene.bottom-result.root.bottom)<tolerance,`${id}: header/scene/tray has a gap`);
@@ -722,10 +722,10 @@ async function checkPlayAgainHintResets(page,engineName) {
 
   for(const [name,openId,screenId,backId] of scenes) {
     await page.locator('#open-listen').click(); await page.locator(`#${openId}`).click();
-    const buttonId={bathroom:'kana',breakfast:'breakfast-kana',living:'living-kana',bedroom:'bedroom-kana'}[name];
-    const finishId={bathroom:'finish-panel',breakfast:'breakfast-finish',living:'living-finish',bedroom:'bedroom-finish'}[name];
-    const againId={bathroom:'play-again',breakfast:'breakfast-play-again',living:'living-play-again',bedroom:'bedroom-play-again'}[name];
-    const captionSelector={bathroom:'#instruction-caption',breakfast:'#breakfast-screen .breakfast-instruction-caption',living:'#living-screen .living-instruction-caption',bedroom:'#bedroom-screen .living-instruction-caption'}[name];
+    const buttonId={bathroom:'kana',breakfast:'breakfast-kana',living:'living-kana',bedroom:'bedroom-kana',entrance:'entrance-kana'}[name];
+    const finishId={bathroom:'finish-panel',breakfast:'breakfast-finish',living:'living-finish',bedroom:'bedroom-finish',entrance:'entrance-finish'}[name];
+    const againId={bathroom:'play-again',breakfast:'breakfast-play-again',living:'living-play-again',bedroom:'bedroom-play-again',entrance:'entrance-play-again'}[name];
+    const captionSelector={bathroom:'#instruction-caption',breakfast:'#breakfast-screen .breakfast-instruction-caption',living:'#living-screen .living-instruction-caption',bedroom:'#bedroom-screen .living-instruction-caption',entrance:'#entrance-screen .living-instruction-caption'}[name];
     await page.locator(`#${buttonId}`).click(); await page.locator(`#${buttonId}`).click();
     await finishListenForHintReset(page,name);
     assert.equal(await page.locator(`#${finishId}.show`).count(),1,`${label}: ${name} did not finish`);
@@ -736,7 +736,7 @@ async function checkPlayAgainHintResets(page,engineName) {
     assert(await page.locator(captionSelector).isHidden(),`${label}: ${name} caption stayed visible`);
     await page.locator(`#${backId}`).click(); await page.locator('#back-games').click();
   }
-  console.log(`PASS ${label}: Item Match and all four Listen & Do scenes reset on Play again`);
+  console.log(`PASS ${label}: Item Match and all five life scenes reset on Play again`);
 }
 
 async function checkShoppingHints(page,engineName,width,height) {
