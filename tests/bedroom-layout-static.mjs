@@ -9,7 +9,7 @@ const image='bedroom-stage-v4a.png.webp';
 assert(fs.existsSync(path.join(root,image)),`Bedroom background is missing: ${image}`);
 assert(fs.existsSync(path.join(root,'bedroom-stage-v3.png.webp')),'The previous Bedroom background must be retained');
 assert.match(html,new RegExp(`<section class="living-scene" id="bedroom-scene"[\\s\\S]*?<image href="${image.replaceAll('.','\\.')}"`));
-assert(html.includes(".place-card.place-bedroom .place-illustration { background-image:linear-gradient(") && html.includes("url('bedroom-stage-v2.png.webp')"),'The place-selection image must remain unchanged');
+assert(html.includes(".place-card.place-bedroom .place-illustration { background-image:linear-gradient(") && html.includes(`url('${image}')`),'The place-selection thumbnail must use the current Bedroom scene');
 assert.match(html,/#bedroom-label-layer \{[^}]*height:calc\(100% - var\(--tray-height\) - env\(safe-area-inset-bottom\)\)/);
 
 const zoneLiteral=html.match(/bedroomZones=(\{[^;]+?\}), bedroomItemNames=/)?.[1];
