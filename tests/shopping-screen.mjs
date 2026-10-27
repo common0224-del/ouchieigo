@@ -302,8 +302,10 @@ assert.match(html, /const listenContent=Object\.freeze\(\{bathroom:[^\n]+breakfa
   assert.equal(cleared,1,'Play again resets hints while ordinary reset retains them');
   assert.equal(ctx.shoppingStatus.textContent,'');
   assert.match(functionSource('leaveShopping'),/stopShoppingSpeech\(\); hideShoppingCorrectCat\(\); setShoppingHintStep\(0\)/);
-  assert.match(html, /function backToPlaces\(\) \{ stopSpeech\(\); leaveShopping\(\);/);
-  assert.match(html, /function returnHome\(\) \{ stopSpeech\(\); leaveShopping\(\);/);
+  assert(/stopSpeech\(\);\s*leaveShopping\(\);/.test(functionSource('backToPlaces').split('\n')[0]),
+    'Shopping back navigation must stop speech before leaving Shopping');
+  assert(/stopSpeech\(\);\s*leaveShopping\(\);/.test(functionSource('returnHome').split('\n')[0]),
+    'Shopping home navigation must stop speech before leaving Shopping');
 }
 
 {

@@ -25,30 +25,39 @@ const actionDefinitions={
   open:{phrase:'Open it.',images:['action-open-boy-v1b.png.webp','action-open-girl-v2a.png.webp']},
   close:{phrase:'Close it.',images:['action-close-boy-v1a.png.webp','action-close-girl-v1a.png.webp']},
   'pick-up':{phrase:'Pick it up.',images:['action-pick-up-boy-v1a.png.webp','action-pick-up-girl-v1b.png.webp']},
+  'turn-on':{phrase:'Turn it on.',images:['action-turn-on-boy-tv-v1.webp','action-turn-on-girl-ac-v1.webp']},
+  'turn-off':{phrase:'Turn it off.',images:['action-turn-off-boy-light-v2.webp','action-turn-off-girl-game-v1.webp']},
+  'take-out':{phrase:'Take it out.',images:['action-take-out-boy-toy-v1.webp','action-take-out-girl-milk-v1.webp']},
+  'put-away':{phrase:'Put it away.',images:['action-put-away-boy-book-v2.webp','action-put-away-girl-toy-v1.webp']},
 };
 const actionKeys=Object.keys(actionDefinitions);
-const actionJapaneseExpected={put:['おく','おく'],get:['とる','とる'],bring:['もってきて','もってきて'],throw:['すてる','すてる'],'put-on':['ぼうしを かぶる','くつしたを はく'],'take-off':['ぼうしを ぬぐ','くつしたを ぬぐ'],open:['ふたを あける','カーテンを あける'],close:['ふたを しめる','カーテンを しめる'],'pick-up':['ボールを ひろう','ぬいぐるみを ひろう']};
+const actionJapaneseExpected={put:['おく','おく'],get:['とる','とる'],bring:['もってきて','もってきて'],throw:['すてる','すてる'],'put-on':['みにつける','みにつける'],'take-off':['ぬぐ','ぬぐ'],open:['あける','あける'],close:['しめる','しめる'],'pick-up':['ひろう','ひろう'],'turn-on':['つける','つける'],'turn-off':['けす','けす'],'take-out':['とりだす','とりだす'],'put-away':['かたづける','かたづける']};
 const actionImageNames=Object.values(actionDefinitions).flatMap(({images})=>images);
 const actionImageBatches=Array.from({length:Math.ceil(actionImageNames.length/4)},(_,index)=>{
   const batch=actionImageNames.slice(index*4,index*4+4);
   return [...batch,...actionImageNames.slice(0,4-batch.length)];
 });
-assert.equal(actionKeys.length,9);
-assert.equal(new Set(actionImageNames).size,18);
+assert.equal(actionKeys.length,13);
+assert.equal(new Set(actionImageNames).size,26);
 const actionSource=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const wordNames=vm.runInNewContext(`(${actionSource.match(/const wordNames=(\{[^;]+\});/)?.[1]})`);
+const wordJapanese=vm.runInNewContext(`(${actionSource.match(/const wordJapanese=(\{[^;]+\});/)?.[1]})`);
+const wordHintPairs=Object.keys(wordNames).map(key=>({english:wordNames[key],japanese:wordJapanese[key]}));
 const actionPhrasesLiteral=actionSource.match(/const actionPhrases=(\{[^;]+\});/)?.[1];
 assert(actionPhrasesLiteral,'Action Match speech phrase table is missing');
 const actualActionPhrases=JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionPhrasesLiteral})`)));
-assert.deepEqual(actualActionPhrases,Object.fromEntries(Object.entries(actionDefinitions).map(([key,{phrase}])=>[key,phrase])),'Action Match speech phrase table differs from the nine approved sentences');
+assert.deepEqual(actualActionPhrases,Object.fromEntries(Object.entries(actionDefinitions).map(([key,{phrase}])=>[key,phrase])),'Action Match speech phrase table differs from the 13 expected sentences');
 const actionJapaneseLiteral=actionSource.match(/const actionJapanese=(\{[^;]+\});/)?.[1];
 assert(actionJapaneseLiteral,'Action Match Japanese hint table is missing');
 assert.deepEqual(JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionJapaneseLiteral})`))),actionJapaneseExpected,'Action Match Japanese hints differ from the approved text');
+function seededDraws(seed) { let state=seed>>>0; return Array.from({length:64},()=>((state=(Math.imul(1664525,state)+1013904223)>>>0)/2**32)); }
 const actionFixtures=[
-  {name:'low',draws:[0],expected:['action-bring-girl-v4.png.webp','action-throw-girl-v5.png.webp','action-put-on-girl-v3a.png.webp','action-get-girl-v4.png.webp']},
-  {name:'middle',draws:[0.45],expected:['action-open-girl-v2a.png.webp','action-pick-up-girl-v1b.png.webp','action-get-girl-v4.png.webp','action-put-girl-v5.png.webp']},
-  {name:'half',draws:[0.5],expected:['action-put-boy-v5.png.webp','action-close-boy-v1a.png.webp','action-take-off-boy-v1b.png.webp','action-get-boy-v4.png.webp']},
+  {name:'seed-1',draws:seededDraws(1),expected:['action-take-out-girl-milk-v1.webp','action-open-boy-v1b.png.webp','action-get-boy-v4.png.webp','action-turn-on-boy-tv-v1.webp']},
+  {name:'seed-17',draws:seededDraws(17),expected:['action-turn-off-boy-light-v2.webp','action-put-away-girl-toy-v1.webp','action-close-girl-v1a.png.webp','action-pick-up-girl-v1b.png.webp']},
+  {name:'seed-18',draws:seededDraws(18),expected:['action-take-out-girl-milk-v1.webp','action-put-on-girl-v3a.png.webp','action-bring-boy-v3.png.webp','action-take-off-girl-v3a.png.webp']},
+  {name:'seed-212',draws:seededDraws(212),expected:['action-throw-girl-v5.png.webp','action-bring-girl-v4.png.webp','action-put-away-boy-book-v2.webp','action-put-boy-v5.png.webp']},
 ];
-assert.deepEqual(new Set(actionFixtures.flatMap(fixture=>fixture.expected.map(name=>Object.entries(actionDefinitions).find(([,definition])=>definition.images.includes(name))?.[0]))),new Set(actionKeys),'Seeded fixtures must cover all nine action words');
+assert.deepEqual(new Set(actionFixtures.flatMap(fixture=>fixture.expected.map(name=>Object.entries(actionDefinitions).find(([,definition])=>definition.images.includes(name))?.[0]))),new Set(actionKeys),'Seeded fixtures must cover all 13 action words');
 const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene'],['entrance','open-entrance','entrance-screen','entrance-back','scene']];
 const engines=[
   ['chromium',chromium,{...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}),args:['--mute-audio']}],
@@ -241,19 +250,26 @@ async function inspectBedroomLabels(page,width,height) {
   console.log(`PASS ${label}: seven labels stay in the scene, clear of faces, lamp, cat, and caption`);
 }
 
-async function inspectWordCaption(page,width,height) {
+async function inspectWordCaption(page,engineName,width,height) {
   const getStep=()=>page.evaluate(()=>document.body.classList.contains('text-bilingual') ? 2 : document.body.classList.contains('text-english') ? 1 : 0);
   const originalStep=await getStep();
   const button=page.locator('#word-kana');
   while(await getStep()!==0) await button.click();
   const snapshot=()=>page.evaluate(()=>{
     const board=document.querySelector('#word-board');
+    const row=board.querySelector('.word-info-row');
     const caption=board.querySelector('.word-caption');
+    const captionContent=board.querySelector('.word-caption-content');
+    const combo=board.querySelector('.word-combo');
+    const comboContent=board.querySelector('.word-combo-content');
+    const comboCount=board.querySelector('#word-combo-count');
+    const comboLabel=board.querySelector('.word-combo-label');
     const english=board.querySelector('#word-caption-english');
     const japanese=board.querySelector('#word-caption-jp');
     const rect=element=>{ const r=element.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}; };
+    const captionStyle=getComputedStyle(caption);
     return {
-      board:rect(board),caption:rect(caption),cards:[...board.querySelectorAll('.word-card:not(.queued)')].map(card=>{
+      board:rect(board),row:rect(row),caption:rect(caption),captionContent:rect(captionContent),combo:rect(combo),comboContent:rect(comboContent),comboCount:rect(comboCount),comboLabel:rect(comboLabel),captionEnglish:rect(english),captionJapanese:rect(japanese),cards:[...board.querySelectorAll('.word-card:not(.queued)')].map(card=>{
         const art=card.querySelector('img,.word-sprite');
         const band=card.querySelector('.word-labels');
         const ja=band.querySelector('.word-label-ja');
@@ -266,13 +282,25 @@ async function inspectWordCaption(page,width,height) {
       captionVisible:caption.getClientRects().length>0,
       englishVisible:english.getClientRects().length>0,
       japaneseVisible:japanese.getClientRects().length>0,
-      background:getComputedStyle(caption).backgroundColor,
+      captionDisplay:captionStyle.display,captionBackground:captionStyle.backgroundImage,
+      captionBorder:parseFloat(captionStyle.borderLeftWidth),captionPadding:parseFloat(captionStyle.paddingLeft),
+      captionRadius:parseFloat(captionStyle.borderTopLeftRadius),captionShadow:captionStyle.boxShadow,
+      rowZIndex:Number(getComputedStyle(row).zIndex),rowPointerEvents:getComputedStyle(row).pointerEvents,rowOverflow:getComputedStyle(row).overflowY,
     };
   });
   const baseline=await snapshot();
   const label=`${width}×${height} Item Match`;
+  const geometry=(state,step)=>{
+    const top=Math.min(...state.cards.map(entry=>entry.card.y));
+    const offset=value=>+(value-state.board.y).toFixed(2);
+    return {stage:step,boardTop:+state.board.y.toFixed(2),rowTop:offset(state.row.y),rowBottom:offset(state.row.bottom),
+      captionWidth:state.captionVisible ? +state.caption.width.toFixed(2) : null,comboWidth:+state.combo.width.toFixed(2),
+      cardTop:offset(top),horizontalGap:state.captionVisible ? +(state.combo.x-state.caption.right).toFixed(2) : null,
+      rowCardGap:+(top-state.row.bottom).toFixed(2)};
+  };
   assert.equal(baseline.titleCount,0,`${label}: in-game Word Match title remains`);
   assert.equal(baseline.captionVisible,false,`${label}: caption shown at text stage 0`);
+  assert.equal(baseline.captionDisplay,'none',`${label}: hidden hint card leaves an empty frame at stage 0`);
   const checkCards=(state,step)=>{
     assert.equal(state.cards.length,12,`${label}: stage ${step} changed the number of visible cards`);
     state.cards.forEach((entry,index)=>{
@@ -292,31 +320,90 @@ async function inspectWordCaption(page,width,height) {
     assert(entry.card.bottom-entry.band.bottom<=4,`${label}: card ${index} label band is not at the bottom`);
     assert(entry.jaFits && (step===1 || entry.enFits),`${label}: card ${index} label text overflows at stage ${step}`);
   });
-  const checkCaption=(state,step)=>{
+  const checkTopRow=(state,step)=>{
     const firstCardTop=Math.min(...state.cards.map(entry=>entry.card.y));
-    assert(state.caption.x>=state.board.x-0.5 && state.caption.right<=state.board.right+0.5,`${label}: stage ${step} caption extends past board width`);
-    assert(Math.abs(state.caption.y-(state.board.y+8))<0.5,`${label}: stage ${step} caption is not 8px below board top`);
-    assert(state.caption.bottom<=firstCardTop-8,`${label}: stage ${step} caption is too close to or overlaps the top cards`);
-    assert(state.caption.bottom<=state.board.y+55,`${label}: stage ${step} caption exceeds the reserved 55px row`);
-    assert.equal(state.background,'rgb(255, 253, 244)',`${label}: caption should be opaque`);
+    assert(Math.abs(state.row.x-(state.board.x+16))<0.5 && Math.abs(state.row.right-(state.board.right-16))<0.5,`${label}: stage ${step} top row changed its horizontal margins`);
+    assert(Math.abs(state.row.y-state.board.y)<0.5 && Math.abs(state.row.height-55)<0.5,`${label}: stage ${step} top row no longer fills the reserved top gap`);
+    assert(Math.abs(firstCardTop-(state.board.y+55))<0.5,`${label}: stage ${step} first cards moved`);
+    assert(Math.abs(state.row.bottom-firstCardTop)<0.5,`${label}: stage ${step} row extends into the first cards (${JSON.stringify(geometry(state,step))})`);
+    assert(state.rowOverflow==='hidden' && state.rowPointerEvents==='none' && state.rowZIndex>1,`${label}: stage ${step} text shadow can leave the top gap or row intercepts card taps`);
+    assert(Math.abs(state.combo.y-(state.row.y+7.5))<0.5 && Math.abs(state.combo.height-40)<0.5,`${label}: stage ${step} combo is not centered in the top gap`);
+    assert(state.comboContent.x>=state.combo.x-0.5 && state.comboContent.right<=state.combo.right+0.5,`${label}: stage ${step} combo text is clipped horizontally`);
+    assert(state.comboContent.y>=state.combo.y-0.5 && state.comboContent.bottom<=state.combo.bottom+0.5,`${label}: stage ${step} combo text is clipped vertically`);
+    assert(state.comboContent.y>=state.board.y+7 && state.comboContent.bottom<=firstCardTop-7,`${label}: stage ${step} combo text is too close to the header or first cards`);
+    const bumpMargin=state.comboCount.width*.09;
+    assert(state.comboCount.x-bumpMargin>=state.combo.x-0.5 && state.comboCount.right+bumpMargin<=state.combo.right+0.5,`${label}: stage ${step} combo bump can leave its 30% region`);
+    assert(state.comboCount.y-state.comboCount.height*.09>=state.board.y+5 && state.comboCount.bottom+state.comboCount.height*.09<=firstCardTop-5,`${label}: stage ${step} animated combo can reach the header or first cards`);
+    assert(state.comboLabel.x>=state.combo.x-0.5 && state.comboLabel.right<=state.combo.right+0.5,`${label}: stage ${step} COMBO! is clipped`);
+    if(step===0) return;
+    assert(Math.abs(state.caption.y-state.combo.y)<0.5 && Math.abs(state.caption.height-state.combo.height)<0.5,`${label}: stage ${step} hint and combo do not share a vertical center line`);
+    assert.equal(state.captionDisplay,'flex',`${label}: stage ${step} hint card is not shown`);
+    assert(state.captionBackground.includes('linear-gradient') && state.captionBorder>=2 && state.captionRadius>=12 && state.captionShadow!=='none',`${label}: stage ${step} hint card lost its cream surface, border, or shadow`);
+    assert(Math.abs(state.caption.width/(state.caption.width+state.combo.width)-.7)<.01,`${label}: stage ${step} caption/combo width is not 70:30`);
+    assert(state.combo.x-state.caption.right>=7.5,`${label}: stage ${step} caption and combo overlap`);
+    const hintInset=state.captionBorder+state.captionPadding;
+    assert(state.captionContent.x>=state.caption.x+hintInset-0.5 && state.captionContent.right<=state.caption.right-hintInset+0.5,`${label}: stage ${step} hint text enters the card padding`);
+    assert(state.captionContent.y>=state.caption.y-0.5 && state.captionContent.bottom<=state.caption.bottom+0.5,`${label}: stage ${step} hint text is clipped vertically`);
+    assert(state.captionContent.y>=state.board.y+7 && state.captionContent.bottom<=firstCardTop-7,`${label}: stage ${step} hint text is too close to the header or first cards`);
+    for(const [name,box] of [['English',state.captionEnglish],['Japanese',state.captionJapanese]]) {
+      if(name==='English' && step===1) continue;
+      assert(box.y>=state.caption.y-0.5 && box.bottom<=state.caption.bottom+0.5,`${label}: stage ${step} ${name} text extends outside the caption`);
+      assert(box.x>=state.caption.x+hintInset-0.5 && box.right<=state.caption.right-hintInset+0.5,`${label}: stage ${step} ${name} text enters the hint-card padding`);
+    }
+    if(step===2) assert(state.captionEnglish.right<=state.captionJapanese.x,`${label}: English and Japanese overlap`);
   };
-  checkLabels(baseline,0);
+  checkLabels(baseline,0); checkTopRow(baseline,0);
   await button.click();
   const english=await snapshot();
   assert.equal(english.captionVisible,true,`${label}: English caption missing at stage 1`);
-  assert.equal(english.englishVisible,true,`${label}: English text missing at stage 1`);
-  assert.equal(english.japaneseVisible,false,`${label}: Japanese text shown at stage 1`);
-  checkCards(english,1); checkLabels(english,1); checkCaption(english,1);
+  assert.equal(english.englishVisible,false,`${label}: English text shown at Japanese-only stage 1`);
+  assert.equal(english.japaneseVisible,true,`${label}: Japanese text missing at stage 1`);
+  checkCards(english,1); checkLabels(english,1); checkTopRow(english,1);
   await button.click();
   const bilingual=await snapshot();
+  console.log(`${label} geometry ${JSON.stringify([geometry(baseline,0),geometry(english,1),geometry(bilingual,2)])}`);
   assert.equal(bilingual.captionVisible,true,`${label}: bilingual caption missing at stage 2`);
   assert.equal(bilingual.englishVisible,true,`${label}: English text missing at stage 2`);
   assert.equal(bilingual.japaneseVisible,true,`${label}: Japanese text missing at stage 2`);
-  checkCards(bilingual,2); checkLabels(bilingual,2); checkCaption(bilingual,2);
+  checkCards(bilingual,2); checkLabels(bilingual,2); checkTopRow(bilingual,2);
+  const longestPair=await page.evaluate(pairs=>{
+    const english=document.querySelector('#word-caption-english'),japanese=document.querySelector('#word-caption-jp');
+    const content=document.querySelector('.word-caption-content');
+    const previous=[english.textContent,japanese.textContent];
+    let longest=null;
+    for(const pair of pairs) {
+      english.textContent=pair.english; japanese.textContent=pair.japanese;
+      const width=content.offsetWidth;
+      if(!longest || width>longest.width) longest={...pair,width};
+    }
+    [english.textContent,japanese.textContent]=previous;
+    window.dispatchEvent(new Event('resize'));
+    return longest;
+  },wordHintPairs);
+  const originalCount=await page.locator('#word-combo-count').textContent();
+  const originalEnglish=await page.locator('#word-caption-english').textContent();
+  const originalJapanese=await page.locator('#word-caption-jp').textContent();
+  for(const count of [1,9,99,999,9999]) {
+    await page.evaluate(({pair,count})=>{
+      document.querySelector('#word-caption-english').textContent=pair.english;
+      document.querySelector('#word-caption-jp').textContent=pair.japanese;
+      document.querySelector('#word-combo-count').textContent=String(count);
+      window.dispatchEvent(new Event('resize'));
+    },{pair:longestPair,count});
+    const extreme=await snapshot();
+    checkCards(extreme,2); checkTopRow(extreme,2);
+    if(count===9999) await page.screenshot({path:path.join(output,`${engineName}-${width}x${height}-word-max-hint-combo.png`)});
+  }
+  await page.evaluate(({english,japanese,count})=>{
+    document.querySelector('#word-caption-english').textContent=english;
+    document.querySelector('#word-caption-jp').textContent=japanese;
+    document.querySelector('#word-combo-count').textContent=count;
+    window.dispatchEvent(new Event('resize'));
+  },{english:originalEnglish,japanese:originalJapanese,count:originalCount});
   await button.click();
   const hidden=await snapshot();
   assert.equal(hidden.captionVisible,false,`${label}: caption remains at stage 0 after cycling`);
-  checkCards(hidden,0); checkLabels(hidden,0);
+  checkCards(hidden,0); checkLabels(hidden,0); checkTopRow(hidden,0);
   for(let step=0;step<originalStep;step++) await button.click();
   console.log(`PASS ${label}: stages 0/1/2 preserve card and artwork rectangles; labels stay inside cards without text overflow`);
 }
@@ -389,7 +476,7 @@ async function inspectActionHintLabels(page) {
     ja:card.querySelector('.action-label-ja')?.textContent,
     count:card.querySelectorAll('.action-labels').length
   })));
-  assert.equal(labels.length,18,'Action Match: expected hint labels on all 18 cards');
+  assert.equal(labels.length,26,'Action Match: expected hint labels on all 26 cards');
   for(const label of labels) {
     assert.equal(label.count,1,`${label.action} has duplicate or missing label groups`);
     assert.equal(label.en,actionDefinitions[label.action].phrase,`${label.action} English differs from speech`);
@@ -407,7 +494,7 @@ async function assertActionHintStep(page,step,width,height,baselineImages) {
       const labels={en:card.querySelector('.action-label-en'),ja:card.querySelector('.action-label-ja')};
       const r=rect(card),band=card.querySelector('.action-labels'),seen={};
       for(const [kind,el] of Object.entries(labels)) seen[kind]=el.getClientRects().length ? {box:rect(el),scrollWidth:el.scrollWidth,clientWidth:el.clientWidth} : null;
-      return {name:card.querySelector('img').getAttribute('src'),card:r,image,band:band.getClientRects().length ? rect(band) : null,labels:seen};
+      return {name:card.querySelector('img').getAttribute('src'),action:card.dataset.action,card:r,image,band:band.getClientRects().length ? rect(band) : null,labels:seen};
     });
     return {step:screen.dataset.actionHintStep,pressed:button.getAttribute('aria-pressed'),description:button.getAttribute('aria-label'),button:rect(button),cards};
   });
@@ -422,12 +509,12 @@ async function assertActionHintStep(page,step,width,height,baselineImages) {
       assert(baseline,`${context}: no baseline image rectangle for ${card.name}`);
       for(const key of ['x','y','width','height']) assert(Math.abs(card.image[key]-baseline[key])<=.5,`${context}: ${card.name} image ${key} changed when hints were toggled`);
     }
-    assert.equal(Boolean(card.band),step!==0,`${context}: top band visibility is wrong`);
+    assert.equal(Boolean(card.band),step!==0,`${context}: hint band visibility is wrong`);
     assert.equal(Boolean(card.labels.ja),step>=1,`${context}: Japanese visibility is wrong`);
     assert.equal(Boolean(card.labels.en),step===2,`${context}: English visibility is wrong`);
     if(card.band) {
       assert(Math.abs(card.band.x-card.card.x)<=4 && Math.abs(card.band.right-card.card.right)<=4,`${context}: band does not span the card width`);
-      assert(Math.abs(card.band.y-card.card.y)<=4,`${context}: band is not at the card top`);
+      assert(Math.abs(card.band.y-card.card.y)<=4,`${context}: action hint band is not at the card top`);
     }
     for(const label of Object.values(card.labels).filter(Boolean)) {
       const box=label.box;
@@ -436,7 +523,7 @@ async function assertActionHintStep(page,step,width,height,baselineImages) {
       const arrowTop=card.card.y+card.card.height/2;
       const arrow={x:card.card.x+card.card.width/2-19,right:card.card.x+card.card.width/2+19,y:arrowTop-11,bottom:arrowTop+11};
       assert(box.right<=arrow.x || box.x>=arrow.right || box.bottom<=arrow.y || box.y>=arrow.bottom,`${context}: hint label covers the double arrow`);
-      assert(box.y>=card.band.y-1 && box.bottom<=card.band.bottom+1,`${context}: label leaves the top band`);
+      assert(box.y>=card.band.y-1 && box.bottom<=card.band.bottom+1,`${context}: label leaves the hint band`);
     }
     if(card.labels.en && card.labels.ja) assert(card.labels.en.box.right<=card.labels.ja.box.x,`${context}: English and Japanese labels overlap`);
   }
@@ -514,8 +601,8 @@ async function inspectActionImages(page,engineName,width,height,names,batchNumbe
     return [...document.querySelectorAll('#action-screen .action-card:not(.queued)')].map(card=>{
       const img=card.querySelector('img');
       const image=rect(img),scale=Math.min(image.w/img.naturalWidth,image.h/img.naturalHeight),renderedWidth=img.naturalWidth*scale,renderedHeight=img.naturalHeight*scale;
-      const imageStyle=getComputedStyle(img);
-      return {name:img.getAttribute('src'),action:card.dataset.action,panels:Number(card.dataset.panels),legacyDivider:card.classList.contains('action-divider-blue'),card:rect(card),image,rendered:{x:image.x+(image.w-renderedWidth)/2,y:image.y+(image.h-renderedHeight)/2,w:renderedWidth,h:renderedHeight,right:image.x+(image.w+renderedWidth)/2,bottom:image.y+(image.h+renderedHeight)/2},imageStyle:{position:imageStyle.position,objectFit:imageStyle.objectFit},imageParentIsCard:img.parentElement===card,complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,clientWidth:card.clientWidth,clientHeight:card.clientHeight,before:pseudo(card,'::before'),after:pseudo(card,'::after')};
+      const imageStyle=getComputedStyle(img),cardStyle=getComputedStyle(card);
+      return {name:img.getAttribute('src'),action:card.dataset.action,panels:Number(card.dataset.panels),legacyDivider:card.classList.contains('action-divider-blue'),card:rect(card),image,rendered:{x:image.x+(image.w-renderedWidth)/2,y:image.y+(image.h-renderedHeight)/2,w:renderedWidth,h:renderedHeight,right:image.x+(image.w+renderedWidth)/2,bottom:image.y+(image.h+renderedHeight)/2},imageStyle:{position:imageStyle.position,objectFit:imageStyle.objectFit,pointerEvents:imageStyle.pointerEvents,transformOrigin:imageStyle.transformOrigin},cardStyle:{overflowX:cardStyle.overflowX,overflowY:cardStyle.overflowY,borderRadius:cardStyle.borderRadius},imageParentIsCard:img.parentElement===card,complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,clientWidth:card.clientWidth,clientHeight:card.clientHeight,before:pseudo(card,'::before'),after:pseudo(card,'::after')};
     });
   });
   assert.equal(cards.length,4,`${engineName} ${width}×${height}: expected four visible Action Match cards`);
@@ -528,11 +615,19 @@ async function inspectActionImages(page,engineName,width,height,names,batchNumbe
     assert(card.card.w>=48 && card.card.h>=48,`${label}: tap target is smaller than 48px`);
     assert(card.complete && card.naturalWidth>0 && card.naturalHeight>0,`${label}: image did not load`);
     assert(card.image.w>60 && card.image.h>40,`${label}: image is blank or collapsed: ${JSON.stringify(card)}`);
-    assert(card.image.x>=card.card.x-1.5 && card.image.right<=card.card.right+1.5 && card.image.y>=card.card.y-1.5 && card.image.bottom<=card.card.bottom+1.5,`${label}: image extends beyond card: ${JSON.stringify(card)}`);
+    // The approved zoom may enlarge the image element beyond its card. The
+    // visible pixels must be clipped by the rounded card, never by the board.
+    assert.equal(card.cardStyle.overflowX,'hidden',`${label}: horizontal image overflow can be visible outside the card`);
+    assert.equal(card.cardStyle.overflowY,'hidden',`${label}: vertical image overflow can be visible outside the card`);
+    assert(Number.parseFloat(card.cardStyle.borderRadius)>0,`${label}: the zoomed artwork must retain the card's rounded clipping`);
     assert.equal(card.imageStyle.position,'absolute',`${label}: image sizing depends on the grid row`);
     assert.equal(card.imageStyle.objectFit,'contain',`${label}: artwork can be stretched or cropped`);
+    assert.equal(card.imageStyle.pointerEvents,'none',`${label}: artwork intercepts the card tap`);
     assert(card.rendered.w>60 && card.rendered.h>40,`${label}: rendered artwork is blank or collapsed: ${JSON.stringify(card)}`);
-    assert(card.rendered.x>=card.card.x-1.5 && card.rendered.right<=card.card.right+1.5 && card.rendered.y>=card.card.y-1.5 && card.rendered.bottom<=card.card.bottom+1.5,`${label}: rendered artwork extends beyond card: ${JSON.stringify(card)}`);
+    const visibleWidth=Math.min(card.rendered.right,card.card.right)-Math.max(card.rendered.x,card.card.x);
+    const visibleHeight=Math.min(card.rendered.bottom,card.card.bottom)-Math.max(card.rendered.y,card.card.y);
+    assert(visibleWidth>60 && visibleHeight>40,`${label}: too little artwork remains visible after card clipping: ${JSON.stringify(card)}`);
+    assert(visibleWidth/card.card.w>.5 && visibleHeight/card.card.h>.5,`${label}: zoom clips most of the artwork: ${JSON.stringify(card)}`);
     assert(Math.abs(card.rendered.w/card.rendered.h-card.naturalWidth/card.naturalHeight)<0.025,`${label}: rendered artwork is stretched: ${JSON.stringify(card)}`);
     assert(near(card.image.x+card.image.w/2,card.card.x+card.card.w/2),`${label}: image is not horizontally centered`);
     if(card.panels===2) {
@@ -553,6 +648,12 @@ async function inspectActionImages(page,engineName,width,height,names,batchNumbe
       assert.notEqual(card.before.content,'""',`${label}: current non-equal throw image must not show a left arrow`);
       assert.notEqual(card.after.content,'""',`${label}: current non-equal throw image must not show a right arrow`);
     }
+  }
+  for(let i=0;i<cards.length;i++) for(let j=i+1;j<cards.length;j++) {
+    const a=cards[i].card,b=cards[j].card;
+    const overlapWidth=Math.min(a.right,b.right)-Math.max(a.x,b.x);
+    const overlapHeight=Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y);
+    assert(overlapWidth<=1 || overlapHeight<=1,`${engineName} ${width}×${height}: Action Match cards overlap: ${cards[i].name} / ${cards[j].name}`);
   }
   const taps=await page.evaluate(()=>{
     const cards=[...document.querySelectorAll('#action-screen .action-card:not(.queued)[data-panels="2"]')];
@@ -912,7 +1013,7 @@ for(const [engineName,engine,launchOptions] of engines) {
         await capture('home-screen','home');
         await page.locator('#open-word').click(); await capture('match-mode-screen','mode');
         await page.locator('#open-item-match').click(); await capture('word-screen','word');
-        await inspectWordCaption(page,width,height);
+        await inspectWordCaption(page,engineName,width,height);
         await inspectWordFoodCards(page,width,height);
         await page.locator('#word-home').click();
         const selectedWords=new Set();
@@ -926,7 +1027,7 @@ for(const [engineName,engine,launchOptions] of engines) {
             if(fixture===actionFixtures[0] && opening===1) {
               await capture('action-screen','action');
               const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
-              assert.deepEqual(panelCounts,{two:18,three:0,total:18},`${current}: Action Match panel metadata must cover 18 two-panel images`);
+              assert.deepEqual(panelCounts,{two:26,three:0,total:26},`${current}: Action Match panel metadata must cover 26 two-panel images`);
             }
             const selected=await inspectActionSelection(page,engineName,width,height,fixture,opening);
             for(const card of selected) selectedWords.add(card.action);
@@ -935,7 +1036,7 @@ for(const [engineName,engine,launchOptions] of engines) {
               for(const [index,batch] of actionImageBatches.entries()) {
                 for(const card of await inspectActionImages(page,engineName,width,height,batch,index+1)) inspected.add(card.name);
               }
-              assert.deepEqual(inspected,new Set(actionImageNames),`${current}: not all 18 Action Match images were inspected`);
+              assert.deepEqual(inspected,new Set(actionImageNames),`${current}: not all 26 Action Match images were inspected`);
               await showActionImages(page,selected.map(card=>card.name));
               await checkAllActionHintGeometry(page,engineName,width,height,selected);
             }
@@ -955,7 +1056,7 @@ for(const [engineName,engine,launchOptions] of engines) {
                 const restarted=await inspectActionSelection(page,engineName,width,height,fixture,'Play again');
                 assert.deepEqual(restarted.map(card=>card.name),selected.map(card=>card.name),`${current}: Play again did not reset the seeded selection`);
                 assert.equal(await page.locator('#action-screen .action-card.matched').count(),0,`${current}: Play again retained matched cards`);
-                assert.equal(await page.locator('#action-screen .action-card.queued').count(),14,`${current}: Play again did not reset hidden cards`);
+                assert.equal(await page.locator('#action-screen .action-card.queued').count(),22,`${current}: Play again did not reset hidden cards`);
                 assert.equal(await page.locator('#action-finish.show').count(),0,`${current}: Play again retained finish screen`);
               }
             }
@@ -963,7 +1064,7 @@ for(const [engineName,engine,launchOptions] of engines) {
           }
           assert.deepEqual(openings[1],openings[0],`${current}: same random draws changed the visible order after reopening`);
         }
-        assert.deepEqual(selectedWords,new Set(actionKeys),`${engineName} ${width}×${height}: seeded games did not cover all nine verbs`);
+        assert.deepEqual(selectedWords,new Set(actionKeys),`${engineName} ${width}×${height}: seeded games did not cover all 13 actions`);
         await page.evaluate(()=>window.__restoreActionTestRandom());
         await page.locator('#open-listen').click(); await capture('place-screen','place');
         for(const [name,openId,screenId,backId] of scenes) {
@@ -988,4 +1089,4 @@ for(const [engineName,engine,launchOptions] of engines) {
   } finally { await browser.close(); }
 }
 if(failures) process.exitCode=1;
-else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 10 screens, all 18 Action Match images, shopping hints, Play again, and reopening. Screenshots: ${output}`);
+else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 10 screens, all 26 Action Match images, shopping hints, Play again, and reopening. Screenshots: ${output}`);

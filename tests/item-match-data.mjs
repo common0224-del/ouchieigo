@@ -90,7 +90,7 @@ for(const first of vocabulary) {
 }
 assert.match(html, /function resetWord\([^\n]+selected=chooseWordCards\(cards\)/);
 assert.match(html, /function speakWord\([^\n]+SpeechSynthesisUtterance\(wordNames\[wordCurrent\.dataset\.word\]\)/);
-assert.match(html, /if\(card===wordCurrent\) \{ card\.classList\.add\('matched'\); correctSound\(\);/);
+assert.match(html, /if\(card===wordCurrent\) \{ card\.classList\.add\('matched'\); advanceWordCombo\(\); correctSound\(\);/);
 assert.match(html, /else wordWrongFeedback\(\)/);
 
 const resetSource=html.match(/^      function resetWord\([^\n]+$/m)?.[0];
@@ -108,7 +108,7 @@ for(const random of [0,.5,.999]) {
     document:{querySelectorAll:()=>cards},
     wordFinish:{classList:{remove(){}}},
     wordBoard:{append(){}},
-    stopSpeech(){},selectWord(){},setTimeout(){}
+    stopSpeech(){},clearWordComboAnimation(){},selectWord(){},setTimeout(){}
   };
   vm.runInNewContext(`${chooseSource}\n${resetSource}\nresetWord(false)`,context);
   const visible=cards.filter(card=>!card.classList.contains('queued')).map(card=>card.dataset.word);

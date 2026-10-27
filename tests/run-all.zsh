@@ -12,6 +12,8 @@ if [[ ! -x "$node_bin" ]]; then node_bin="$(command -v node)"; fi
 suite_result=0
 NODE_PATH="$node_modules" CHROME_PATH="$chrome_path" "$node_bin" tests/check-image-alpha.mjs || suite_result=1
 "$node_bin" tests/item-match-data.mjs || suite_result=1
+"$node_bin" tests/item-match-combo.mjs || suite_result=1
+"$node_bin" tests/action-match-data.mjs || suite_result=1
 "$node_bin" tests/shopping-data.mjs || suite_result=1
 "$node_bin" tests/shopping-screen.mjs || suite_result=1
 "$node_bin" tests/listen-uniform-selection.mjs || suite_result=1
