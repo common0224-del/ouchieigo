@@ -92,7 +92,8 @@ const actionHeader=source.match(/<main class="app" id="action-screen"[\s\S]*?<\/
 assert(actionHeader,'Action Match header is missing');
 assert.deepEqual([...actionHeader.matchAll(/id="(action-(?:home|reset|hint|speaker))"/g)].map(match=>match[1]),['action-home','action-reset','action-hint','action-speaker'],'Action Match header controls must match the other games');
 assert.match(actionHeader,/<button class="round compact-control" id="action-reset" type="button" aria-label="リセット">↻<\/button>/);
-for(const selector of ['#action-reset { background:linear-gradient(145deg,#d9f1ff,#8ac8e9); font-size:0; }','#action-reset::after { content:"↻"; font-size:21px; display:block; line-height:1; transform:translate(0,-1px); }']) assert(source.includes(selector),'Action Match reset must share the existing button styling');
+assert(/#action-reset[^\{]*\{ background:linear-gradient\(145deg,#d9f1ff,#8ac8e9\); font-size:0; \}/.test(source),'Action Match reset must share the existing button background');
+assert(/#action-reset::after[^\{]*\{ content:"↻"; font-size:21px; display:block; line-height:1; transform:translate\(0,-1px\); \}/.test(source),'Action Match reset must share the existing icon styling');
 for(const width of [375,390,430]) assert(2*7+48+90+4*48+5*4<=width,`${width}px: Action Match controls cannot fit the top bar`);
 
 // Mirror the existing Fisher-Yates selection with deterministic draws. This is

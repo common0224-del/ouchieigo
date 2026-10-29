@@ -10,16 +10,37 @@ const literal=name=>{
   assert(match,`Missing ${name}`);
   return JSON.parse(JSON.stringify(vm.runInNewContext(`(${match[1]})`)));
 };
-const names=literal('wordNames'), japanese=literal('wordJapanese');
+const existingNames=literal('wordNames'), existingJapanese=literal('wordJapanese');
+const bathWordMatch=html.match(/const bathTimeWordItems=(\[[^;]+\]);/);
+assert(bathWordMatch,'Bath Time shared Item Match registrations are missing');
+const bathWordItems=JSON.parse(JSON.stringify(vm.runInNewContext(`(${bathWordMatch[1]})`)));
+const bathWords=bathWordItems.map(([key])=>key);
+const names={...existingNames,...Object.fromEntries(bathWordItems.map(([key,en])=>[key,en]))};
+const japanese={...existingJapanese,...Object.fromEntries(bathWordItems.map(([key,,jp])=>[key,jp]))};
 const original='toothbrush cup towel soap toothpaste comb toast banana milk cereal spoon plate mug fork chopsticks apple bowl napkin sink tray rack basket table boy girl book remote blanket blocks car tissue crayons doll teddy-bear cat turtle rabbit cookie-wrapper cat-drawing bookshelf mom sofa toybox bin pajamas pillow socks alarm-clock nightcap bed dad drawer night-table'.split(' ');
 const food='apple banana milk bread egg tomato carrot potato chicken pork beef fish strawberry'.split(' ');
 const added='bread egg tomato carrot potato chicken pork beef fish strawberry'.split(' ');
-const vocabulary=[...food,'house'];
+const vocabulary=[...food,'house',...bathWords];
 assert.equal(original.length,53);
 assert.equal(new Set(original).size,53);
-assert.deepEqual(Object.keys(names),[...original,...added,'house'],'existing vocabulary or registration order changed');
-assert.deepEqual(Object.keys(japanese),[...original,...added,'house'],'Japanese vocabulary is missing or duplicated');
-assert.equal(Object.keys(names).length,64);
+assert.deepEqual(Object.keys(existingNames),[...original,...added,'house'],'existing vocabulary or registration order changed');
+assert.deepEqual(Object.keys(existingJapanese),[...original,...added,'house'],'existing Japanese vocabulary changed');
+assert.equal(Object.keys(existingNames).length,64,'pre-addition Item Match count changed');
+assert.deepEqual(Object.keys(names),[...original,...added,'house',...bathWords],'shared Bath Time words are missing or reordered');
+assert.deepEqual(Object.keys(japanese),Object.keys(names),'Japanese vocabulary is missing or duplicated');
+assert.equal(Object.keys(names).length,71);
+assert.deepEqual(bathWordItems,[
+  ['shampoo','Shampoo','シャンプー','bath-time-item-shampoo-pump-v2.webp'],
+  ['sponge','Sponge','スポンジ','bath-time-item-sponge-v1.webp'],
+  ['rubber-duck','Rubber duck','あひるのおもちゃ','bath-time-item-rubber-duck-v1.webp'],
+  ['washbowl','Washbowl','せんめんき','bath-time-item-washbowl-v1.webp'],
+  ['shower','Shower','シャワー','bath-time-item-shower-v1.webp'],
+  ['bathtub','Bathtub','バスタブ','item-match-bathtub-v1.webp'],
+  ['hook','Hook','フック','item-match-hook-v1.webp']
+]);
+assert.equal(new Set(bathWords).size,7,'duplicate Bath Time word ID');
+assert(bathWords.every(word=>!(word in existingNames)),'Bath Time word ID already registered');
+assert(bathWordItems.every(([,en])=>!Object.values(existingNames).some(value=>value.toLowerCase()===en.toLowerCase())),'Bath Time English label already registered');
 assert.equal(names.house,'House');
 assert.equal(japanese.house,'いえ');
 assert.deepEqual(food.filter(key=>original.includes(key)),['apple','banana','milk']);
@@ -45,15 +66,30 @@ assert.equal([...html.matchAll(/card\.innerHTML=`<img src="\$\{src\}" alt="" dra
 assert.match(html,/const art=document\.createElement\('img'\); art\.src=src; art\.alt=''; art\.draggable=false; card\.append\(art\);/,'dynamic Item Match food images must disable native dragging');
 assert.match(html,/:is\([^\n]*#word-screen[^\n]*\) \* \{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent; \}/,'Item Match cards must retain selection and tap-highlight protection');
 assert.match(html,/:is\([^\n]*#word-screen[^\n]*\) :is\(img,image\) \{ -webkit-user-drag:none; \}/,'Item Match images must retain native-drag protection');
-const allCards=[...staticCards,...dynamicCards];
-assert.equal(allCards.length,64,'each vocabulary entry needs exactly one card');
-assert.equal(new Set(allCards).size,64,'duplicate Item Match cards');
+const allCards=[...staticCards,...dynamicCards,...bathWords];
+assert.equal(allCards.length,71,'each vocabulary entry needs exactly one card');
+assert.equal(new Set(allCards).size,71,'duplicate Item Match cards');
 assert.deepEqual(new Set(allCards),new Set(Object.keys(names)),'word tables and cards differ');
+assert.match(html,/bathTimeWordItems\.forEach\(\(\[word,label,jp,src\]\)=>\{ wordNames\[word\]=label; wordJapanese\[word\]=jp;/,'new words must use the existing label and speech maps');
+assert.match(html,/bathTimeWordItems\.forEach\([^\n]+wordBoard\.insertBefore\(card,wordFinish\); \}\);/,'new words must join the Item Match card pool');
+for(const [key,, ,image] of bathWordItems) {
+  assert(fs.existsSync(path.join(root,image)),`Missing shared image: ${image}`);
+  if(key!=='bathtub' && key!=='hook') assert.match(html,new RegExp(`<button class="living-item bath-time-item" data-bath-time-item="${key}"[^>]*><img[^>]* src="${image.replaceAll('.','\\.')}"`),`${key}: Bath Time must keep the same image reference`);
+}
+for(const [key,scale] of Object.entries({shampoo:1.4,sponge:1,'rubber-duck':1.05,washbowl:1.8,shower:1.3})) {
+  const css=html.match(new RegExp(`\\.word-card\\[data-word="${key}"\\] img \\{([^}]+)\\}`))?.[1] || '';
+  if(scale===1) assert.doesNotMatch(css,/scale\(/,`${key}: existing card image size should be reused`);
+  else assert.match(css,new RegExp(`scale\\(${scale}\\)`),`${key}: incorrect image scale`);
+}
+for(const [key,scale] of Object.entries({bathtub:1.12,hook:1.35})) {
+  const css=html.match(new RegExp(`\\.word-card\\[data-word="${key}"\\] img \\{([^}]+)\\}`))?.[1] || '';
+  assert.match(css,new RegExp(`scale\\(${scale}\\)`),`${key}: incorrect image scale`);
+}
 assert.match(board,/<button class="word-card" data-word="house" type="button" aria-label="House"><img src="word-item-house-v2\.png\.webp" alt=""><\/button>/,'House card must use the shared illustration');
 assert(fs.existsSync(path.join(root,'word-item-house-v2.png.webp')),'Shared House illustration is missing');
 assert.match(html,/\.word-card img, \.word-card \.word-sprite \{ width:91%; height:91%; object-fit:contain;/,'House art must use existing card image sizing');
 assert.match(html,/\.screen-header \.home-icon \{ display:block; width:30px; height:30px; object-fit:contain;/,'Home art must fit inside the existing button');
-assert.equal([...html.matchAll(/class="home-icon" src="word-item-house-v2\.png\.webp"/g)].length,10,'Every home button must share the Item Match House asset');
+assert.equal([...html.matchAll(/class="home-icon" src="word-item-house-v2\.png\.webp"/g)].length,11,'Every home button, including Bath Time, must share the Item Match House asset');
 assert.doesNotMatch(html,/home-icon-art|word-item-house-v1\.png\.webp/,'Old or rejected House art must not be referenced');
 assert.equal(dynamicLists.at(-1).length,10,'only the ten unregistered foods should be added');
 assert.deepEqual(dynamicLists.at(-1).map(([key])=>key),added);
@@ -128,4 +164,4 @@ const speak=vm.runInNewContext(`${speechSource}\nspeakWord`,speechContext);
 for(const key of vocabulary) { speechContext.wordCurrent={dataset:{word:key}}; speak(); }
 assert.deepEqual(spoken,vocabulary.map(key=>names[key]),'Item Match speech must use the single-word labels');
 
-console.log('PASS Item Match: 63 existing + house = 64 unique words, 12-card rounds, shared house art, image references, speech and answer paths');
+console.log('PASS Item Match: 64 existing + 7 Bath Time = 71 unique words, 12-card rounds, shared assets, speech and answer paths');

@@ -119,7 +119,7 @@ assert.match(html,/id="entrance-screen"/);
 assert.match(html,/id="entrance-label-layer"/);
 assert.match(html,/function openEntrance\(\).*speakSceneIntro/);
 assert.match(html,/id="entrance-kana"/);
-assert.match(html,/:is\(#game-screen,#breakfast-screen,#living-screen,#bedroom-screen,#entrance-screen,#shopping-screen,#word-screen,#action-screen,#think-screen\) \* \{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;/);
+assert(html.includes(':is(#game-screen,#breakfast-screen,#living-screen,#bedroom-screen,#entrance-screen,#shopping-screen,#word-screen,#action-screen,#think-screen,#bath-time-screen) * { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;'), 'Life-scene touch selection suppression must include Entrance and Bath Time');
 assert.match(html,/#entrance-screen img, #shopping-screen img/);
 
 const background='entrance-stage-v1e.png.webp';

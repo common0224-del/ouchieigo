@@ -22,7 +22,7 @@ for(const id of resetIds) {
 }
 assert.match(resetRule,/content:"↻"; font-size:21px; display:block; line-height:1; transform:translate\(0,-1px\);/,'Reset arrow must be visually centered');
 assert.doesNotMatch(html,/\.app > header #shopping-reset::after \{/,'Shopping must not have a separate reset-arrow rule');
-const gameIds=['game-screen','breakfast-screen','living-screen','bedroom-screen','entrance-screen','shopping-screen','word-screen','action-screen','think-screen'];
+const gameIds=['game-screen','breakfast-screen','living-screen','bedroom-screen','entrance-screen','shopping-screen','word-screen','action-screen','think-screen','bath-time-screen'];
 const gameSelector=`:is(${gameIds.map(id=>`#${id}`).join(',')})`;
 const gameSelectionRule=html.match(/    (:is\(#[^\n]+\)),\n    (:is\(#[^\n]+\)) \* \{ ([^}]+) \}/);
 assert(gameSelectionRule,'Game-wide long-press protection is missing');

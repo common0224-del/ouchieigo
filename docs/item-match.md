@@ -1,6 +1,6 @@
 # Item Match の語
 
-- 現在の登録語は64語（従来の53語＋食べ物10語＋`House`）。毎ゲーム、その中から12枚をランダムに表示する。問題数・カード数・正誤判定・読み上げは変更しない。
+- 現在の登録語は71語（従来の53語＋食べ物10語＋`House`＋Bath Time由来の7語）。毎ゲーム、その中から12枚をランダムに表示する。問題数・カード数・正誤判定・読み上げは変更しない。
 - `Turtle`（かめ、`living-item-turtle-v1b.png.webp`）と `Rabbit`（うさぎ、`living-item-rabbit-v1a.png.webp`）を追加した。
 - `Cat`（ねこ）には `think-say-cat-v1.png.webp` を使う。
 - 以前の `Doll and stuffed toy` 1枚は使わず、`Doll`（おにんぎょう、`living-item-doll-v1.png.webp`）と `Teddy bear`（くまのぬいぐるみ、`think-say-teddy-bear-v1.png.webp`）の2枚に分けた。1枚に2つの物が描かれていると、聞いた語がどちらを指すか分かりにくいため。
@@ -18,6 +18,13 @@
 
 - `House`／いえを追加した。ほかの語と同じ12枚のランダム抽選・単語読み上げ・正誤判定に参加する。
 - Item Matchのカードと全画面の丸いホームボタンは、同じ透過画像 `word-item-house-v2.png.webp` を参照する。亀・うさぎに近い、輪郭が分かりやすい2Dの家イラストで、別テイストの家画像を使い分けない。カードでは既存画像と同じ91%の枠内、ホームボタンでは30px四方に `object-fit:contain` で収める。ボタン自体の寸法・動作は変えない。
+
+## Bath Timeと共用する語
+
+- `Shampoo`／シャンプー、`Sponge`／スポンジ、`Rubber duck`／あひるのおもちゃ、`Washbowl`／せんめんき、`Shower`／シャワーを追加する。既存の`Towel`と`Soap`は重複登録しない。
+- 画像はBath Timeと同じ公開用ファイルを直接参照する。順に`bath-time-item-shampoo-pump-v2.webp`、`bath-time-item-sponge-v1.webp`、`bath-time-item-rubber-duck-v1.webp`、`bath-time-item-washbowl-v1.webp`、`bath-time-item-shower-v1.webp`を使い、複製しない。
+- Item Match内の画像倍率は順に1.4倍、1.0倍（既定）、1.05倍、1.8倍、1.3倍。シャンプーは11％、スポンジは2％、アヒルは5％、シャワーは10％上へ寄せ、文字帯を避ける。既存カードの91％の画像枠、縦横比、12枚抽選は維持する。
+- 承認済みの`Bathtub`／バスタブと`Hook`／フックも追加した。画像は非公開候補を変更せず、公開用の`item-match-bathtub-v1.webp`と`item-match-hook-v1.webp`へそれぞれ1回だけコピーした。Item Matchの表示倍率はBathtubが1.12倍、Hookが1.35倍（上へ5％移動）。Bath Timeの背景・アイテム画像参照は変更しない。
 
 ## 画面の見出しと出題バー
 

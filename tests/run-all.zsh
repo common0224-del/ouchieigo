@@ -18,6 +18,7 @@ NODE_PATH="$node_modules" CHROME_PATH="$chrome_path" "$node_bin" tests/check-ima
 "$node_bin" tests/shopping-screen.mjs || suite_result=1
 "$node_bin" tests/listen-uniform-selection.mjs || suite_result=1
 "$node_bin" tests/entrance-scene.mjs || suite_result=1
+"$node_bin" tests/bath-time-scene.mjs || suite_result=1
 "$node_bin" tests/breakfast-drop-zones.mjs || suite_result=1
 "$node_bin" tests/place-thumbnails-static.mjs || suite_result=1
 "$node_bin" tests/ui-polish-static.mjs || suite_result=1

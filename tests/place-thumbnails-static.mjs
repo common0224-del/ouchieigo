@@ -19,6 +19,7 @@ const scenes=[
   {id:'living',selector:'.place-card.place-living .place-illustration',image:'living-stage-v2.png.webp',x:100,y:10,zoom:360,face:[708,143,845,285],cue:[600,330]},
   {id:'bedroom',selector:'.place-card.place-bedroom .place-illustration',image:'bedroom-stage-v4a.png.webp',x:86,y:48,zoom:320,face:[625,455,780,620],cue:[500,500]},
   {id:'entrance',selector:'.place-card.place-entrance .place-illustration',image:'entrance-stage-v1e.png.webp',x:100,y:33,zoom:260,face:[695,305,830,505],cue:[550,420]},
+  {id:'bath-time',selector:'.place-card.place-bath-time .place-illustration',image:'bath-time-stage-v1.webp',x:90,y:8,zoom:280,face:[510,155,675,335],cue:[500,380]},
   {id:'shopping',selector:'.place-card.place-shopping .place-illustration',image:'shopping-scene-bg-v2a.png.webp',x:25,y:30,zoom:285,face:[365,305,525,475],cue:[180,500]},
 ];
 
@@ -50,5 +51,5 @@ for(const [viewportWidth,viewportHeight] of [[375,667],[390,844],[430,932]]) {
     assert(faceHeightRatio>=.35 && faceHeightRatio<=.45,`${scene.id} ${viewportWidth}x${viewportHeight}: face size is outside the intended range`);
     assert(toX(scene.cue[0])>=0 && toX(scene.cue[0])<=panelWidth && toY(scene.cue[1])>=0 && toY(scene.cue[1])<=cardHeight,`${scene.id} ${viewportWidth}x${viewportHeight}: scene cue is cropped out`);
   }
-  console.log(`PASS place thumbnails ${viewportWidth}x${viewportHeight}: six faces and scene cues fit their right panels`);
+  console.log(`PASS place thumbnails ${viewportWidth}x${viewportHeight}: seven faces and scene cues fit their right panels`);
 }
