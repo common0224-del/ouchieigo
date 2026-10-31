@@ -18,7 +18,6 @@ const sizes=[[375,667],[390,844],[430,932]];
 const actionDefinitions={
   put:{phrase:'Put it.',images:['action-put-boy-v5.png.webp','action-put-girl-v5.png.webp']},
   get:{phrase:'Get it.',images:['action-get-boy-v4.png.webp','action-get-girl-v4.png.webp']},
-  bring:{phrase:'Bring it to me.',images:['action-bring-boy-v3.png.webp','action-bring-girl-v4.png.webp']},
   throw:{phrase:'Throw it away.',images:['action-throw-boy-v3.png.webp','action-throw-girl-v5.png.webp']},
   'put-on':{phrase:'Put it on.',images:['action-put-on-boy-v3b.png.webp','action-put-on-girl-v3a.png.webp']},
   'take-off':{phrase:'Take it off.',images:['action-take-off-boy-v1b.png.webp','action-take-off-girl-v3a.png.webp']},
@@ -29,16 +28,20 @@ const actionDefinitions={
   'turn-off':{phrase:'Turn it off.',images:['action-turn-off-boy-light-v2.webp','action-turn-off-girl-game-v1.webp']},
   'take-out':{phrase:'Take it out.',images:['action-take-out-boy-toy-v1.webp','action-take-out-girl-milk-v1.webp']},
   'put-away':{phrase:'Put it away.',images:['action-put-away-boy-book-v2.webp','action-put-away-girl-toy-v1.webp']},
+  push:{phrase:'Push it.',images:['action-push-boy-layout-v5.webp','action-push-girl-layout-v3.webp']},
+  pull:{phrase:'Pull it.',images:['action-pull-boy-layout-v5.webp','action-pull-girl-layout-v3.webp']},
+  give:{phrase:'Give it to me.',images:['action-give-boy-layout-v3.webp','action-give-girl-layout-v5.webp']},
+  eat:{phrase:'Eat it.',images:['action-eat-boy-layout-v3.webp','action-eat-girl-layout-v3.webp']},
 };
 const actionKeys=Object.keys(actionDefinitions);
-const actionJapaneseExpected={put:['おく','おく'],get:['とる','とる'],bring:['もってきて','もってきて'],throw:['すてる','すてる'],'put-on':['みにつける','みにつける'],'take-off':['ぬぐ','ぬぐ'],open:['あける','あける'],close:['しめる','しめる'],'pick-up':['ひろう','ひろう'],'turn-on':['つける','つける'],'turn-off':['けす','けす'],'take-out':['とりだす','とりだす'],'put-away':['かたづける','かたづける']};
+const actionJapaneseExpected={put:['おく','おく'],get:['とる','とる'],throw:['すてる','すてる'],'put-on':['みにつける','みにつける'],'take-off':['ぬぐ','ぬぐ'],open:['あける','あける'],close:['しめる','しめる'],'pick-up':['ひろう','ひろう'],'turn-on':['つける','つける'],'turn-off':['けす','けす'],'take-out':['とりだす','とりだす'],'put-away':['かたづける','かたづける'],push:['おす','おす'],pull:['ひっぱる','ひっぱる'],give:['わたす','わたす'],eat:['たべる','たべる']};
 const actionImageNames=Object.values(actionDefinitions).flatMap(({images})=>images);
 const actionImageBatches=Array.from({length:Math.ceil(actionImageNames.length/4)},(_,index)=>{
   const batch=actionImageNames.slice(index*4,index*4+4);
   return [...batch,...actionImageNames.slice(0,4-batch.length)];
 });
-assert.equal(actionKeys.length,13);
-assert.equal(new Set(actionImageNames).size,26);
+assert.equal(actionKeys.length,16);
+assert.equal(new Set(actionImageNames).size,32);
 const actionSource=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const wordNames=vm.runInNewContext(`(${actionSource.match(/const wordNames=(\{[^;]+\});/)?.[1]})`);
 const wordJapanese=vm.runInNewContext(`(${actionSource.match(/const wordJapanese=(\{[^;]+\});/)?.[1]})`);
@@ -46,18 +49,19 @@ const wordHintPairs=Object.keys(wordNames).map(key=>({english:wordNames[key],jap
 const actionPhrasesLiteral=actionSource.match(/const actionPhrases=(\{[^;]+\});/)?.[1];
 assert(actionPhrasesLiteral,'Action Match speech phrase table is missing');
 const actualActionPhrases=JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionPhrasesLiteral})`)));
-assert.deepEqual(actualActionPhrases,Object.fromEntries(Object.entries(actionDefinitions).map(([key,{phrase}])=>[key,phrase])),'Action Match speech phrase table differs from the 13 expected sentences');
+assert.deepEqual(actualActionPhrases,Object.fromEntries(Object.entries(actionDefinitions).map(([key,{phrase}])=>[key,phrase])),'Action Match speech phrase table differs from the 16 expected sentences');
 const actionJapaneseLiteral=actionSource.match(/const actionJapanese=(\{[^;]+\});/)?.[1];
 assert(actionJapaneseLiteral,'Action Match Japanese hint table is missing');
 assert.deepEqual(JSON.parse(JSON.stringify(vm.runInNewContext(`(${actionJapaneseLiteral})`))),actionJapaneseExpected,'Action Match Japanese hints differ from the approved text');
 function seededDraws(seed) { let state=seed>>>0; return Array.from({length:64},()=>((state=(Math.imul(1664525,state)+1013904223)>>>0)/2**32)); }
 const actionFixtures=[
-  {name:'seed-1',draws:seededDraws(1),expected:['action-take-out-girl-milk-v1.webp','action-open-boy-v1b.png.webp','action-get-boy-v4.png.webp','action-turn-on-boy-tv-v1.webp']},
-  {name:'seed-17',draws:seededDraws(17),expected:['action-turn-off-boy-light-v2.webp','action-put-away-girl-toy-v1.webp','action-close-girl-v1a.png.webp','action-pick-up-girl-v1b.png.webp']},
-  {name:'seed-18',draws:seededDraws(18),expected:['action-take-out-girl-milk-v1.webp','action-put-on-girl-v3a.png.webp','action-bring-boy-v3.png.webp','action-take-off-girl-v3a.png.webp']},
-  {name:'seed-212',draws:seededDraws(212),expected:['action-throw-girl-v5.png.webp','action-bring-girl-v4.png.webp','action-put-away-boy-book-v2.webp','action-put-boy-v5.png.webp']},
+  {name:'seed-1',draws:seededDraws(1),expected:['action-push-boy-layout-v5.webp','action-close-boy-v1a.png.webp','action-turn-on-boy-tv-v1.webp','action-eat-girl-layout-v3.webp']},
+  {name:'seed-3',draws:seededDraws(3),expected:['action-put-away-girl-toy-v1.webp','action-pull-boy-layout-v5.webp','action-throw-girl-v5.png.webp','action-get-girl-v4.png.webp']},
+  {name:'seed-32',draws:seededDraws(32),expected:['action-take-off-boy-v1b.png.webp','action-open-boy-v1b.png.webp','action-put-boy-v5.png.webp','action-pick-up-girl-v1b.png.webp']},
+  {name:'seed-9',draws:seededDraws(9),expected:['action-turn-off-boy-light-v2.webp','action-close-girl-v1a.png.webp','action-give-girl-layout-v5.webp','action-take-out-girl-milk-v1.webp']},
+  {name:'seed-36',draws:seededDraws(36),expected:['action-pick-up-girl-v1b.png.webp','action-put-on-girl-v3a.png.webp','action-throw-girl-v5.png.webp','action-turn-off-boy-light-v2.webp']},
 ];
-assert.deepEqual(new Set(actionFixtures.flatMap(fixture=>fixture.expected.map(name=>Object.entries(actionDefinitions).find(([,definition])=>definition.images.includes(name))?.[0]))),new Set(actionKeys),'Seeded fixtures must cover all 13 action words');
+assert.deepEqual(new Set(actionFixtures.flatMap(fixture=>fixture.expected.map(name=>Object.entries(actionDefinitions).find(([,definition])=>definition.images.includes(name))?.[0]))),new Set(actionKeys),'Seeded fixtures must cover all 16 action words');
 const scenes=[['bathroom','open-bathroom','game-screen','bathroom-back','scene'],['breakfast','open-breakfast','breakfast-screen','breakfast-back','breakfast-scene'],['living','open-living','living-screen','living-back','living-scene'],['bedroom','open-bedroom','bedroom-screen','bedroom-back','bedroom-scene'],['entrance','open-entrance','entrance-screen','entrance-back','scene'],['bath-time','open-bath-time','bath-time-screen','bath-time-back','scene']];
 const engines=[
   ['chromium',chromium,{...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {}),args:['--mute-audio']}],
@@ -458,6 +462,7 @@ async function inspectActionSelection(page,engineName,width,height,fixture,openi
   const label=`${engineName} ${width}×${height} ${fixture.name}, opening ${opening}`;
   assert.equal(cards.length,4,`${label}: expected four visible Action Match cards`);
   assert.equal(new Set(cards.map(card=>card.action)).size,4,`${label}: action words are duplicated`);
+  assert(!(cards.some(card=>card.action==='pull') && cards.some(card=>card.action==='open')),`${label}: Pull and Open appeared together`);
   assert.deepEqual(cards.map(card=>card.name),fixture.expected,`${label}: seeded selection or visual/DOM order is incorrect`);
   for(let i=0;i<cards.length;i++) {
     assert.equal(cards[i].hidden,null,`${label}: visible card is hidden from accessibility`);
@@ -476,7 +481,7 @@ async function inspectActionHintLabels(page) {
     ja:card.querySelector('.action-label-ja')?.textContent,
     count:card.querySelectorAll('.action-labels').length
   })));
-  assert.equal(labels.length,26,'Action Match: expected hint labels on all 26 cards');
+  assert.equal(labels.length,32,'Action Match: expected hint labels on all 32 cards');
   for(const label of labels) {
     assert.equal(label.count,1,`${label.action} has duplicate or missing label groups`);
     assert.equal(label.en,actionDefinitions[label.action].phrase,`${label.action} English differs from speech`);
@@ -1027,7 +1032,7 @@ for(const [engineName,engine,launchOptions] of engines) {
             if(fixture===actionFixtures[0] && opening===1) {
               await capture('action-screen','action');
               const panelCounts=await page.locator('#action-screen .action-card').evaluateAll(cards=>({two:cards.filter(card=>card.dataset.panels==='2').length,three:cards.filter(card=>card.dataset.panels==='3').length,total:cards.length}));
-              assert.deepEqual(panelCounts,{two:26,three:0,total:26},`${current}: Action Match panel metadata must cover 26 two-panel images`);
+              assert.deepEqual(panelCounts,{two:32,three:0,total:32},`${current}: Action Match panel metadata must cover 32 two-panel images`);
             }
             const selected=await inspectActionSelection(page,engineName,width,height,fixture,opening);
             for(const card of selected) selectedWords.add(card.action);
@@ -1036,7 +1041,7 @@ for(const [engineName,engine,launchOptions] of engines) {
               for(const [index,batch] of actionImageBatches.entries()) {
                 for(const card of await inspectActionImages(page,engineName,width,height,batch,index+1)) inspected.add(card.name);
               }
-              assert.deepEqual(inspected,new Set(actionImageNames),`${current}: not all 26 Action Match images were inspected`);
+              assert.deepEqual(inspected,new Set(actionImageNames),`${current}: not all 32 Action Match images were inspected`);
               await showActionImages(page,selected.map(card=>card.name));
               await checkAllActionHintGeometry(page,engineName,width,height,selected);
             }
@@ -1056,7 +1061,7 @@ for(const [engineName,engine,launchOptions] of engines) {
                 const restarted=await inspectActionSelection(page,engineName,width,height,fixture,'Play again');
                 assert.deepEqual(restarted.map(card=>card.name),selected.map(card=>card.name),`${current}: Play again did not reset the seeded selection`);
                 assert.equal(await page.locator('#action-screen .action-card.matched').count(),0,`${current}: Play again retained matched cards`);
-                assert.equal(await page.locator('#action-screen .action-card.queued').count(),22,`${current}: Play again did not reset hidden cards`);
+                assert.equal(await page.locator('#action-screen .action-card.queued').count(),28,`${current}: Play again did not reset hidden cards`);
                 assert.equal(await page.locator('#action-finish.show').count(),0,`${current}: Play again retained finish screen`);
               }
             }
@@ -1064,7 +1069,7 @@ for(const [engineName,engine,launchOptions] of engines) {
           }
           assert.deepEqual(openings[1],openings[0],`${current}: same random draws changed the visible order after reopening`);
         }
-        assert.deepEqual(selectedWords,new Set(actionKeys),`${engineName} ${width}×${height}: seeded games did not cover all 13 actions`);
+        assert.deepEqual(selectedWords,new Set(actionKeys),`${engineName} ${width}×${height}: seeded games did not cover all 16 actions`);
         await page.evaluate(()=>window.__restoreActionTestRandom());
         await page.locator('#open-listen').click(); await capture('place-screen','place');
         for(const [name,openId,screenId,backId] of scenes) {
@@ -1089,4 +1094,4 @@ for(const [engineName,engine,launchOptions] of engines) {
   } finally { await browser.close(); }
 }
 if(failures) process.exitCode=1;
-else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 10 screens, all 26 Action Match images, shopping hints, Play again, and reopening. Screenshots: ${output}`);
+else console.log(`RESPONSIVE LAYOUT PASSED: ${completed} browser/size runs × 10 screens, all 32 Action Match images, shopping hints, Play again, and reopening. Screenshots: ${output}`);
